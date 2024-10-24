@@ -1,24 +1,47 @@
+// Copyright 2024 ProntoGUI, LLC.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 import 'package:test/test.dart';
-import 'package:app/key/fkey.dart';
+import 'package:dartlib/key/fkey.dart';
 
 void main() {
-  test('Get a fieldname for an FKey #1.', () {
-    var fieldname = fieldnameFor(3);
-    expect(fieldname, equals("B.Embodiment"));
+  test('Get a fieldname for an fkeyChecked.', () {
+    var fieldname = fieldnameFor(fkeyChecked);
+    expect(fieldname, equals('Checked'));
   });
 
-  test('Get a fieldname for an FKey #2.', () {
-    var fieldname = fieldnameFor(10);
-    expect(fieldname, equals("Rows"));
+  test('Get a fieldname for an fkeyImported.', () {
+    var fieldname = fieldnameFor(fkeyImported);
+    expect(fieldname, equals('Imported'));
   });
 
-  test('Get an FKey for a fieldname #1.', () {
-    var fkey = fkeyFor("Choices");
-    expect(fkey, equals(7));
+  test('Get a fieldname for an fkeyValidExtensions.', () {
+    var fieldname = fieldnameFor(fkeyValidExtensions);
+    expect(fieldname, equals('ValidExtensions'));
   });
 
-  test('Get an FKey for a fieldname #2.', () {
-    var fkey = fkeyFor("B.Row");
-    expect(fkey, equals(1));
+  test('Get a fieldname for an invalid FKey.', () {
+    var fieldname = fieldnameFor(254);
+    expect(fieldname, equals(invalidFKey));
+  });
+
+  test('Get an FKey for Tag.', () {
+    var fkey = fkeyFor('Tag');
+    expect(fkey, equals(fkeyTag));
+  });
+
+  test('Get an FKey for Headings.', () {
+    var fkey = fkeyFor('Headings');
+    expect(fkey, equals(fkeyHeadings));
+  });
+
+  test('Get an FKey for Checked.', () {
+    var fkey = fkeyFor('Checked');
+    expect(fkey, equals(fkeyChecked));
+  });
+
+  test('Get an FKey for an invalid field name.', () {
+    var fkey = fkeyFor('INVALID FIELD NAME');
+    expect(fkey, equals(invalidFieldName));
   });
 }
