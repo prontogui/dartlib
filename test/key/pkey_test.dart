@@ -83,13 +83,23 @@ void main() {
 
   test('PKey addLevel method', () {
     final pkey = PKey(1, 2, 3);
-    final newPkey = pkey.addLevel(4);
+    final newPkey = PKey.fromPKey(pkey, 4);
 
     expect(newPkey.indices.length, equals(4));
     expect(newPkey.indices[0], equals(1));
     expect(newPkey.indices[1], equals(2));
     expect(newPkey.indices[2], equals(3));
     expect(newPkey.indices[3], equals(4));
+  });
+
+  test('PKey addLevel method (no added level)', () {
+    final pkey = PKey(1, 2, 3);
+    final newPkey = PKey.fromPKey(pkey);
+
+    expect(newPkey.indices.length, equals(3));
+    expect(newPkey.indices[0], equals(1));
+    expect(newPkey.indices[1], equals(2));
+    expect(newPkey.indices[2], equals(3));
   });
 
   test('PKey descendsFrom method', () {

@@ -62,6 +62,16 @@ class PKey {
     _indices = List<int>.from(indices);
   }
 
+  // Returns a new PKey built from an existing PKey [fromPKey] with and optional
+  // [index] added to the end.
+  PKey.fromPKey(PKey fromPkey, [int? index]) {
+    var newIndices = List<int>.from(fromPkey.indices);
+    if (index != null) {
+      newIndices.add(index);
+    }
+    _indices = List<int>.from(newIndices);
+  }
+
   // The list of indices in the PKey.
   List<int> get indices {
     return _indices;
@@ -80,13 +90,6 @@ class PKey {
     }
 
     return true;
-  }
-
-  // Returns a new PKey with the supplied index added to the end.
-  PKey addLevel(int index) {
-    var newIndices = List<int>.from(_indices);
-    newIndices.add(index);
-    return PKey.fromIndices(newIndices);
   }
 
   // Returns true if this PKey descends from the other PKey.

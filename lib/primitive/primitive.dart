@@ -8,8 +8,8 @@ import 'package:dartlib/key/onset.dart';
 
 // Interface for Primitives.
 abstract class Primitive {
-  prepareForUpdates(PKey pkey, OnsetFunction onset);
+  void prepareForUpdates(PKey pkey, OnsetFunction onset);
   Primitive? locateNextDescendant(PKeyLocator locator);
-  CborMap egestCborUpdate(bool fullUpdate, List<FKey> fkeys);
-  bool ingestCborUpdate(CborMap update);
+  CborMap egestCborMap(bool fullUpdate, List<FKey> fkeys);
+  bool ingestCborMap(CborMap cbor);
 }

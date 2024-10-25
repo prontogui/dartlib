@@ -7,6 +7,7 @@ import 'package:dartlib/key/pkey.dart';
 import 'package:dartlib/key/fkey.dart';
 import 'package:dartlib/key/onset.dart';
 import 'primitive.dart';
+import 'string_field.dart';
 
 class FieldRef {
   FieldRef(this.fkey, this.field);
@@ -15,12 +16,54 @@ class FieldRef {
   Field field;
 }
 
-mixin PrimitiveBase {
-  late PKey _pkey;
-  List<FieldRef>? _fieldRefs;
+abstract class PrimitiveBase {
+  PrimitiveBase({String embodiment = '', String tag = ''})
+      : _embodiment = StringField.from(embodiment),
+        _tag = StringField.from(tag) {}
 
-  prepareForUpdates(PKey pkey, OnsetFunction onset) {
-    throw UnimplementedError();
+  late PKey _pkey;
+  late List<FieldRef>? __cached_fieldRefs;
+
+  List<FieldRef> get _fieldRefs {
+    // Build list of field refs on demand and cache it.
+    if (__cached_fieldRefs == null) {
+      var fieldRefs = List<FieldRef>.empty(growable: true);
+
+      // Add common fields here...
+      fieldRefs.add(FieldRef(fkeyEmbodiment, _embodiment));
+      fieldRefs.add(FieldRef(fkeyTag, _tag));
+
+      // Add fields specific to the derived class
+      describeFields(fieldRefs);
+
+      __cached_fieldRefs = fieldRefs;
+    }
+
+    return __cached_fieldRefs!;
+  }
+
+  // Common fields for all primitives
+  final StringField _embodiment;
+  final StringField _tag;
+
+  // The embodiment to use for rendering the Text.
+  String get embodiment => _embodiment.get();
+  set embodiment(String embodiment) {
+    _embodiment.set(embodiment);
+  }
+
+  // The tag to keep around with this primitive.
+  String get tag => _tag.get();
+  set tag(String tag) {
+    _tag.set(tag);
+  }
+
+  // Derived primitives must implement this method to describe their fields.
+  void describeFields(List<FieldRef> fieldRefs);
+
+  bool initializeFromCborMap(PKey pkey, CborMap cbor) {
+    _pkey = pkey;
+    return ingestCborMap(cbor);
   }
 
   Primitive? locateNextDescendant(PKeyLocator locator) {
@@ -28,7 +71,7 @@ mixin PrimitiveBase {
   }
 
   Field? findField(FKey fkey) {
-    for (var fieldRef in _fieldRefs!) {
+    for (var fieldRef in _fieldRefs) {
       if (fieldRef.fkey == fkey) {
         return fieldRef.field;
       }
@@ -36,10 +79,21 @@ mixin PrimitiveBase {
     return null;
   }
 
-  CborMap egestCborUpdate(bool fullUpdate, List<FKey> fkeys) {
-    Map<CborValue, CborValue> update = {};
+  void prepareForUpdates(PKey pkey, OnsetFunction onset) {
+    _pkey = pkey;
 
-    assert(_fieldRefs != null);
+    // Prepare each field for updates
+    var fieldPKeyIndex = 0;
+    for (var fieldRef in _fieldRefs) {
+      if (fieldRef.field
+          .prepareForUpdates(fieldRef.fkey, pkey, fieldPKeyIndex, onset)) {
+        fieldPKeyIndex++;
+      }
+    }
+  }
+
+  CborMap egestCborMap(bool fullUpdate, List<FKey> fkeys) {
+    Map<CborValue, CborValue> update = {};
 
     if (fullUpdate) {
       for (var field in _fieldRefs!) {
@@ -58,8 +112,8 @@ mixin PrimitiveBase {
     return CborMap(update);
   }
 
-  bool ingestCborUpdate(CborMap update) {
-    for (var item in update.entries) {
+  bool ingestCborMap(CborMap cbor) {
+    for (var item in cbor.entries) {
       var k = item.key;
 
       if (k is! CborString) {
@@ -86,24 +140,6 @@ mixin PrimitiveBase {
     }
 
     return true;
-  }
-
-  // func (r *PrimitiveBase) InternalPrepareForUpdates(pkey key.PKey, onset key.OnSetFunction, getFields func() []FieldRef) {
-  void internalPrepareForUpdates(
-      PKey pkey, OnsetFunction onset, List<FieldRef> Function() getFields) {
-    _pkey = pkey;
-
-    // Attach fields (if not done already)
-    _fieldRefs ??= getFields();
-
-    // Prepare each field for updates
-    var fieldPKeyIndex = 0;
-    for (var fieldRef in getFields()) {
-      if (fieldRef.field
-          .prepareForUpdates(fieldRef.fkey, pkey, fieldPKeyIndex, onset)) {
-        fieldPKeyIndex++;
-      }
-    }
   }
 
   // Returns the index of this primitive in a parent container specified by [parentLevel] as follows:
