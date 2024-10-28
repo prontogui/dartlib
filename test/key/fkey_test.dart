@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 import 'package:test/test.dart';
-import 'package:dartlib/key/fkey.dart';
+import 'package:dartlib/src/fkey.dart';
 
 void main() {
   test('Get a fieldname for an fkeyChecked.', () {

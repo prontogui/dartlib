@@ -1,7 +1,6 @@
 import 'package:test/test.dart';
-import 'package:dartlib/primitive/primitive_base.dart';
-import 'package:dartlib/primitive/text.dart';
-import 'package:dartlib/key/pkey.dart';
+import 'package:dartlib/src/text.dart';
+import 'package:dartlib/src/pkey.dart';
 
 void main() {
   group('Text', () {

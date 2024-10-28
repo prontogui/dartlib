@@ -2,24 +2,33 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 import 'package:cbor/cbor.dart';
-import 'package:dartlib/key/pkey.dart';
-import 'package:dartlib/key/fkey.dart';
+import 'pkey.dart';
+import 'fkey.dart';
 import 'primitive.dart';
 import 'primitive_factory.dart';
 import 'primitive_model_watcher.dart';
+import 'primitive_locator.dart';
 
-class PrimitiveModel {
+class PrimitiveModel implements PrimitiveLocator {
   List<Primitive> _topPrimitives = [];
   final List<PrimitiveModelWatcher> _watchers = [];
 
-  /// Returns true i-if the model is empty.0
+  /// Returns true if the model is empty.
   bool get isEmpty {
     return _topPrimitives.isEmpty;
   }
 
-  /// Gets a list of top-level primitives comprising the GUI.
+  /// List of top-level primitives comprising the GUI.
   List<Primitive> get topPrimitives {
     return _topPrimitives;
+  }
+
+  set topPrimitives(List<Primitive> primitives) {
+    _topPrimitives = primitives;
+
+    _prepareForUpdates();
+
+    onFullModelUpdate();
   }
 
   void addWatcher(PrimitiveModelWatcher watcher) {
@@ -50,22 +59,24 @@ class PrimitiveModel {
     }
   }
 
-  void prepareForUpdates() {
+  void _prepareForUpdates() {
     var emptyPKey = PKey();
     for (var p in _topPrimitives) {
       p.prepareForUpdates(emptyPKey, onSetField);
     }
   }
 
+  @override
   Primitive? locatePrimitive(PKey pkey) {
-    PKeyLocator locator = PKeyLocator(pkey);
-    for (var p in _topPrimitives) {
-      var found = p.locateNextDescendant(locator);
-      if (found != null) {
-        return found;
-      }
+    var locator = PKeyLocator(pkey);
+
+    Primitive? next = topPrimitives[locator.nextIndex()];
+
+    while (!locator.located()) {
+      next = next!.locateNextDescendant(locator);
     }
-    return null;
+
+    return next;
   }
 
   bool ingestCborUpdate(CborValue v) {

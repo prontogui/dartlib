@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 import 'package:cbor/cbor.dart';
 import 'field.dart';
-import 'package:dartlib/key/pkey.dart';
-import 'package:dartlib/key/fkey.dart';
-import 'package:dartlib/key/onset.dart';
+import 'pkey.dart';
+import 'fkey.dart';
+import 'onset.dart';
 import 'primitive.dart';
 import 'string_field.dart';
 
@@ -16,17 +16,17 @@ class FieldRef {
   Field field;
 }
 
-abstract class PrimitiveBase {
+abstract class PrimitiveBase implements Primitive {
   PrimitiveBase({String embodiment = '', String tag = ''})
       : _embodiment = StringField.from(embodiment),
         _tag = StringField.from(tag) {}
 
   late PKey _pkey;
-  late List<FieldRef>? __cached_fieldRefs;
+  List<FieldRef>? __cachedFieldRefs;
 
   List<FieldRef> get _fieldRefs {
     // Build list of field refs on demand and cache it.
-    if (__cached_fieldRefs == null) {
+    if (__cachedFieldRefs == null) {
       var fieldRefs = List<FieldRef>.empty(growable: true);
 
       // Add common fields here...
@@ -36,10 +36,10 @@ abstract class PrimitiveBase {
       // Add fields specific to the derived class
       describeFields(fieldRefs);
 
-      __cached_fieldRefs = fieldRefs;
+      __cachedFieldRefs = fieldRefs;
     }
 
-    return __cached_fieldRefs!;
+    return __cachedFieldRefs!;
   }
 
   // Common fields for all primitives
@@ -66,6 +66,7 @@ abstract class PrimitiveBase {
     return ingestCborMap(cbor);
   }
 
+  @override
   Primitive? locateNextDescendant(PKeyLocator locator) {
     return null;
   }
@@ -79,6 +80,7 @@ abstract class PrimitiveBase {
     return null;
   }
 
+  @override
   void prepareForUpdates(PKey pkey, OnsetFunction onset) {
     _pkey = pkey;
 
@@ -92,26 +94,38 @@ abstract class PrimitiveBase {
     }
   }
 
-  CborMap egestCborMap(bool fullUpdate, List<FKey> fkeys) {
+  /// Egests a full update from this primitive as a CborMap.
+  @override
+  CborMap egestFullCborMap() {
     Map<CborValue, CborValue> update = {};
 
-    if (fullUpdate) {
-      for (var field in _fieldRefs!) {
-        update[CborString(fieldnameFor(field.fkey))] =
-            field.field.egestCborValue();
-      }
-    } else {
-      for (var fkey in fkeys) {
-        var field = findField(fkey);
-        assert(field != null);
-
-        update[CborString(fieldnameFor(fkey))] = field!.egestCborValue();
-      }
+    for (var field in _fieldRefs!) {
+      update[CborString(fieldnameFor(field.fkey))] =
+          field.field.egestCborValue();
     }
 
     return CborMap(update);
   }
 
+  /// Egests a partil update from this primitive as a CborMap.
+  /// Only the fields specified in [fkeys] will be included in the map.
+  /// It is assumed that [fkeys] is a subset of the fields of this primitive, otherwise
+  /// an assertion is thrown.
+  @override
+  CborMap egestPartialCborMap(List<FKey> fkeys) {
+    Map<CborValue, CborValue> update = {};
+
+    for (var fkey in fkeys) {
+      var field = findField(fkey);
+      assert(field != null);
+
+      update[CborString(fieldnameFor(fkey))] = field!.egestCborValue();
+    }
+
+    return CborMap(update);
+  }
+
+  @override
   bool ingestCborMap(CborMap cbor) {
     for (var item in cbor.entries) {
       var k = item.key;
@@ -160,6 +174,7 @@ abstract class PrimitiveBase {
   }
 
   // Default implementation of toString() for all primitives returns an empty string.
+  @override
   String toString() {
     return '';
   }

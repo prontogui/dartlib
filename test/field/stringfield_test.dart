@@ -1,8 +1,8 @@
 import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
-import 'package:dartlib/primitive/string_field.dart';
-import 'package:dartlib/key/fkey.dart';
-import 'package:dartlib/key/pkey.dart';
+import 'package:dartlib/src/string_field.dart';
+import 'package:dartlib/src/fkey.dart';
+import 'package:dartlib/src/pkey.dart';
 
 void main() {
   group('StringField', () {

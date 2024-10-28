@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:cbor/cbor.dart';
-import '../key/pkey.dart';
+import 'pkey.dart';
 //import 'check.dart';
 //import 'choice.dart';
 //import 'command.dart';

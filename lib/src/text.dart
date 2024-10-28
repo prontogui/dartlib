@@ -1,12 +1,11 @@
 // Copyright 2024 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-import 'package:dartlib/key/fkey.dart';
-import 'primitive.dart';
+import 'fkey.dart';
 import 'primitive_base.dart';
 import 'string_field.dart';
 
-class Text extends PrimitiveBase implements Primitive {
+class Text extends PrimitiveBase {
   Text({super.embodiment, super.tag, String content = ''}) {
     _content = StringField.from(content);
   }

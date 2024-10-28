@@ -4,11 +4,11 @@
 import 'field.dart';
 import 'package:cbor/cbor.dart';
 import 'field_base.dart';
-import '../key/fkey.dart';
-import '../key/pkey.dart';
-import '../key/onset.dart';
+import 'fkey.dart';
+import 'pkey.dart';
+import 'onset.dart';
 
-class StringField with FieldBase implements Field {
+class StringField extends FieldBase implements Field {
   StringField() : _s = '';
 
   StringField.from(String s) : _s = s;

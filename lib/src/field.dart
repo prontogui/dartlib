@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 import 'package:cbor/cbor.dart';
-import '../key/fkey.dart';
-import '../key/pkey.dart';
-import '../key/onset.dart';
+import 'fkey.dart';
+import 'pkey.dart';
+import 'onset.dart';
 
 abstract interface class Field {
   bool prepareForUpdates(
