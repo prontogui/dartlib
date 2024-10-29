@@ -24,6 +24,9 @@ abstract class PrimitiveBase implements Primitive {
   late PKey _pkey;
   List<FieldRef>? __cachedFieldRefs;
 
+  // Derived primitives must implement this method to describe their type and fields.
+  void describeFields(List<FieldRef> fieldRefs);
+
   List<FieldRef> get _fieldRefs {
     // Build list of field refs on demand and cache it.
     if (__cachedFieldRefs == null) {
@@ -47,23 +50,20 @@ abstract class PrimitiveBase implements Primitive {
   final StringField _tag;
 
   // The embodiment to use for rendering the Text.
-  String get embodiment => _embodiment.get();
+  String get embodiment => _embodiment.value;
   set embodiment(String embodiment) {
-    _embodiment.set(embodiment);
+    _embodiment.value = embodiment;
   }
 
   // The tag to keep around with this primitive.
-  String get tag => _tag.get();
+  String get tag => _tag.value;
   set tag(String tag) {
-    _tag.set(tag);
+    _tag.value = tag;
   }
 
-  // Derived primitives must implement this method to describe their fields.
-  void describeFields(List<FieldRef> fieldRefs);
-
-  bool initializeFromCborMap(PKey pkey, CborMap cbor) {
+  void initializeFromCborMap(PKey pkey, CborMap cbor) {
     _pkey = pkey;
-    return ingestCborMap(cbor);
+    ingestCborMap(cbor);
   }
 
   @override
@@ -87,8 +87,9 @@ abstract class PrimitiveBase implements Primitive {
     // Prepare each field for updates
     var fieldPKeyIndex = 0;
     for (var fieldRef in _fieldRefs) {
-      if (fieldRef.field
-          .prepareForUpdates(fieldRef.fkey, pkey, fieldPKeyIndex, onset)) {
+      fieldRef.field
+          .prepareForUpdates(fieldRef.fkey, pkey, fieldPKeyIndex, onset);
+      if (fieldRef.field.isStructural) {
         fieldPKeyIndex++;
       }
     }
@@ -126,34 +127,26 @@ abstract class PrimitiveBase implements Primitive {
   }
 
   @override
-  bool ingestCborMap(CborMap cbor) {
+  void ingestCborMap(CborMap cbor) {
     for (var item in cbor.entries) {
       var k = item.key;
 
       if (k is! CborString) {
-        // TODO: Log an error
-        return false;
+        throw 'key is not a CborString';
       }
 
       var fkey = fkeyFor(k.toString());
       if (fkey == invalidFieldName) {
-        // TODO: Log an error
-        return false;
+        throw 'invalid field name';
       }
 
       var field = findField(fkey);
       if (field == null) {
-        // TODO: Log an error
-        return false;
+        throw 'field not found';
       }
 
-      if (!field.ingestCborValue(item.value)) {
-        // TODO: Log an error
-        return false;
-      }
+      field.ingestCborValue(item.value);
     }
-
-    return true;
   }
 
   // Returns the index of this primitive in a parent container specified by [parentLevel] as follows:
@@ -171,6 +164,15 @@ abstract class PrimitiveBase implements Primitive {
     }
 
     return -1;
+  }
+
+  /// Returns a pretty-printed string representation of this primitive.
+  String prettyPrint() {
+    var pp = '$describeType\n  pkey : ${_pkey.toString()}';
+    for (var field in _fieldRefs) {
+      pp += '\n  ${fieldnameFor(field.fkey)} : ${field.field.toString()}';
+    }
+    return pp;
   }
 
   // Default implementation of toString() for all primitives returns an empty string.

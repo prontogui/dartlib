@@ -52,6 +52,38 @@ void main() {
     expect(pkey.indices[3], equals(4));
   });
 
+  test('PKey fromIndicesString constructor', () {
+    final pkey = PKey.fromIndicesString('1,2,3,4');
+
+    expect(pkey.indices.length, equals(4));
+    expect(pkey.indices[0], equals(1));
+    expect(pkey.indices[1], equals(2));
+    expect(pkey.indices[2], equals(3));
+    expect(pkey.indices[3], equals(4));
+  });
+
+  test('PKey fromIndicesString with empty string', () {
+    final pkey = PKey.fromIndicesString('');
+
+    expect(pkey.indices.length, equals(0));
+  });
+
+  test('PKey fromIndicesString with invalid string', () {
+    expect(() => PKey.fromIndicesString('1,2,a,4'), throwsFormatException);
+  });
+
+  test('PKey toString method', () {
+    final pkey = PKey(1, 2, 3, 4);
+
+    expect(pkey.toString(), equals('[1, 2, 3, 4]'));
+  });
+
+  test('PKey toString method with empty PKey', () {
+    final pkey = PKey();
+
+    expect(pkey.toString(), equals('[]'));
+  });
+
   test('PKey isEqualTo method', () {
     final pkey1 = PKey(1, 2, 3);
     final pkey2 = PKey(1, 2, 3);

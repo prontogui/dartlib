@@ -4,22 +4,17 @@
 import 'field.dart';
 import 'package:cbor/cbor.dart';
 import 'field_base.dart';
+import 'primitive.dart';
 
-/// A field that holds a string value.
-class StringField extends FieldBase implements Field {
-  /// Construct a StringField with an empty string.
-  StringField() : _s = '';
-
-  /// Construct a StringField from a string.
-  StringField.from(String s) : _s = s;
-
+/// A field that holds a single primitive.
+class AnyField extends FieldBase implements Field {
   /// Storage of this field's value.
-  String _s;
+  Primitive? _p;
 
   /// The value of this field.
-  String get value => _s;
-  set value(String s) {
-    _s = s;
+  Primitive? get value => _p;
+  set value(Primitive? p) {
+    _p = p;
     onSet();
   }
 
@@ -27,21 +22,30 @@ class StringField extends FieldBase implements Field {
 
   @override
   void ingestCborValue(CborValue value) {
-    if (value is! CborString) {
+    if (value is! CborMap) {
       throw Exception('value is not a CborString');
     }
-    _s = value.toString();
+    if (_p == null) {
+      throw Exception('field has a null primitive');
+    }
+    _p!.ingestCborMap(value);
   }
 
   @override
   CborValue egestCborValue() {
-    return CborString(_s);
+    if (_p == null) {
+      return CborNull();
+    }
+    return _p!.egestFullCborMap();
   }
 
   // Object overrides
 
   @override
   String toString() {
-    return _s;
+    if (_p == null) {
+      return "<empty>";
+    }
+    return _p!.describeType;
   }
 }

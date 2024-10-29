@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:grpc/grpc.dart';
-import 'package:dartlib/proto/pg.pbgrpc.dart';
+import 'proto/pg.pbgrpc.dart';
 import 'package:cbor/cbor.dart';
 
 /// States of communication

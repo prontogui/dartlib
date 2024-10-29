@@ -10,7 +10,11 @@ class Text extends PrimitiveBase {
     _content = StringField.from(content);
   }
 
+  /// The text content to display.
   late StringField _content;
+
+  @override
+  String get describeType => 'Text';
 
   @override
   void describeFields(List<FieldRef> fieldRefs) {
@@ -19,12 +23,12 @@ class Text extends PrimitiveBase {
 
   @override
   String toString() {
-    return _content.get();
+    return _content.value;
   }
 
-  // The text content to display.
-  String get content => _content.get();
+  /// The text content to display.
+  String get content => _content.value;
   set content(String content) {
-    _content.set(content);
+    _content.value = content;
   }
 }

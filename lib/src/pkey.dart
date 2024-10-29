@@ -72,6 +72,16 @@ class PKey {
     _indices = List<int>.from(newIndices);
   }
 
+  /// Create a PKey from a string of comma separated indices.
+  PKey.fromIndicesString(String indicesString) {
+    if (indicesString.isEmpty) {
+      _indices = [];
+      return;
+    }
+    var indices = indicesString.split(',');
+    _indices = indices.map((e) => int.parse(e)).toList();
+  }
+
   // The list of indices in the PKey.
   List<int> get indices {
     return _indices;
@@ -118,6 +128,11 @@ class PKey {
   // Returns the number of levels in the PKey.
   int get length {
     return _indices.length;
+  }
+
+  @override
+  String toString() {
+    return _indices.toString();
   }
 }
 

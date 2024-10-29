@@ -9,6 +9,7 @@ import 'onset.dart';
 // Interface for Primitives.
 abstract class Primitive {
   void prepareForUpdates(PKey pkey, OnsetFunction onset);
+
   Primitive? locateNextDescendant(PKeyLocator locator);
 
   /// Egests a full update from this primitive as a CborMap.
@@ -20,5 +21,9 @@ abstract class Primitive {
   /// an assertion is thrown.
   CborMap egestPartialCborMap(List<FKey> fkeys);
 
-  bool ingestCborMap(CborMap cbor);
+  /// Update field values by ingesting them from a CborMap.
+  void ingestCborMap(CborMap cbor);
+
+  // Returns the type of primitive this is.
+  String get describeType;
 }

@@ -6,7 +6,7 @@ import 'pkey.dart';
 import 'fkey.dart';
 import 'onset.dart';
 
-class FieldBase {
+abstract class FieldBase {
   // PKey of this field's container primitive.
   late PKey _pkey;
 
@@ -20,17 +20,22 @@ class FieldBase {
   // It is used when assigning new primitives to this field.
   int _fieldPKeyIndex = -1;
 
-  void stashUpdateInfo(
-      FKey fkey, PKey pkey, fieldPKeyIndex, OnsetFunction onset) {
+  /// Derived field classes can override this when they are considered structural, that is,
+  /// they contain other primitives.
+  bool get isStructural => false;
+
+  @override
+  void prepareForUpdates(
+      FKey fkey, PKey pkey, int fieldPKeyIndex, OnsetFunction onset) {
     _fkey = fkey;
     _pkey = pkey;
     _fieldPKeyIndex = fieldPKeyIndex;
     _onset = onset;
   }
 
-  void onSet(bool structural) {
+  void onSet() {
     if (_onset != null) {
-      _onset!(_pkey, _fkey, structural);
+      _onset!(_pkey, _fkey, isStructural);
     }
   }
 }
