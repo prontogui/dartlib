@@ -79,7 +79,7 @@ class PrimitiveModel implements PrimitiveLocator {
     return next;
   }
 
-  bool ingestCborUpdate(CborValue v) {
+  void ingestCborUpdate(CborValue v) {
     assert(v is CborList);
 
     var l = v as CborList;
@@ -88,9 +88,9 @@ class PrimitiveModel implements PrimitiveLocator {
     var updateList = l.sublist(1);
 
     if (fullUpdate.value) {
-      return _ingestFullUpdate(updateList);
+      _ingestFullUpdate(updateList);
     } else {
-      return _ingestPartialUpdate(updateList);
+      _ingestPartialUpdate(updateList);
     }
   }
 
@@ -101,51 +101,47 @@ class PrimitiveModel implements PrimitiveLocator {
   /// Ingests a full update from a list of CBOR values and notifies listeners.
   ///
   /// This method is used internally by the class.
-  bool _ingestFullUpdate(List<CborValue> l) {
+  void _ingestFullUpdate(List<CborValue> l) {
     final numPrimitives = l.length;
     final List<Primitive> newTopPrimitives = [];
     final pkey = PKey();
 
     for (var i = 0; i < numPrimitives; i++) {
-      var cbor = l.elementAt(i) as CborMap;
+      var cbor = l.elementAt(i);
 
-      var newPrimitive = PrimitiveFactory.createPrimitiveFromCborMap(
-          PKey.fromPKey(pkey, i), cbor);
+      if (cbor is! CborMap) {
+        throw Exception('element is not a CborMap');
+      }
 
-      assert(newPrimitive != null);
-
-      newTopPrimitives.add(newPrimitive!);
+      newTopPrimitives.add(PrimitiveFactory.createPrimitiveFromCborMap(
+          PKey.fromPKey(pkey, i), cbor));
     }
     _topPrimitives = newTopPrimitives;
 
     onFullModelUpdate();
-
-    return true;
   }
 
   /// Ingests a partial update from a list of CBOR values.  Listeners are notified as each
   /// updated primitive dictates.
   ///
   /// This method is used internally by the class.
-  bool _ingestPartialUpdate(List<CborValue> l) {
+  void _ingestPartialUpdate(List<CborValue> l) {
     final numPrimitives = l.length;
     bool topLevelUpdated = false;
 
     for (var i = 0; i < numPrimitives; i += 2) {
       var pkey = PKey.fromCbor(l.elementAt(i));
-      var cbor = l.elementAt(i + 1) as CborMap;
-      if (cbor == null) {
-        // TODO:  log an error
-        return false;
+      var cbor = l.elementAt(i + 1);
+      if (cbor is! CborMap) {
+        throw Exception('element is not a CborMap');
       }
 
       var p = locatePrimitive(pkey);
       if (p == null) {
-        // TODO:  log an error
-        return false;
+        throw Exception('primitive cannot be located');
       }
 
-      p.ingestCborMap(cbor);
+      p.ingestPartialCborMap(cbor);
 
       if (!topLevelUpdated) {
         topLevelUpdated = (pkey.indices.length == 1);
@@ -155,7 +151,5 @@ class PrimitiveModel implements PrimitiveLocator {
     if (topLevelUpdated) {
       onTopLevelPrimitiveUpdate();
     }
-
-    return true;
   }
 }

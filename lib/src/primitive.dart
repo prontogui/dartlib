@@ -8,7 +8,13 @@ import 'onset.dart';
 
 // Interface for Primitives.
 abstract class Primitive {
+  /// Prepare this primitive for updates, where [pkey] is the path to this primitive,
+  /// and [onset] is the function to call when fields of this primitive are updated.
   void prepareForUpdates(PKey pkey, OnsetFunction onset);
+
+  /// Unprepare this primitive for updates.  Subsequent updates to fields will not
+  /// call the previous onset function, not will this primitive have a valid PKey.
+  void unprepareForUpdates();
 
   Primitive? locateNextDescendant(PKeyLocator locator);
 
@@ -21,9 +27,16 @@ abstract class Primitive {
   /// an assertion is thrown.
   CborMap egestPartialCborMap(List<FKey> fkeys);
 
-  /// Update field values by ingesting them from a CborMap.
-  void ingestCborMap(CborMap cbor);
+  /// Initialize from a CborMap.  This includes creating new child primitives.
+  void ingestFullCborMap(CborMap cbor);
 
-  // Returns the type of primitive this is.
+  /// Update field values by ingesting them from a CborMap. The map can only contain
+  /// updates for pre-existing child primmitives.  New children are not created.
+  void ingestPartialCborMap(CborMap cbor);
+
+  /// Returns the type of primitive this is.
   String get describeType;
+
+  /// True if the primitive has not been prepared yet for updates.
+  bool get notPreparedYet;
 }

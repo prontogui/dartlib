@@ -5,11 +5,11 @@ import 'package:cbor/cbor.dart';
 
 const invalidIndex = -1;
 
-// A path of integers used to locate a Primitive in the model.
+/// A path of integers used to locate a Primitive in the model.
 class PKey {
   late List<int> _indices;
 
-  // Create a PKey from supplied integers.
+  /// Create a PKey from optional supplied integers [i0], [i1], [i2], [i3], [i4], [i5], [i6], [i7].
   PKey(
       [int? i0,
       int? i1,
@@ -47,7 +47,7 @@ class PKey {
     }
   }
 
-  // Create a PKey from a list of indices in a CborList.
+  /// Create a PKey from a list of indices in a CborList.
   PKey.fromCbor(CborValue v) {
     assert(v is CborList);
     var cborIndices = v as CborList;
@@ -57,13 +57,13 @@ class PKey {
         growable: false);
   }
 
-  // Create a PKey from the supplied indices.
+  /// Create a PKey from the supplied indices.
   PKey.fromIndices(List<int> indices) {
     _indices = List<int>.from(indices);
   }
 
-  // Returns a new PKey built from an existing PKey [fromPKey] with and optional
-  // [index] added to the end.
+  /// Returns a new PKey built from an existing PKey [fromPKey] with and optional
+  /// [index] added to the end.
   PKey.fromPKey(PKey fromPkey, [int? index]) {
     var newIndices = List<int>.from(fromPkey.indices);
     if (index != null) {
@@ -82,12 +82,12 @@ class PKey {
     _indices = indices.map((e) => int.parse(e)).toList();
   }
 
-  // The list of indices in the PKey.
+  /// The list of indices in the PKey.
   List<int> get indices {
     return _indices;
   }
 
-  // Return true if this PKey is equal to the other PKey.
+  /// Return true if this PKey is equal to the other PKey.
   bool isEqualTo(PKey other) {
     if (_indices.length != other._indices.length) {
       return false;
@@ -102,7 +102,7 @@ class PKey {
     return true;
   }
 
-  // Returns true if this PKey descends from the other PKey.
+  /// Returns true if this PKey descends from the other PKey.
   bool descendsFrom(PKey other) {
     if (_indices.length <= other._indices.length) {
       return false;
@@ -116,7 +116,7 @@ class PKey {
     return true;
   }
 
-  // Returns the index at supplied level.
+  /// The index at supplied level.
   int indexAtLevel(int level) {
     if (level >= 0 && level < _indices.length) {
       return _indices[level];
@@ -125,9 +125,14 @@ class PKey {
     }
   }
 
-  // Returns the number of levels in the PKey.
+  /// The number of levels in the PKey.
   int get length {
     return _indices.length;
+  }
+
+  /// Return true if the PKey is empty.
+  bool get isEmpty {
+    return _indices.isEmpty;
   }
 
   @override
@@ -136,25 +141,25 @@ class PKey {
   }
 }
 
-// A helper class to locate a Primitive in the model.
+/// A helper class to locate a Primitive in the model.
 class PKeyLocator {
   PKeyLocator(this.pkey) : locationLevel = -1;
 
-  // The PKey being located.
+  /// The PKey being located.
   final PKey pkey;
 
-  // The current level of the locator.
+  /// The current level of the locator.
   late int locationLevel;
 
-  // Advance the level and return the index at that level.
+  /// Advance the level and return the index at that level.
   int nextIndex() {
     assert(locationLevel < (pkey.indices.length - 1));
     locationLevel++;
     return pkey.indices[locationLevel];
   }
 
-  // Return true if the locator is at the last level and therefore
-  // primitive hase been located.
+  /// Return true if the locator is at the last level and therefore
+  /// primitive hase been located.
   bool located() {
     return locationLevel == (pkey.indices.length - 1);
   }

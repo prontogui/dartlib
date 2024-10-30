@@ -23,18 +23,18 @@ void main() {
       expect(field.isStructural, isFalse);
     });
 
-    test('ingestCborValue with valid CborString', () {
+    test('ingestFullCborValue with valid CborString', () {
       var field = StringField();
       var cborValue = CborString('test');
-      field.ingestCborValue(cborValue);
+      field.ingestFullCborValue(cborValue);
       expect(field.value, equals('test'));
     });
 
-    test('ingestCborValue with invalid CborValue', () {
+    test('ingestFullCborValue with invalid CborValue', () {
       var field = StringField();
       var cborValue = CborSmallInt(123);
       try {
-        field.ingestCborValue(cborValue);
+        field.ingestFullCborValue(cborValue);
       } catch (e) {
         expect(e, isA<Exception>());
         expect(e.toString(), equals('Exception: value is not a CborString'));

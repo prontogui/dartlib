@@ -15,12 +15,27 @@ abstract interface class Field {
   void prepareForUpdates(
       FKey fkey, PKey pkey, int fieldPKeyIndex, OnsetFunction onset);
 
+  /// Unprepare this field for updates.  Subsequent updates to the field will not
+  /// call the previous onset function, not will this field have a valid PKey or FKey.
+  void unprepareForUpdates();
+
   /// Egest the field's value as a CBOR value.
   CborValue egestCborValue();
 
-  /// Ingest a CBOR value into the field.  An exception is thrown if there is a
-  /// problem ingesting the value.
-  void ingestCborValue(CborValue value);
+  /// Ingest a CBOR value into the field.  The update must only apply to pre-existing
+  /// child primitives and no additional children can be created.  An exception is
+  /// thrown if there is a problem ingesting the value.
+  ///
+  /// Note:  for atomic field types, this method is equivalent to ingestFullCborValue.
+  void ingestPartialCborValue(CborValue value);
+
+  /// Injest a CBOR value into the field.  An exception is thrown if there is a
+  /// problem ingesting the value.  If this field contains primitive children, they
+  /// will be replaced entirely by the new value.  An exception is
+  /// thrown if there is a problem ingesting the value.
+  ///
+  /// Note:  for atomic field types, this method is equivalent to ingestPartialCborValue.
+  void ingestFullCborValue(CborValue value);
 
   /// The structural status of this filed.  Fields that are structural can contains
   /// other primitives.  Non-structural fields are atomic such as String, Integer, etc.

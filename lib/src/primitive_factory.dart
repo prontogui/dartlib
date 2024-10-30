@@ -38,7 +38,7 @@ final CborString _dpfTimer = CborString("PeriodMs");
 /// The static object factory responsible for creating primitive-type objects.
 abstract class PrimitiveFactory {
   /// Creates the appropriate primitive from the CBOR specification provide in [ctorArgs].
-  static Primitive? createPrimitiveFromCborMap(PKey pkey, CborMap cbor) {
+  static Primitive createPrimitiveFromCborMap(PKey pkey, CborMap cbor) {
     // Determine what primitive to create from the unique set of fields it holds.
 
 /*     if (ctorArgs.cbor.containsKey(_dpfCommand)) {
@@ -74,10 +74,9 @@ abstract class PrimitiveFactory {
     if (cbor.containsKey(_dpfText)) {
       var p = Text();
       p.initializeFromCborMap(pkey, cbor);
+      return p;
     } else {
-      assert(false, "primitive_factory:  primitive not recognized.");
+      throw Exception('primitive_factory:  primitive not recognized.');
     }
-
-    return null;
   }
 }

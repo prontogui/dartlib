@@ -26,7 +26,7 @@ class IntegerField extends FieldBase implements Field {
   // Implement Field interface
 
   @override
-  void ingestCborValue(CborValue value) {
+  void ingestFullCborValue(CborValue value) {
     if (value is CborSmallInt) {
       _i = value.value;
     } else if (value is CborSmallInt) {
@@ -36,6 +36,11 @@ class IntegerField extends FieldBase implements Field {
     } else {
       throw Exception('CBOR value is not an integer type');
     }
+  }
+
+  @override
+  void ingestPartialCborValue(CborValue value) {
+    ingestFullCborValue(value);
   }
 
   @override

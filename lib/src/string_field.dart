@@ -26,11 +26,16 @@ class StringField extends FieldBase implements Field {
   // Implement Field interface
 
   @override
-  void ingestCborValue(CborValue value) {
+  void ingestFullCborValue(CborValue value) {
     if (value is! CborString) {
       throw Exception('value is not a CborString');
     }
     _s = value.toString();
+  }
+
+  @override
+  void ingestPartialCborValue(CborValue value) {
+    ingestFullCborValue(value);
   }
 
   @override

@@ -1,6 +1,8 @@
 // Copyright 2024 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+import 'dart:io';
+
 import 'package:cbor/cbor.dart';
 import 'field.dart';
 import 'pkey.dart';
@@ -21,7 +23,7 @@ abstract class PrimitiveBase implements Primitive {
       : _embodiment = StringField.from(embodiment),
         _tag = StringField.from(tag) {}
 
-  late PKey _pkey;
+  PKey _pkey = PKey();
   List<FieldRef>? __cachedFieldRefs;
 
   // Derived primitives must implement this method to describe their type and fields.
@@ -63,7 +65,7 @@ abstract class PrimitiveBase implements Primitive {
 
   void initializeFromCborMap(PKey pkey, CborMap cbor) {
     _pkey = pkey;
-    ingestCborMap(cbor);
+    ingestFullCborMap(cbor);
   }
 
   @override
@@ -95,6 +97,15 @@ abstract class PrimitiveBase implements Primitive {
     }
   }
 
+  @override
+  void unprepareForUpdates() {
+    _pkey = PKey();
+
+    for (var fieldRef in _fieldRefs) {
+      fieldRef.field.unprepareForUpdates();
+    }
+  }
+
   /// Egests a full update from this primitive as a CborMap.
   @override
   CborMap egestFullCborMap() {
@@ -108,7 +119,7 @@ abstract class PrimitiveBase implements Primitive {
     return CborMap(update);
   }
 
-  /// Egests a partil update from this primitive as a CborMap.
+  /// Egests a partial update from this primitive as a CborMap.
   /// Only the fields specified in [fkeys] will be included in the map.
   /// It is assumed that [fkeys] is a subset of the fields of this primitive, otherwise
   /// an assertion is thrown.
@@ -127,7 +138,7 @@ abstract class PrimitiveBase implements Primitive {
   }
 
   @override
-  void ingestCborMap(CborMap cbor) {
+  void ingestFullCborMap(CborMap cbor) {
     for (var item in cbor.entries) {
       var k = item.key;
 
@@ -145,9 +156,35 @@ abstract class PrimitiveBase implements Primitive {
         throw 'field not found';
       }
 
-      field.ingestCborValue(item.value);
+      field.ingestFullCborValue(item.value);
     }
   }
+
+  @override
+  void ingestPartialCborMap(CborMap cbor) {
+    for (var item in cbor.entries) {
+      var k = item.key;
+
+      if (k is! CborString) {
+        throw 'key is not a CborString';
+      }
+
+      var fkey = fkeyFor(k.toString());
+      if (fkey == invalidFieldName) {
+        throw 'invalid field name';
+      }
+
+      var field = findField(fkey);
+      if (field == null) {
+        throw 'field not found';
+      }
+
+      field.ingestPartialCborValue(item.value);
+    }
+  }
+
+  @override
+  bool get notPreparedYet => _pkey.isEmpty;
 
   // Returns the index of this primitive in a parent container specified by [parentLevel] as follows:
   // parentLevel = 0, immediate parent container

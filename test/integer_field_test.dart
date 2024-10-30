@@ -23,31 +23,31 @@ void main() {
       expect(field.value, equals(100));
     });
 
-    test('ingestCborValue sets the value correctly for CborSmallInt', () {
+    test('ingestFullCborValue sets the value correctly for CborSmallInt', () {
       final field = IntegerField();
       final cborValue = CborSmallInt(123);
-      field.ingestCborValue(cborValue);
+      field.ingestFullCborValue(cborValue);
       expect(field.value, equals(123));
     });
 
-    test('ingestCborValue sets the value correctly for CborInt', () {
+    test('ingestFullCborValue sets the value correctly for CborInt', () {
       final field = IntegerField();
       final cborValue = CborInt(BigInt.from(9203));
-      field.ingestCborValue(cborValue);
+      field.ingestFullCborValue(cborValue);
       expect(field.value, equals(9203));
     });
 
-    test('ingestCborValue sets the value correctly for CborBigInt', () {
+    test('ingestFullCborValue sets the value correctly for CborBigInt', () {
       final field = IntegerField();
       final cborValue = CborBigInt(BigInt.from(9203));
-      field.ingestCborValue(cborValue);
+      field.ingestFullCborValue(cborValue);
       expect(field.value, equals(9203));
     });
 
-    test('ingestCborValue throws exception for non-CborSmallInt', () {
+    test('ingestFullCborValue throws exception for non-CborSmallInt', () {
       final field = IntegerField();
       final cborValue = CborString('not an int');
-      expect(() => field.ingestCborValue(cborValue), throwsException);
+      expect(() => field.ingestFullCborValue(cborValue), throwsException);
     });
 
     test('egestCborValue returns correct CborSmallInt', () {

@@ -6,12 +6,12 @@ import 'package:cbor/cbor.dart';
 import 'field_base.dart';
 
 /// A field that holds a boolean value.
-class BoolField extends FieldBase implements Field {
+class BooleanField extends FieldBase implements Field {
   /// Construct a BoolField with a default value.
-  BoolField() : _b = false;
+  BooleanField() : _b = false;
 
   /// Construct a BoolField from a string.
-  BoolField.from(String s) : _b = bool.parse(s);
+  BooleanField.from(String s) : _b = bool.parse(s);
 
   /// Storage of this field's value.
   bool _b;
@@ -26,11 +26,16 @@ class BoolField extends FieldBase implements Field {
   // Implement Field interface
 
   @override
-  void ingestCborValue(CborValue value) {
+  void ingestFullCborValue(CborValue value) {
     if (value is! CborBool) {
       throw Exception('value is not a CborBool');
     }
     _b = value.value;
+  }
+
+  @override
+  void ingestPartialCborValue(CborValue value) {
+    ingestFullCborValue(value);
   }
 
   @override
