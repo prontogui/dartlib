@@ -13,7 +13,7 @@ void main() {
     });
 
     test('constructor from string initializes with correct value', () {
-      final field = IntegerField.from('42');
+      final field = IntegerField.from(42);
       expect(field.value, equals(42));
     });
 

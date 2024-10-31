@@ -7,8 +7,14 @@ import 'field_base.dart';
 
 /// A field that holds a 1-dimensional array of string values.
 class Strings1DField extends FieldBase implements Field {
+  Strings1DField();
+
   /// Storage of this field's value.
   final List<String> _sa = [];
+
+  Strings1DField.from(List<String> sa) {
+    _sa.replaceRange(0, _sa.length, sa);
+  }
 
   /// The value of this field.  WHen setting the value, a copy of the input
   /// list is made.  When getting the value, a copy of the internal list is

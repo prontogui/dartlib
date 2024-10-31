@@ -34,12 +34,12 @@ abstract class PrimitiveBase implements Primitive {
     if (__cachedFieldRefs == null) {
       var fieldRefs = List<FieldRef>.empty(growable: true);
 
+      // Add fields specific to the derived class
+      describeFields(fieldRefs);
+
       // Add common fields here...
       fieldRefs.add(FieldRef(fkeyEmbodiment, _embodiment));
       fieldRefs.add(FieldRef(fkeyTag, _tag));
-
-      // Add fields specific to the derived class
-      describeFields(fieldRefs);
 
       __cachedFieldRefs = fieldRefs;
     }

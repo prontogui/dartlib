@@ -10,8 +10,7 @@ class IntegerField extends FieldBase implements Field {
   /// Construct a StringField with a default value.
   IntegerField() : _i = 0;
 
-  /// Construct a StringField from a string.
-  IntegerField.from(String s) : _i = int.parse(s);
+  IntegerField.from(int i) : _i = i;
 
   /// Storage of this field's value.
   int _i;

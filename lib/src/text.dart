@@ -10,7 +10,7 @@ class Text extends PrimitiveBase {
     _content = StringField.from(content);
   }
 
-  /// The text content to display.
+  // Field storage
   late StringField _content;
 
   @override

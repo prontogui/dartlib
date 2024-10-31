@@ -12,8 +12,12 @@ import 'primitive_factory.dart';
 
 /// A field that holds a one-dimensional array of primitives.
 class Any1DField extends FieldBase implements Field {
+  Any1DField() : _pa = List<Primitive>.unmodifiable([]);
+
+  Any1DField.from(List<Primitive> pa) : _pa = List<Primitive>.unmodifiable(pa);
+
   /// Storage of this field's value.
-  List<Primitive> _pa = List<Primitive>.unmodifiable([]);
+  late List<Primitive> _pa;
 
   /// The value of this field.  When setting the value, a copy of the input
   /// list is made.  When getting the value, a copy of the internal list is

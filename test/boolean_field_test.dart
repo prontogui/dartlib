@@ -13,7 +13,7 @@ void main() {
     });
 
     test('can be constructed from a string', () {
-      final field = BooleanField.from('true');
+      final field = BooleanField.from(true);
       expect(field.value, isTrue);
     });
 

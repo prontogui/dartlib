@@ -27,6 +27,12 @@ class EventField extends FieldBase implements Field {
     return _timeProvider!().difference(_eventTimestamp!) == Duration.zero;
   }
 
+  /// Issues the event now.
+  void issueNow() {
+    _checkMissingFunc();
+    _eventTimestamp = _timeProvider!();
+  }
+
   /// Sets the time provider function to use.
   set timeProvider(TimeProviderFunction provider) {
     _timeProvider = provider;

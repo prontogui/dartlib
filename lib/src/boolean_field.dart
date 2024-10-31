@@ -11,7 +11,7 @@ class BooleanField extends FieldBase implements Field {
   BooleanField() : _b = false;
 
   /// Construct a BoolField from a string.
-  BooleanField.from(String s) : _b = bool.parse(s);
+  BooleanField.from(bool b) : _b = b;
 
   /// Storage of this field's value.
   bool _b;
