@@ -10,27 +10,50 @@ import 'pkey.dart';
 import 'onset.dart';
 import 'primitive_factory.dart';
 
-/// A field that holds a two-dimensional array of primitives.
+/// A field that holds a uniform two-dimensional array of primitives.
 class Any2DField extends FieldBase implements Field {
-  /// Storage of this field's value.
-  List<List<Primitive>> _pa = [];
+  /// Storage of this field's value.  Note:  all lists are created as unmodifiable.
+  List<List<Primitive>> _pa = List<List<Primitive>>.unmodifiable([]);
+
+  /// Storage of number fo columns.
+  int _numColumns = 0;
 
   /// The value of this field.  When setting the value, a copy of the input
   /// list is made.  When getting the value, a copy of the internal list is
   /// returned.
   List<List<Primitive>> get value {
-    // Make a copy of the internal lists
-    _pa.toList();
+    return _pa;
+  }
+
+  /// The number of rows in the 2D array.
+  int get numRows {
+    return _pa.length;
+  }
+
+  /// The number of columns in the 2D array.
+  int get numColumns {
+    return _numColumns;
   }
 
   set value(List<List<Primitive>> pa) {
     _unprepareDescendantsForUpdates();
-    _pa.replaceRange(0, _pa.length, pa);
-    _prepareDescendantsForUpdates();
-    onSet();
 
-    // Put some thought into the above
-    return true;
+    var numColumns = _verifyUniformNumColumns(pa);
+    if (numColumns == null) {
+      throw Exception('number of columns in each row must be the same');
+    }
+
+    // Create new lists from supplied list.  New lists are unmodifiable.
+    _pa = List<List<Primitive>>.unmodifiable(
+        List<List<Primitive>>.generate(pa.length, (i) {
+      return List<Primitive>.unmodifiable(pa[i]);
+    }));
+
+    _numColumns = numColumns;
+
+    _prepareDescendantsForUpdates();
+
+    onSet();
   }
 
   // Implement Field interface
@@ -87,31 +110,46 @@ class Any2DField extends FieldBase implements Field {
 
     var fieldPKey = PKey.fromPKey(pkey, fieldPKeyIndex);
 
-    // Generate a list of rows from the cbor value...
-    _pa = List<List<Primitive>>.generate(value.length, (i) {
-      var cbor = value.elementAt(i);
+    int? numColumns;
 
-      if (cbor is! CborList) {
+    // Generate a list of rows from the cbor value...
+    var newRows = List<List<Primitive>>.generate(value.length, (i) {
+      var outerCbor = value.elementAt(i);
+
+      if (outerCbor is! CborList) {
         throw Exception('element is not a CborList');
       }
 
       var outerPKey = PKey.fromPKey(fieldPKey, i);
 
-      // Generate a list of cells from the cbor value...
-      var row = List<Primitive>.generate(cbor.length, (j) {
-        var cbor2 = cbor.elementAt(j);
+      if (numColumns == null) {
+        // Record the number of columns in the first row.
+        numColumns = outerCbor.length;
+      } else if (numColumns != outerCbor.length) {
+        // Enforce that the number of columns in each row is the same.
+        throw Exception('number of columns in each row must be the same');
+      }
 
-        if (cbor2 is! CborMap) {
+      // Generate a list of cells from the cbor value...
+      var row = List<Primitive>.generate(outerCbor.length, (j) {
+        var innerCbor = outerCbor.elementAt(j);
+
+        if (innerCbor is! CborMap) {
           throw Exception('element is not a CborMap');
         }
 
         var innerPKey = PKey.fromPKey(outerPKey, j);
 
-        return PrimitiveFactory.createPrimitiveFromCborMap(innerPKey, cbor2);
+        return PrimitiveFactory.createPrimitiveFromCborMap(
+            innerPKey, innerCbor);
       });
 
-      return row;
+      return List<Primitive>.unmodifiable(row);
     });
+
+    // Save the new list of rows and number of columns
+    _pa = List<List<Primitive>>.unmodifiable(newRows);
+    _numColumns = numColumns == null ? 0 : numColumns!;
 
     _prepareDescendantsForUpdates();
   }
@@ -126,6 +164,9 @@ class Any2DField extends FieldBase implements Field {
       throw Exception(
           'number of primitives in update does not equal existing primitives');
     }
+
+    // Make sure the number of columns in each row is the same and matches
+    // the number of columns in the existing 2D array.
 
     // For each existing row...
     for (var i = 0; i < _pa.length; i++) {
@@ -175,9 +216,43 @@ class Any2DField extends FieldBase implements Field {
 
   @override
   String toString() {
-    /*
-    return List<String>.generate(_pa.length, (index) => _pa[index].describeType)
-        .join(', ');
-        */
+    var numRows = _pa.length;
+
+    if (numRows == 0) {
+      return '<Empty>';
+    }
+
+    // Gather some information about the columns in 2D array
+    var gatheredTypes = List<String>.generate(_numColumns, (index) => '');
+
+    for (var row in _pa) {
+      for (var i = 0; i < row.length; i++) {
+        var gatheredType = gatheredTypes[i];
+
+        if (gatheredType.isEmpty) {
+          gatheredTypes[i] = row[i].describeType;
+        } else {
+          gatheredTypes[i] == row[i].describeType
+              ? gatheredTypes[i]
+              : '<mixed>';
+        }
+      }
+    }
+
+    return 'Array [${numRows}x$_numColumns  primitives], column types: ${gatheredTypes.join(', ')}';
+  }
+
+  int? _verifyUniformNumColumns(List<List<Primitive>> pa) {
+    int? numColumns;
+
+    for (var row in pa) {
+      if (numColumns == null) {
+        numColumns = row.length;
+      } else if (numColumns != row.length) {
+        return null;
+      }
+    }
+
+    return numColumns ?? 0;
   }
 }

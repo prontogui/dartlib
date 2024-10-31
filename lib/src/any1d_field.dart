@@ -13,15 +13,15 @@ import 'primitive_factory.dart';
 /// A field that holds a one-dimensional array of primitives.
 class Any1DField extends FieldBase implements Field {
   /// Storage of this field's value.
-  List<Primitive> _pa = [];
+  List<Primitive> _pa = List<Primitive>.unmodifiable([]);
 
   /// The value of this field.  When setting the value, a copy of the input
   /// list is made.  When getting the value, a copy of the internal list is
   /// returned.
-  List<Primitive> get value => _pa.toList();
+  List<Primitive> get value => _pa;
   set value(List<Primitive> pa) {
     _unprepareDescendantsForUpdates();
-    _pa.replaceRange(0, _pa.length, pa);
+    _pa = List<Primitive>.unmodifiable(pa);
     _prepareDescendantsForUpdates();
     onSet();
   }
@@ -69,7 +69,7 @@ class Any1DField extends FieldBase implements Field {
 
     _unprepareDescendantsForUpdates();
 
-    _pa = List<Primitive>.generate(value.length, (index) {
+    var newArray = List<Primitive>.generate(value.length, (index) {
       var cbor = value.elementAt(index);
 
       if (cbor is! CborMap) {
@@ -79,6 +79,8 @@ class Any1DField extends FieldBase implements Field {
       return PrimitiveFactory.createPrimitiveFromCborMap(
           PKey.fromPKey(pkey, index), cbor);
     });
+
+    _pa = List<Primitive>.unmodifiable(newArray);
 
     _prepareDescendantsForUpdates();
   }
@@ -118,7 +120,10 @@ class Any1DField extends FieldBase implements Field {
 
   @override
   String toString() {
-    return List<String>.generate(_pa.length, (index) => _pa[index].describeType)
-        .join(', ');
+    if (_pa.isEmpty) {
+      return '<Empty>';
+    }
+
+    return 'Array [${_pa.length} primitives] with types: ${List<String>.generate(_pa.length, (index) => _pa[index].describeType).join(', ')}';
   }
 }

@@ -1,3 +1,6 @@
+// Copyright 2024 ProntoGUI, LLC.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/fkey.dart';
@@ -8,22 +11,62 @@ import 'package:dartlib/src/text.dart';
 void main() {
   group('Any1DField', () {
     late Any1DField field;
+    late Text primitive1;
+    late Text primitive2;
+
+    List<Text> primitives() => [primitive1, primitive2];
 
     setUp(() {
       field = Any1DField();
     });
+
+    populateField() {
+      primitive1 = Text(content: 'Original Content 1');
+      primitive2 = Text(content: 'Original Content 2');
+      field.value = [primitive1, primitive2];
+    }
+
+    CborValue getCborForTesting() {
+      return CborList([
+        CborMap({
+          CborString('Content'): CborString('new content 1'),
+        }),
+        CborMap({
+          CborString('Content'): CborString('new content 2'),
+        }),
+      ]);
+    }
+
+    populateFromCbor() {
+      field.ingestFullCborValue(getCborForTesting());
+    }
 
     test('initial value is an empty list', () {
       expect(field.value, isEmpty);
     });
 
     test('setting value updates the internal list', () {
-      var primitives = [
-        Text(content: 'Original Content 1'),
-        Text(content: 'Original Content 2')
-      ];
-      field.value = primitives;
-      expect(field.value, equals(primitives));
+      populateField();
+      expect(field.value, equals(primitives()));
+    });
+
+    test('initial value is an unmodifiable list', () {
+      expect(() => field.value.clear(), throwsUnsupportedError);
+    });
+
+    test('assigned value is an unmodifiable list', () {
+      populateField();
+      expect(() => field.value.clear(), throwsUnsupportedError);
+    });
+
+    test('ingested value is an unmodifiable list', () {
+      var cborList = CborList([
+        CborMap({
+          CborString('Content'): CborString('new content 1'),
+        }),
+      ]);
+      field.ingestFullCborValue(cborList);
+      expect(() => field.value.clear(), throwsUnsupportedError);
     });
 
     test('prepareForUpdates prepares descendant primitives', () {
@@ -39,13 +82,9 @@ void main() {
     });
 
     test('assignment prepares descendant primitives', () {
-      var primitives = [
-        Text(content: 'Original Content 1'),
-        Text(content: 'Original Content 2')
-      ];
       field.prepareForUpdates(fkeyLabel, PKey(1), 0, (PKey, FKey, bool) {});
-      field.value = primitives;
-      for (var primitive in primitives) {
+      populateField();
+      for (var primitive in primitives()) {
         expect(primitive.notPreparedYet, isFalse);
       }
     });
@@ -69,43 +108,26 @@ void main() {
     });
 
     test('ingestFullCborValue updates the internal list', () {
-      var p1 = Text(content: 'Original Content 1');
-      var p2 = Text(content: 'Original Content 2');
-      var primitives = [p1, p2];
-      field.value = primitives;
+      populateField();
+      populateFromCbor();
+
       field.prepareForUpdates(fkeyLabel, PKey(1), 0, (PKey, FKey, bool) {});
-      var cborList = CborList([
-        CborMap({
-          CborString('Content'): CborString('new content 1'),
-        }),
-      ]);
-      field.ingestFullCborValue(cborList);
+
       var newText = field.value[0] as Text;
       expect(newText.content, equals('new content 1'));
 
-      expect(field.value.length, equals(1));
-      expect(p1.content, equals('Original Content 1'));
-      expect(p1.notPreparedYet, isTrue);
-      expect(p2.content, equals('Original Content 2'));
-      expect(p2.notPreparedYet, isTrue);
+      expect(field.value.length, equals(2));
+      expect(primitive1.content, equals('Original Content 1'));
+      expect(primitive1.notPreparedYet, isTrue);
+      expect(primitive2.content, equals('Original Content 2'));
+      expect(primitive2.notPreparedYet, isTrue);
     });
 
     test('ingestPartialCborValue updates existing primitives', () {
-      var p1 = Text(content: 'Original Content 1');
-      var p2 = Text(content: 'Original Content 2');
-      var primitives = [p1, p2];
-      field.value = primitives;
-      var cborList = CborList([
-        CborMap({
-          CborString('Content'): CborString('new content 1'),
-        }),
-        CborMap({
-          CborString('Content'): CborString('new content 2'),
-        }),
-      ]);
-      field.ingestPartialCborValue(cborList);
-      expect(p1.content, equals('new content 1'));
-      expect(p2.content, equals('new content 2'));
+      populateField();
+      field.ingestPartialCborValue(getCborForTesting());
+      expect(primitive1.content, equals('new content 1'));
+      expect(primitive2.content, equals('new content 2'));
     });
 
     test('egestCborValue returns the correct CborList', () {
@@ -118,12 +140,14 @@ void main() {
       expect((cborValue as CborList).length, equals(2));
     });
 
+    test('toString returns for empty array', () {
+      expect(field.toString(), equals('<Empty>'));
+    });
+
     test('toString returns a comma-separated list of primitive types', () {
-      var p1 = Text(content: 'Original Content 1');
-      var p2 = Text(content: 'Original Content 2');
-      var primitives = [p1, p2];
-      field.value = primitives;
-      expect(field.toString(), equals('Text, Text'));
+      populateField();
+      expect(field.toString(),
+          equals('Array [2 primitives] with types: Text, Text'));
     });
   });
 }

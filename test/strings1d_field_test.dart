@@ -1,23 +1,34 @@
+// Copyright 2024 ProntoGUI, LLC.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/strings1d_field.dart';
 
 void main() {
   group('Strings1DField', () {
+    late Strings1DField field;
+
+    setUp(() {
+      field = Strings1DField();
+    });
+
+    List<String> populateField() {
+      var testValue = ['hello', 'world'];
+      field.value = testValue;
+      return testValue;
+    }
+
     test('initial value is empty', () {
-      final field = Strings1DField();
       expect(field.value, isEmpty);
     });
 
     test('set and get value', () {
-      final field = Strings1DField();
-      final testValue = ['hello', 'world'];
-      field.value = testValue;
+      var testValue = populateField();
       expect(field.value, equals(testValue));
     });
 
     test('set makes a copy of value', () {
-      final field = Strings1DField();
       final testValue = ['hello', 'world'];
       field.value = testValue;
 
@@ -28,44 +39,37 @@ void main() {
     });
 
     test('get returns a copy of value', () {
-      final field = Strings1DField();
-      final testValue = ['hello', 'world'];
-      field.value = testValue;
+      var testValue = populateField();
 
-      // Modify field.value.  This should not affect testValue.
-      field.value.clear();
+      var value = field.value;
+      value.clear();
 
-      expect(field.value, equals(['hello', 'world']));
+      expect(field.value, equals(testValue));
     });
 
     test('ingestFullCborValue with valid CborList', () {
-      final field = Strings1DField();
       final cborList = CborList([CborString('hello'), CborString('world')]);
       field.ingestFullCborValue(cborList);
       expect(field.value, equals(['hello', 'world']));
     });
 
     test('ingestFullCborValue with invalid CborList throws exception', () {
-      final field = Strings1DField();
       final cborList = CborList([CborString('hello'), CborSmallInt(42)]);
       expect(() => field.ingestFullCborValue(cborList), throwsException);
     });
 
     test('ingestPartialCborValue with valid CborList', () {
-      final field = Strings1DField();
       final cborList = CborList([CborString('hello'), CborString('world')]);
       field.ingestPartialCborValue(cborList);
       expect(field.value, equals(['hello', 'world']));
     });
 
     test('ingestPartialCborValue with invalid CborList throws exception', () {
-      final field = Strings1DField();
       final cborList = CborList([CborString('hello'), CborSmallInt(42)]);
       expect(() => field.ingestPartialCborValue(cborList), throwsException);
     });
 
     test('egestCborValue returns correct CborList', () {
-      final field = Strings1DField();
       field.value = ['hello', 'world'];
       final cborValue = field.egestCborValue();
       expect(cborValue, isA<CborList>());
@@ -74,7 +78,6 @@ void main() {
     });
 
     test('toString returns correct string representation', () {
-      final field = Strings1DField();
       field.value = ['hello', 'world'];
       expect(field.toString(), equals('"hello", "world"'));
     });
