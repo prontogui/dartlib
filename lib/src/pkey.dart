@@ -143,24 +143,27 @@ class PKey {
 
 /// A helper class to locate a Primitive in the model.
 class PKeyLocator {
-  PKeyLocator(this.pkey) : locationLevel = -1;
+  PKeyLocator(this.pkey) : _locationLevel = -1;
 
   /// The PKey being located.
   final PKey pkey;
 
   /// The current level of the locator.
-  late int locationLevel;
+  late int _locationLevel;
 
   /// Advance the level and return the index at that level.
   int nextIndex() {
-    assert(locationLevel < (pkey.indices.length - 1));
-    locationLevel++;
-    return pkey.indices[locationLevel];
+    if (_locationLevel >= (pkey.indices.length - 1)) {
+      throw Exception(
+          'PKeyLocator: nextIndex() called when already at last level');
+    }
+    _locationLevel++;
+    return pkey.indices[_locationLevel];
   }
 
   /// Return true if the locator is at the last level and therefore
   /// primitive hase been located.
   bool located() {
-    return locationLevel == (pkey.indices.length - 1);
+    return _locationLevel == (pkey.indices.length - 1);
   }
 }

@@ -1,7 +1,10 @@
 // Copyright 2024 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+import 'dart:js_interop';
+
 import 'fkey.dart';
+import 'pkey.dart';
 import 'primitive_base.dart';
 import 'any1d_field.dart';
 import 'primitive.dart';
@@ -23,6 +26,18 @@ class Group extends PrimitiveBase {
   @override
   void describeFields(List<FieldRef> fieldRefs) {
     fieldRefs.add(FieldRef(fkeyGroupItems, _groupItems));
+  }
+
+  @override
+  Primitive locateNextDescendant(PKeyLocator locator) {
+    // The next index specifies which container field to access...
+    var nextIndex = locator.nextIndex();
+    if (nextIndex != 0) {
+      throw Exception('PKey locator is out of bounds');
+    }
+
+    // The next index thereafter specifies which primitive to access...
+    return groupItems[locator.nextIndex()];
   }
 
   @override

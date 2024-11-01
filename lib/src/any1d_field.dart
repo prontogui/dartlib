@@ -7,7 +7,7 @@ import 'field_base.dart';
 import 'primitive.dart';
 import 'fkey.dart';
 import 'pkey.dart';
-import 'onset.dart';
+import 'field_hooks.dart';
 import 'primitive_factory.dart';
 
 /// A field that holds a one-dimensional array of primitives.
@@ -35,8 +35,8 @@ class Any1DField extends FieldBase implements Field {
   // Override the default implementation to prepare the descendant primitives.
   @override
   void prepareForUpdates(
-      FKey fkey, PKey pkey, int fieldPKeyIndex, OnsetFunction onset) {
-    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, onset);
+      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks) {
+    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks);
 
     _prepareDescendantsForUpdates();
   }
@@ -55,7 +55,7 @@ class Any1DField extends FieldBase implements Field {
 
     for (var i = 0; i < _pa.length; i++) {
       // Add another level representing the array index of primitive
-      _pa[i].prepareForUpdates(PKey.fromPKey(fieldPKey, i), onset!);
+      _pa[i].prepareForUpdates(PKey.fromPKey(fieldPKey, i), fieldHooks!);
     }
   }
 

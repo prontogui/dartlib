@@ -9,8 +9,10 @@ import 'package:dartlib/src/frame.dart';
 import 'package:dartlib/src/group.dart';
 import 'package:dartlib/src/import_file.dart';
 import 'package:dartlib/src/list.dart';
+import 'package:dartlib/src/table.dart';
 import 'package:dartlib/src/text.dart';
 import 'package:dartlib/src/textfield.dart';
+import 'package:dartlib/src/timer.dart';
 import 'package:dartlib/src/tristate.dart';
 import 'test_cbor_samples.dart';
 
@@ -73,6 +75,13 @@ void main() {
     expect(p.describeType, equals('ListP'));
   });
 
+  test('Create a Table primitive.', () {
+    var p = PrimitiveFactory.createPrimitiveFromCborMap(
+        pkey, distinctCborForTable());
+    expect(p, isA<Table>());
+    expect(p.describeType, equals('Table'));
+  });
+
   test('Create a Text primitive.', () {
     var p = PrimitiveFactory.createPrimitiveFromCborMap(
         pkey, distinctCborForText());
@@ -87,37 +96,17 @@ void main() {
     expect(p.describeType, equals('TextField'));
   });
 
+  test('Create a Timer primitive.', () {
+    var p = PrimitiveFactory.createPrimitiveFromCborMap(
+        pkey, distinctCborForTimer());
+    expect(p, isA<Timer>());
+    expect(p.describeType, equals('Timer'));
+  });
+
   test('Create a Tristate primitive.', () {
     var p = PrimitiveFactory.createPrimitiveFromCborMap(
         pkey, distinctCborForTristate());
     expect(p, isA<Tristate>());
     expect(p.describeType, equals('Tristate'));
   });
-
-/*
-
-
-
-
-
-
-
-
-
-
-
- 
-
-  test('Create a Table primitive.', () {
-    var p = PrimitiveFactory.createPrimitiveFromCborMap(
-        pkey, distinctCborForTable());
-    expect(p, isA<XXXX>());
-  });
-
-  test('Create a Timer primitive.', () {
-    var p = PrimitiveFactory.createPrimitiveFromCborMap(
-        pkey, distinctCborForTimer());
-    expect(p, isA<XXXX>());
-  });
-  */
 }

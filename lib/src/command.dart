@@ -13,7 +13,6 @@ import 'string_field.dart';
 class Command extends PrimitiveBase {
   Command({super.embodiment, super.tag, String label = '', int status = 0}) {
     _commandIssued = EventField();
-    _commandIssued.timeProvider = DateTime.now;
     _label = StringField.from(label);
     _status = IntegerField.from(status);
   }
@@ -52,9 +51,31 @@ class Command extends PrimitiveBase {
     _label.value = label;
   }
 
-  /// the status of the command:  0 = Command Normal, 1 = Command Disabled, 2 = Command Hidden.
+  /// The status of the command:  0 = Command Normal, 1 = Command Disabled, 2 = Command Hidden.
   int get status => _status.value;
   set status(int status) {
     _status.value = status;
+  }
+
+  /// The enabled status of the command.  This is derived from the Status field.
+  /// Setting this to true will set Status to 0 (visible & enabled)
+  /// and setting this to false will set Status to 1 (disabled).
+  ///
+  /// Note:  this is a helper method to make it easier to work with the status field.  The
+  /// canonical storage is still with the status field.
+  bool get enabled => status == 0;
+  set enabled(bool enabled) {
+    status = enabled ? 0 : 1;
+  }
+
+  /// Tthe visibility of the command.  This is derived from the Status field.
+  /// Setting this to true will set Status to 0 (visible & enabled)and setting
+  /// this to false will set Status to 2 (hidden).
+  ///
+  /// Note:  this is a helper method to make it easier to work with the status field.  The
+  /// canonical storage is still with the status field.
+  bool get visible => status != 2;
+  set visible(bool visible) {
+    status = visible ? 0 : 2;
   }
 }

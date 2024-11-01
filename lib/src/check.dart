@@ -35,13 +35,9 @@ class Check extends PrimitiveBase {
 
   /// The check state is Yes, On, 1, etc., and false if the check state is No, Off, 0, etc.
   bool get checked => _checked.value;
-  set content(String content) {
-    _checked.value = checked;
-  }
+  set checked(bool checked) => _checked.value = checked;
 
   /// The text label to display.
   String get label => _label.value;
-  set label(String label) {
-    _label.value = label;
-  }
+  set label(String label) => _label.value = label;
 }

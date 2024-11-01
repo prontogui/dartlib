@@ -1,13 +1,11 @@
 // Copyright 2024 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-import 'dart:io';
-
 import 'package:cbor/cbor.dart';
 import 'field.dart';
 import 'pkey.dart';
 import 'fkey.dart';
-import 'onset.dart';
+import 'field_hooks.dart';
 import 'primitive.dart';
 import 'string_field.dart';
 
@@ -69,8 +67,9 @@ abstract class PrimitiveBase implements Primitive {
   }
 
   @override
-  Primitive? locateNextDescendant(PKeyLocator locator) {
-    return null;
+  Primitive locateNextDescendant(PKeyLocator locator) {
+    throw Exception(
+        'locateNextDescendant not implemented for this primitive because it doesn\'t have descendants.');
   }
 
   Field? findField(FKey fkey) {
@@ -83,14 +82,15 @@ abstract class PrimitiveBase implements Primitive {
   }
 
   @override
-  void prepareForUpdates(PKey pkey, OnsetFunction onset) {
+  void prepareForUpdates(PKey pkey, FieldHooks fieldHooks) {
     _pkey = pkey;
 
     // Prepare each field for updates
     var fieldPKeyIndex = 0;
     for (var fieldRef in _fieldRefs) {
       fieldRef.field
-          .prepareForUpdates(fieldRef.fkey, pkey, fieldPKeyIndex, onset);
+          .prepareForUpdates(fieldRef.fkey, pkey, fieldPKeyIndex, fieldHooks);
+
       if (fieldRef.field.isStructural) {
         fieldPKeyIndex++;
       }

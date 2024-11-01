@@ -4,19 +4,21 @@
 import 'package:cbor/cbor.dart';
 import 'pkey.dart';
 import 'fkey.dart';
-import 'onset.dart';
+import 'field_hooks.dart';
 
 // Interface for Primitives.
 abstract class Primitive {
   /// Prepare this primitive for updates, where [pkey] is the path to this primitive,
-  /// and [onset] is the function to call when fields of this primitive are updated.
-  void prepareForUpdates(PKey pkey, OnsetFunction onset);
+  /// and [fieldHooks] is the interface to call when fields of this primitive are updated.
+  void prepareForUpdates(PKey pkey, FieldHooks fieldHooks);
 
   /// Unprepare this primitive for updates.  Subsequent updates to fields will not
   /// call the previous onset function, not will this primitive have a valid PKey.
   void unprepareForUpdates();
 
-  Primitive? locateNextDescendant(PKeyLocator locator);
+  /// Returns the next primitive that is a direct descendant of this primitive.
+  /// A caller presumes there is a next descendant, otherwise an exception is thrown.
+  Primitive locateNextDescendant(PKeyLocator locator);
 
   /// Egests a full update from this primitive as a CborMap.
   CborMap egestFullCborMap();

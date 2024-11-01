@@ -1,6 +1,7 @@
 import 'package:test/test.dart';
 import 'package:dartlib/src/text.dart';
 import 'package:dartlib/src/pkey.dart';
+import 'package:dartlib/src/field_hooks.dart';
 
 void main() {
   group('Text', () {
@@ -43,8 +44,7 @@ void main() {
 
     test('prepareForUpdates does not throw', () {
       final text = Text();
-      expect(
-          () => text.prepareForUpdates(PKey(), (PKey pkey, int i, bool b) {}),
+      expect(() => text.prepareForUpdates(PKey(), NullFieldHooks()),
           returnsNormally);
     });
   });

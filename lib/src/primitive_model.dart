@@ -8,8 +8,9 @@ import 'primitive.dart';
 import 'primitive_factory.dart';
 import 'primitive_model_watcher.dart';
 import 'primitive_locator.dart';
+import 'field_hooks.dart';
 
-class PrimitiveModel implements PrimitiveLocator {
+class PrimitiveModel implements PrimitiveLocator, FieldHooks {
   List<Primitive> _topPrimitives = [];
   final List<PrimitiveModelWatcher> _watchers = [];
 
@@ -53,16 +54,10 @@ class PrimitiveModel implements PrimitiveLocator {
     }
   }
 
-  void onSetField(PKey pkey, FKey fkey, bool structural) {
-    for (var w in _watchers) {
-      w.onSetField(pkey, fkey, structural);
-    }
-  }
-
   void _prepareForUpdates() {
     var emptyPKey = PKey();
     for (var p in _topPrimitives) {
-      p.prepareForUpdates(emptyPKey, onSetField);
+      p.prepareForUpdates(emptyPKey, this);
     }
   }
 
@@ -77,6 +72,18 @@ class PrimitiveModel implements PrimitiveLocator {
     }
 
     return next;
+  }
+
+  @override
+  DateTime getEventTimestamp() {
+    return DateTime.now();
+  }
+
+  @override
+  void onSetField(PKey pkey, FKey fkey, bool structural) {
+    for (var w in _watchers) {
+      w.onSetField(pkey, fkey, structural);
+    }
   }
 
   void ingestCborUpdate(CborValue v) {

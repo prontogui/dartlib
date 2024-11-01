@@ -4,7 +4,7 @@
 
 import 'pkey.dart';
 import 'fkey.dart';
-import 'onset.dart';
+import 'field_hooks.dart';
 import 'field.dart';
 
 abstract class FieldBase implements Field {
@@ -19,8 +19,8 @@ abstract class FieldBase implements Field {
   // Private storage for FKey of this field.
   late FKey _fkey;
 
-  // Private storage for the onset field.
-  late OnsetFunction? _onset;
+  // Private storage for the fieldHooks field.
+  late FieldHooks? _fieldHooks;
 
   // Private storage for fieldPKeyIndex field.
   late int _fieldPKeyIndex;
@@ -32,11 +32,11 @@ abstract class FieldBase implements Field {
   /// It is used when assigning new primitives to this field.
   int get fieldPKeyIndex => _fieldPKeyIndex;
 
-  // The function to call to notify the field was updated.
-  OnsetFunction? get onset => _onset;
+  // The interface to call to notify the field was updated.
+  FieldHooks? get fieldHooks => _fieldHooks;
 
   /// True if the field has not been prepared yet for updates.
-  bool get notPreparedYet => (_onset == null);
+  bool get notPreparedYet => (_fieldHooks == null);
 
   /// Derived field classes can override this when they are considered structural, that is,
   /// they contain other primitives.
@@ -45,11 +45,11 @@ abstract class FieldBase implements Field {
 
   @override
   void prepareForUpdates(
-      FKey fkey, PKey pkey, int fieldPKeyIndex, OnsetFunction onset) {
+      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks) {
     _fkey = fkey;
     _pkey = pkey;
     _fieldPKeyIndex = fieldPKeyIndex;
-    _onset = onset;
+    _fieldHooks = fieldHooks;
   }
 
   @override
@@ -57,12 +57,12 @@ abstract class FieldBase implements Field {
     _pkey = PKey();
     _fkey = invalidFieldName;
     _fieldPKeyIndex = -1;
-    _onset = null;
+    _fieldHooks = null;
   }
 
   void onSet() {
-    if (_onset != null) {
-      _onset!(_pkey, _fkey, isStructural);
+    if (_fieldHooks != null) {
+      _fieldHooks!.onSetField(_pkey, _fkey, isStructural);
     }
   }
 }

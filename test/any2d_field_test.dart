@@ -58,6 +58,13 @@ void main() {
       expect(() => field.value.clear(), throwsUnsupportedError);
     });
 
+    test('construction value is an unmodifiable list', () {
+      var altField = Any2DField.from([
+        [Text(content: 'Content 1')],
+      ]);
+      expect(() => altField.value.clear(), throwsUnsupportedError);
+    });
+
     test('assgined value is an unmodifiable list', () {
       populateField();
       expect(() => field.value.clear(), throwsUnsupportedError);

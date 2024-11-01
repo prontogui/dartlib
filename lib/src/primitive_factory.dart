@@ -15,18 +15,11 @@ import 'frame.dart';
 import 'group.dart';
 import 'import_file.dart';
 import 'list.dart';
-//import 'table.dart';
+import 'table.dart';
 import 'text.dart';
 import 'textfield.dart';
-//import 'timer.dart';
+import 'timer.dart';
 import 'tristate.dart';
-
-/*
-final CborString _dpfImportFile = CborString("Imported");
-final CborString _dpfTable = CborString("Rows");
-final CborString _dpfTextField = CborString("TextEntry");
-final CborString _dpfTimer = CborString("PeriodMs");
-*/
 
 typedef FactoryFunction = PrimitiveBase Function();
 
@@ -42,6 +35,8 @@ final Map<String, FactoryFunction> _factoryFunctions = {
   "State": () => Tristate(),
   "TextEntry": () => TextField(),
   "Imported": () => ImportFile(),
+  "Rows": () => Table(),
+  "PeriodMs": () => Timer(),
 };
 
 /// The static object factory responsible for creating primitive-type objects.

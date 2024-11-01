@@ -42,4 +42,16 @@ class Choice extends PrimitiveBase {
   /// the set of valid choices to choose from.
   List<String> get choices => _choices.value;
   set choices(List<String> choices) => _choices.value = choices;
+
+  /// The index (0, 1, ..) of selected choice or -1 if choice is empty.  This is a covenvenience
+  /// function as an alternative to Choice().  The canonical storage of choice remains a string.
+  /// Also used to set the selected choice or empty if none chosen or if index is out of range.
+  int get choiceIndex => _choices.value.indexOf(_choice.value);
+  set choiceIndex(int index) {
+    if (index >= 0 && index < _choices.value.length) {
+      _choice.value = _choices.value[index];
+    } else {
+      _choice.value = '';
+    }
+  }
 }

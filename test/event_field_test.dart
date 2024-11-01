@@ -1,62 +1,83 @@
 import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/event_field.dart';
+import 'package:dartlib/src/field_hooks.dart';
+import 'package:dartlib/src/pkey.dart';
+import 'package:dartlib/src/fkey.dart';
+
+class EventFieldSetup extends FieldHooks {
+  EventFieldSetup() {
+    eventField = EventField();
+    eventField.prepareForUpdates(fkeyCommandIssued, PKey(0), 0, this);
+    testTime = DateTime.now();
+  }
+
+  late EventField eventField;
+  late DateTime testTime;
+
+  @override
+  void onSetField(PKey pkey, FKey fkey, bool structural) {
+    // Do nothing.
+  }
+
+  @override
+  DateTime getEventTimestamp() {
+    return testTime;
+  }
+}
 
 void main() {
   group('EventField', () {
-    late EventField eventField;
-    late DateTime testTime;
+    late EventFieldSetup t;
 
     setUp(() {
-      eventField = EventField();
-      testTime = DateTime.now();
-      eventField.timeProvider = () => testTime;
+      t = EventFieldSetup();
     });
 
     test('issued should return false if _eventTimestamp is null', () {
-      expect(eventField.issued, isFalse);
+      expect(t.eventField.issued, isFalse);
     });
 
     test('issued should return true if _eventTimestamp matches timeProvider',
         () {
-      eventField.ingestFullCborValue(CborBool(true));
-      expect(eventField.issued, isTrue);
+      t.eventField.ingestFullCborValue(CborBool(true));
+      expect(t.eventField.issued, isTrue);
     });
 
     test(
         'issued should return false if _eventTimestamp does not match timeProvider',
         () {
-      eventField.ingestFullCborValue(CborBool(true));
-      testTime = testTime.add(Duration(seconds: 1));
-      expect(eventField.issued, isFalse);
+      t.eventField.ingestFullCborValue(CborBool(true));
+      t.testTime = t.testTime.add(Duration(seconds: 1));
+      expect(t.eventField.issued, isFalse);
     });
 
     test('ingestFullCborValue should set _eventTimestamp', () {
-      eventField.ingestFullCborValue(CborBool(true));
-      expect(eventField.issued, isTrue);
+      t.eventField.ingestFullCborValue(CborBool(true));
+      expect(t.eventField.issued, isTrue);
     });
 
     test('ingestPartialCborValue should set _eventTimestamp', () {
-      eventField.ingestPartialCborValue(CborBool(true));
-      expect(eventField.issued, isTrue);
+      t.eventField.ingestPartialCborValue(CborBool(true));
+      expect(t.eventField.issued, isTrue);
     });
 
     test('egestCborValue should return CborBool(false)', () {
-      expect(eventField.egestCborValue(), CborBool(false));
+      expect(t.eventField.egestCborValue(), CborBool(false));
     });
 
     test('toString should return <Event Issued> if issued is true', () {
-      eventField.ingestFullCborValue(CborBool(true));
-      expect(eventField.toString(), '<Event Issued>');
+      t.eventField.ingestFullCborValue(CborBool(true));
+      expect(t.eventField.toString(), '<Event Issued>');
     });
 
     test('toString should return <Event Not Issued> if issued is false', () {
-      expect(eventField.toString(), '<Event Not Issued>');
+      expect(t.eventField.toString(), '<Event Not Issued>');
     });
 
     test('should throw exception if timeProvider is not set', () {
-      eventField = EventField();
-      expect(() => eventField.ingestFullCborValue(CborBool(true)),
+      t.eventField = EventField();
+      expect(() => t.eventField.ingestFullCborValue(CborBool(true)),
           throwsException);
     });
   });

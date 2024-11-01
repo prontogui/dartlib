@@ -7,7 +7,7 @@ import 'field_base.dart';
 import 'primitive.dart';
 import 'fkey.dart';
 import 'pkey.dart';
-import 'onset.dart';
+import 'field_hooks.dart';
 import 'primitive_factory.dart';
 
 /// A field that holds a single primitive.
@@ -29,8 +29,8 @@ class AnyField extends FieldBase implements Field {
   // Override the default implementation to prepare the descendant primitive.
   @override
   void prepareForUpdates(
-      FKey fkey, PKey pkey, int fieldPKeyIndex, OnsetFunction onset) {
-    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, onset);
+      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks) {
+    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks);
 
     _prepareDescendantsForUpdates();
   }
@@ -52,7 +52,7 @@ class AnyField extends FieldBase implements Field {
     // Prepare descendant primitive for updates
     if (_p != null) {
       var fieldPKey = PKey.fromPKey(pkey, fieldPKeyIndex);
-      _p!.prepareForUpdates(fieldPKey, onset!);
+      _p!.prepareForUpdates(fieldPKey, fieldHooks!);
     }
   }
 

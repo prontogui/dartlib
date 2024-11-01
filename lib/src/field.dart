@@ -4,16 +4,17 @@
 import 'package:cbor/cbor.dart';
 import 'fkey.dart';
 import 'pkey.dart';
-import 'onset.dart';
+import 'field_hooks.dart';
 
 /// A field is a single piece of data or setting of a Primitive that can be updated.
 abstract interface class Field {
-  /// Prepare this field for updates.  This includes assigning a [fkey], [pkey],
-  /// and [fieldPKeyIndex] to the field, and setting the [onset] function to call
-  /// when the field is updated.  This method returns true if the field is structural,
-  /// that is, it contains other primitives.
+  /// Prepare this field for updates, where [fkey] is the field key, [pkey] is the
+  /// path to this primitive, [fieldPKeyIndex] is the PKey index to use for the field,
+  /// and [fieldHooks] is the interface to call when fields of this primitive are updated.
+  /// This method returns true if the field is structural, that is, it contains other
+  /// primitives.
   void prepareForUpdates(
-      FKey fkey, PKey pkey, int fieldPKeyIndex, OnsetFunction onset);
+      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks);
 
   /// Unprepare this field for updates.  Subsequent updates to the field will not
   /// call the previous onset function, not will this field have a valid PKey or FKey.

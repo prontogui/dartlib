@@ -7,14 +7,19 @@ import 'field_base.dart';
 import 'primitive.dart';
 import 'fkey.dart';
 import 'pkey.dart';
-import 'onset.dart';
+import 'field_hooks.dart';
 import 'primitive_factory.dart';
 
 /// A field that holds a uniform two-dimensional array of primitives.
 class Any2DField extends FieldBase implements Field {
-  /// Storage of this field's value.  Note:  all lists are created as unmodifiable.
-  List<List<Primitive>> _pa = List<List<Primitive>>.unmodifiable([]);
+  Any2DField() : _pa = List<List<Primitive>>.unmodifiable([]);
 
+  Any2DField.from(List<List<Primitive>> pa)
+      : _pa = List<List<Primitive>>.unmodifiable(pa);
+
+  /// Storage of this field's value.  Note:  all lists are created as unmodifiable.
+  late List<List<Primitive>> _pa;
+  //
   /// Storage of number fo columns.
   int _numColumns = 0;
 
@@ -61,8 +66,8 @@ class Any2DField extends FieldBase implements Field {
   // Override the default implementation to prepare the descendant primitives.
   @override
   void prepareForUpdates(
-      FKey fkey, PKey pkey, int fieldPKeyIndex, OnsetFunction onset) {
-    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, onset);
+      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks) {
+    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks);
 
     _prepareDescendantsForUpdates();
   }
@@ -87,7 +92,7 @@ class Any2DField extends FieldBase implements Field {
         var innerPKey = PKey.fromPKey(outerPKey, j);
 
         // Add another level representing the array index of primitive
-        innerList[j].prepareForUpdates(innerPKey, onset!);
+        innerList[j].prepareForUpdates(innerPKey, fieldHooks!);
       }
     }
   }

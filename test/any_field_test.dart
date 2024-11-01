@@ -7,8 +7,9 @@ import 'package:dartlib/src/text.dart';
 import 'package:dartlib/src/any_field.dart';
 import 'package:dartlib/src/fkey.dart';
 import 'package:dartlib/src/pkey.dart';
+import 'package:dartlib/src/field_hooks.dart';
 
-class PrepareForUpdatesSetup {
+class PrepareForUpdatesSetup implements FieldHooks {
   PrepareForUpdatesSetup() {
     _setupTest();
   }
@@ -21,7 +22,11 @@ class PrepareForUpdatesSetup {
   var onsetPkey = PKey();
   var onsetFKey = invalidFieldName;
 
-  void onset(PKey pkey, FKey fkey, bool structural) {
+  @override
+  DateTime getEventTimestamp() => DateTime.now();
+
+  @override
+  void onSetField(PKey pkey, FKey fkey, bool structural) {
     onsetCalled++;
     onsetPkey = pkey;
     onsetFKey = fkey;
@@ -31,7 +36,7 @@ class PrepareForUpdatesSetup {
     // Prepare for updates and set a field of text
     final fkey = fkeyLabel;
     final pkey = PKey(0, 1, 2);
-    field.prepareForUpdates(fkey, pkey, 6, onset);
+    field.prepareForUpdates(fkey, pkey, 6, this);
   }
 
   void verifyOnsetCalled1() {

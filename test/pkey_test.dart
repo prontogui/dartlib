@@ -177,6 +177,11 @@ void main() {
     expect(locator.located(), isTrue);
   });
 
+  test('PKey isEmpty getter', () {
+    final pkey1 = PKey(1, 2, 3);
+    expect(pkey1.isEmpty, isFalse);
+  });
+
   test('PKeyLocator with single index', () {
     final pkey = PKey(1);
     final locator = PKeyLocator(pkey);
@@ -184,5 +189,13 @@ void main() {
     expect(locator.located(), isFalse);
     expect(locator.nextIndex(), equals(1));
     expect(locator.located(), isTrue);
+  });
+
+  test('PKeyLocator nextIndex throws exception when at last level', () {
+    final pkey = PKey(1);
+    final locator = PKeyLocator(pkey);
+
+    expect(locator.nextIndex(), equals(1));
+    expect(() => locator.nextIndex(), throwsException);
   });
 }

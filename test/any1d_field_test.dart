@@ -1,6 +1,7 @@
 // Copyright 2024 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+import 'package:dartlib/src/field_hooks.dart';
 import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/fkey.dart';
@@ -75,14 +76,14 @@ void main() {
         Text(content: 'Original Content 2')
       ];
       field.value = primitives;
-      field.prepareForUpdates(fkeyLabel, PKey(1), 0, (PKey, FKey, bool) {});
+      field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks());
       for (var primitive in primitives) {
         expect(primitive.notPreparedYet, isFalse);
       }
     });
 
     test('assignment prepares descendant primitives', () {
-      field.prepareForUpdates(fkeyLabel, PKey(1), 0, (PKey, FKey, bool) {});
+      field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks());
       populateField();
       for (var primitive in primitives()) {
         expect(primitive.notPreparedYet, isFalse);
@@ -94,7 +95,7 @@ void main() {
         Text(content: 'Original Content 1'),
         Text(content: 'Original Content 2')
       ];
-      field.prepareForUpdates(fkeyLabel, PKey(1), 0, (PKey, FKey, bool) {});
+      field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks());
       field.value = primitives;
 
       var newPrimitives = [
@@ -111,7 +112,7 @@ void main() {
       populateField();
       populateFromCbor();
 
-      field.prepareForUpdates(fkeyLabel, PKey(1), 0, (PKey, FKey, bool) {});
+      field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks());
 
       var newText = field.value[0] as Text;
       expect(newText.content, equals('new content 1'));
