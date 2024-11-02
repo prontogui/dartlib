@@ -12,16 +12,32 @@ import 'primitive_factory.dart';
 
 /// A field that holds a uniform two-dimensional array of primitives.
 class Any2DField extends FieldBase implements Field {
-  Any2DField() : _pa = List<List<Primitive>>.unmodifiable([]);
+  /// Create with an empty array.
+  Any2DField()
+      : _pa = List<List<Primitive>>.unmodifiable([]),
+        _columnCount = 0;
 
-  Any2DField.from(List<List<Primitive>> pa)
-      : _pa = List<List<Primitive>>.unmodifiable(pa);
+  /// Create a new field from a list of rows.  The number of columns in each row
+  /// must be the same.  If not, an exception is thrown.
+  Any2DField.from(List<List<Primitive>> pa) {
+    var colCount = _verifyUniformNumColumns(pa);
+    if (colCount == null) {
+      throw Exception('number of columns in each row must be the same');
+    }
+    _columnCount = colCount;
+
+    // Create new lists from supplied list.  New lists are unmodifiable.
+    _pa = List<List<Primitive>>.unmodifiable(
+        List<List<Primitive>>.generate(pa.length, (i) {
+      return List<Primitive>.unmodifiable(pa[i]);
+    }));
+  }
 
   /// Storage of this field's value.  Note:  all lists are created as unmodifiable.
   late List<List<Primitive>> _pa;
-  //
+
   /// Storage of number fo columns.
-  int _colCount = 0;
+  late int _columnCount;
 
   /// The number of rows in the 2D array.
   int get rowCount {
@@ -30,7 +46,7 @@ class Any2DField extends FieldBase implements Field {
 
   /// The number of columns in the 2D array.
   int get columnCount {
-    return _colCount;
+    return _columnCount;
   }
 
   /// Inserts a new row in the array before the index specified.  If index is negative or
@@ -38,7 +54,7 @@ class Any2DField extends FieldBase implements Field {
   /// end of the table.  The row must match the dimension and cell types of the
   /// original array, otherwise an exception is thrown.
   void insertRow(int index, List<Primitive> row) {
-    if (row.length != _colCount) {
+    if (row.length != _columnCount) {
       throw Exception('number of columns in row does not match existing');
     }
 
@@ -86,8 +102,8 @@ class Any2DField extends FieldBase implements Field {
   }
 
   set value(List<List<Primitive>> pa) {
-    var numColumns = _verifyUniformNumColumns(pa);
-    if (numColumns == null) {
+    var columnCount = _verifyUniformNumColumns(pa);
+    if (columnCount == null) {
       throw Exception('number of columns in each row must be the same');
     }
 
@@ -99,7 +115,7 @@ class Any2DField extends FieldBase implements Field {
 
     _unprepareDescendantsForUpdates();
     _pa = newpa;
-    _colCount = numColumns;
+    _columnCount = columnCount;
     _prepareDescendantsForUpdates();
 
     onSet();
@@ -199,7 +215,7 @@ class Any2DField extends FieldBase implements Field {
     // Save the new list of rows and number of columns
     _unprepareDescendantsForUpdates();
     _pa = newRowsUnmodifiable;
-    _colCount = numColumns == null ? 0 : numColumns!;
+    _columnCount = numColumns == null ? 0 : numColumns!;
     _prepareDescendantsForUpdates();
   }
 
@@ -272,7 +288,7 @@ class Any2DField extends FieldBase implements Field {
     }
 
     // Gather some information about the columns in 2D array
-    var gatheredTypes = List<String>.generate(_colCount, (index) => '');
+    var gatheredTypes = List<String>.generate(_columnCount, (index) => '');
 
     for (var row in _pa) {
       for (var i = 0; i < row.length; i++) {
@@ -288,7 +304,7 @@ class Any2DField extends FieldBase implements Field {
       }
     }
 
-    return 'Array [${numRows}x$_colCount  primitives], column types: ${gatheredTypes.join(', ')}';
+    return 'Array [${numRows}x$_columnCount  primitives], column types: ${gatheredTypes.join(', ')}';
   }
 
   int? _verifyUniformNumColumns(List<List<Primitive>> pa) {

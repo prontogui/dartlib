@@ -76,6 +76,13 @@ void main() {
       expect(() => altField.value.clear(), throwsUnsupportedError);
     });
 
+    test('columnCount is correct after contruction from array', () {
+      var altField = Any2DField.from([
+        [Text(content: 'Content 1'), Text(content: 'Content 2')],
+      ]);
+      expect(altField.columnCount, equals(2));
+    });
+
     test('assgined value is an unmodifiable list', () {
       populateField();
       expect(() => field.value.clear(), throwsUnsupportedError);
