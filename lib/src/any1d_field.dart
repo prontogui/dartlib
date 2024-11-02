@@ -71,8 +71,6 @@ class Any1DField extends FieldBase implements Field {
       throw Exception('value is not a CborList');
     }
 
-    _unprepareDescendantsForUpdates();
-
     var newArray = List<Primitive>.generate(value.length, (index) {
       var cbor = value.elementAt(index);
 
@@ -84,8 +82,8 @@ class Any1DField extends FieldBase implements Field {
           PKey.fromPKey(pkey, index), cbor);
     });
 
+    _unprepareDescendantsForUpdates();
     _pa = List<Primitive>.unmodifiable(newArray);
-
     _prepareDescendantsForUpdates();
   }
 
