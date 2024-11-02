@@ -30,7 +30,7 @@ void main() {
       var primitive1 = Text();
       var primitive2 = Text();
       var group = Group(groupItems: [primitive1, primitive2]);
-      var locator = PKeyLocator(PKey(0));
+      var locator = PKeyLocator(PKey(0, 1));
       var descendant = group.locateNextDescendant(locator);
       expect(descendant, primitive2);
     });

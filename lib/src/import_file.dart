@@ -51,6 +51,14 @@ class ImportFile extends PrimitiveBase {
     _imported.value = false;
   }
 
+  /// Sets the blob of data for the file, sets the name of the file, and sets
+  /// imported flag to true.
+  void importData(List<int> data, String name) {
+    _data.value = data;
+    _name.value = name;
+    _imported.value = true;
+  }
+
   /// Returns true when the file has been imported by the app side and signals to the server
   /// side that file is ready to processs.  This field is normally only updated by the app.
   bool get imported => _imported.value;

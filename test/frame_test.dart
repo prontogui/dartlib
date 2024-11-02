@@ -43,6 +43,15 @@ void main() {
       expect(frame.describeType, 'Frame');
     });
 
+    test('should locate next descendant correctly', () {
+      var primitive1 = Text();
+      var primitive2 = Text();
+      var frame = Frame(frameItems: [primitive1, primitive2]);
+      var locator = PKeyLocator(PKey(0, 1));
+      var descendant = frame.locateNextDescendant(locator);
+      expect(descendant, primitive2);
+    });
+
     test('should throw exception for out of bounds locator', () {
       final frame = Frame();
       final locator = PKeyLocator(PKey(0));

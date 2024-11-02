@@ -68,4 +68,27 @@ class Table extends PrimitiveBase {
   /// The status of the table:  0 = Table Normal, 1 = Table Disabled, 2 = Table Hidden.
   int get status => _status.value;
   set status(int status) => _status.value = status;
+
+  /// Inserts a new row in this table before the index specified.  If index is -1 or extends beyond the number
+  /// of rows in the table then row is appended at the end of the table.
+  /// The row must match the dimension and cell types of the template row
+  void insertRow(int index, List<Primitive> row) {
+    _rows.insertRow(index, row);
+  }
+
+  /// Deletes a row in this table at the given index.  An exception is thrown
+  /// if the index is out of range.
+  void deleteRow(int index) {
+    _rows.deleteRow(index);
+  }
+
+  /// Deletes all rows in the table.
+  void deleteAllRows() {
+    _rows.value = [];
+  }
+
+  /// Convenience function that returns the number of rows.
+  int rowCount() {
+    return _rows.rowCount;
+  }
 }

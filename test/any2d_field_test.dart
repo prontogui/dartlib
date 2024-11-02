@@ -54,6 +54,17 @@ void main() {
       expect(field.value[1][0], equals(primitive2));
     });
 
+    test('should return correct number of rows and columns', () {
+      populateField();
+      expect(field.rowCount, equals(2));
+      expect(field.columnCount, equals(1));
+    });
+
+    test('should handle empty array correctly', () {
+      expect(field.rowCount, equals(0));
+      expect(field.columnCount, equals(0));
+    });
+
     test('initial value is an unmodifiable list', () {
       expect(() => field.value.clear(), throwsUnsupportedError);
     });
@@ -116,6 +127,54 @@ void main() {
       populateField();
       expect(field.toString(),
           contains('Array [2x1  primitives], column types: Text'));
+    });
+
+    test('should insert row correctly', () {
+      populateField();
+      var newRow = [Text(content: 'New Content')];
+      field.insertRow(1, newRow);
+      expect(field.value.length, equals(3));
+      expect((field.value[1][0] as Text).content, equals('New Content'));
+    });
+
+    test('should append row when index = -1', () {
+      populateField();
+      var newRow = [Text(content: 'New Content')];
+      field.insertRow(-1, newRow);
+      expect(field.value.length, equals(3));
+      expect((field.value[2][0] as Text).content, equals('New Content'));
+    });
+
+    test('should append row when index = 3', () {
+      populateField();
+      var newRow = [Text(content: 'New Content')];
+      field.insertRow(3, newRow);
+      expect(field.value.length, equals(3));
+      expect((field.value[2][0] as Text).content, equals('New Content'));
+    });
+
+    test(
+        'should throw exception when inserting row with incorrect column count',
+        () {
+      populateField();
+      var newRow = [
+        Text(content: 'New Content'),
+        Text(content: 'Extra Content')
+      ];
+      expect(() => field.insertRow(1, newRow), throwsException);
+    });
+
+    test('should delete row correctly', () {
+      populateField();
+      field.deleteRow(0);
+      expect(field.value.length, equals(1));
+      expect(field.value[0][0], equals(primitive2));
+    });
+
+    test('should throw exception when deleting row with invalid index', () {
+      populateField();
+      expect(() => field.deleteRow(-1), throwsException);
+      expect(() => field.deleteRow(2), throwsException);
     });
   });
 }
