@@ -38,5 +38,14 @@ void main() {
       final check = Check();
       expect(check.describeType, 'Check');
     });
+
+    test('nextState toggles the checked state', () {
+      final check = Check();
+      expect(check.checked, false);
+      check.nextState();
+      expect(check.checked, true);
+      check.nextState();
+      expect(check.checked, false);
+    });
   });
 }

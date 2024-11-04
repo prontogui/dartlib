@@ -5,6 +5,7 @@ import 'fkey.dart';
 import 'primitive_base.dart';
 import 'string_field.dart';
 
+/// A text primitive displays text on the screen.
 class Text extends PrimitiveBase {
   Text({super.embodiment, super.tag, String content = ''}) {
     _content = StringField.from(content);

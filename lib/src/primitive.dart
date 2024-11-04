@@ -23,7 +23,7 @@ abstract class Primitive {
   /// Egests a full update from this primitive as a CborMap.
   CborMap egestFullCborMap();
 
-  /// Egests a partil update from this primitive as a CborMap.
+  /// Egests a partial update from this primitive as a CborMap.
   /// Only the fields specified in [fkeys] will be included in the map.
   /// It is assumed that [fkeys] is a subset of the fields of this primitive, otherwise
   /// an assertion is thrown.
@@ -41,4 +41,9 @@ abstract class Primitive {
 
   /// True if the primitive has not been prepared yet for updates.
   bool get notPreparedYet;
+
+  /// The embodiment properties of this primitive, derived from the embodiment
+  /// field of this primitive.  If there are no embodiment properties, an empty map
+  /// is returned.
+  Map<String, dynamic> get embodimentProperties;
 }

@@ -40,4 +40,9 @@ class Check extends PrimitiveBase {
   /// The text label to display.
   String get label => _label.value;
   set label(String label) => _label.value = label;
+
+  /// Cycles to the next state.
+  void nextState() {
+    checked = !checked;
+  }
 }

@@ -54,4 +54,9 @@ class Choice extends PrimitiveBase {
       _choice.value = '';
     }
   }
+
+  /// Returns whether or not the choice is valid.
+  bool get isChoiceValid {
+    return choices.contains(choice);
+  }
 }

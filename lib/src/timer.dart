@@ -4,6 +4,7 @@
 import 'fkey.dart';
 import 'primitive_base.dart';
 import 'integer_field.dart';
+import 'event_field.dart';
 
 // A timer is an invisible primitive that fires an event, triggering an update
 // to the server.  This is useful for low-precision GUI updates that originate
@@ -16,6 +17,7 @@ class Timer extends PrimitiveBase {
 
   // Field storage
   late IntegerField _periodMs;
+  late EventField _timerFired;
 
   @override
   String get describeType => 'Timer';
@@ -23,6 +25,7 @@ class Timer extends PrimitiveBase {
   @override
   void describeFields(List<FieldRef> fieldRefs) {
     fieldRefs.add(FieldRef(fkeyPeriodMs, _periodMs));
+    fieldRefs.add(FieldRef(fkeyTimerFired, _timerFired));
   }
 
   @override
@@ -33,4 +36,9 @@ class Timer extends PrimitiveBase {
   /// The period of the timer in milliseconds.
   int get periodMs => _periodMs.value;
   set periodMs(int periodMs) => _periodMs.value = periodMs;
+
+  /// Fires the event for the timer.
+  void fireTimer() {
+    _timerFired.issueNow();
+  }
 }

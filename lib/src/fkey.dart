@@ -32,8 +32,9 @@ const int fkeyState = 21;
 const int fkeyStatus = 22;
 const int fkeyTag = 23;
 const int fkeyTextEntry = 24;
-const int fkeyValidExtensions = 25;
-const int fkeyMaximumKeys = 26;
+const int fkeyTimerFired = 25;
+const int fkeyValidExtensions = 26;
+const int fkeyMaximumKeys = 27;
 
 final _fkeyToName = _initializeFkeyToName();
 final _nameToFKey = _initializeNameToFKey();
@@ -67,6 +68,7 @@ List<String> _initializeFkeyToName() {
   list[fkeyStatus] = "Status";
   list[fkeyTag] = "Tag";
   list[fkeyTextEntry] = "TextEntry";
+  list[fkeyTimerFired] = "TimerFired";
   list[fkeyValidExtensions] = "ValidExtensions";
 
   return list;
@@ -100,6 +102,7 @@ Map<String, int> _initializeNameToFKey() {
     "Status": fkeyStatus,
     "Tag": fkeyTag,
     "TextEntry": fkeyTextEntry,
+    "TimerFired": fkeyTimerFired,
     "ValidExtensions": fkeyValidExtensions,
   };
 }

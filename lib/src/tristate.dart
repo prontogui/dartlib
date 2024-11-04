@@ -39,4 +39,45 @@ class Tristate extends PrimitiveBase {
   /// The text label to display.
   String get label => _label.value;
   set label(String label) => _label.value = label;
+
+  /// Alternative getter of state represented as nullable boolean.
+  bool? get stateAsBool {
+    switch (state) {
+      case 0:
+        return false;
+      case 1:
+        return true;
+      case 2:
+        return null;
+      default:
+        assert(false);
+    }
+    return null;
+  }
+
+  /// Alternative setter of state using a nullable boolean.  Calling this function also
+  /// sets the state field appropriately.
+  set stateAsBool(bool? boolState) {
+    if (boolState == null) {
+      state = 2;
+    } else if (boolState) {
+      state = 1;
+    } else {
+      state = 0;
+    }
+  }
+
+  /// Cycles to the next state.
+  void nextState() {
+    switch (state) {
+      case 0:
+        state = 1;
+      case 1:
+        state = 2;
+      case 2:
+        state = 0;
+      default:
+        state = 0;
+    }
+  }
 }

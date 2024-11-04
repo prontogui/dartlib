@@ -49,5 +49,20 @@ void main() {
       final choice = Choice(choice: 'Option1', choices: ['Option1', 'Option2']);
       expect(choice.toString(), 'Option1');
     });
+
+    test('isChoiceValid returns true for valid choice', () {
+      final choice = Choice(choice: 'Option1', choices: ['Option1', 'Option2']);
+      expect(choice.isChoiceValid, isTrue);
+    });
+
+    test('isChoiceValid returns false for invalid choice', () {
+      final choice = Choice(choice: 'Option3', choices: ['Option1', 'Option2']);
+      expect(choice.isChoiceValid, isFalse);
+    });
+
+    test('isChoiceValid returns false for empty choice', () {
+      final choice = Choice(choice: '', choices: ['Option1', 'Option2']);
+      expect(choice.isChoiceValid, isFalse);
+    });
   });
 }

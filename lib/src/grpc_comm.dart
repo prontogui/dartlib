@@ -7,38 +7,7 @@ import 'dart:io';
 import 'package:grpc/grpc.dart';
 import 'proto/pg.pbgrpc.dart';
 import 'package:cbor/cbor.dart';
-
-/// States of communication
-enum PGCommState {
-  /// Communication is inactive because either open() hasn't been called yet or
-  /// the close() method was called.
-  inactive,
-
-  /// A connection attempt has been made by trying to make an RPC.  This brief state is designed
-  /// to allow time for the connection to be established without having to tell the user
-  /// we are waiting for the connection to be made.  It's mainly for messaging purposes.  After
-  /// the connectingPeriod elapses, it switches to the connectingWait state, where we
-  /// can notify the user that we're waiting.
-  connecting,
-
-  /// A connection attempt has been made by trying to make an RPC.  It remains in this state
-  /// until successful or the connection times out or an error is returned.  This state is
-  /// designed so we can update the user that we are waiting on the connection to occur.
-  connectingWait,
-
-  /// State where streaming of updates is happening without any problems.
-  active,
-
-  /// This state is entered upon error or disconnection during active streaming.  It
-  /// is where we peroidically try to reestablish streaming through a successful RPC.
-  reestablishmentDelay,
-}
-
-/// A callback function for handling updates coming from the server.
-typedef OnUpdateFunction = void Function(CborValue update);
-
-/// A callback function for notifying the user of a state change in communication.
-typedef OnStateChange = void Function();
+import 'comm_client.dart';
 
 /// ProntoGUI communication client to talk with a single server using gRPC.
 ///
@@ -51,13 +20,7 @@ typedef OnStateChange = void Function();
 /// If this check-in fails, then it will keep trying until communication is up again.
 ///
 /// You can call open() any time to specify a different server to connect with.
-class GrpcCommClient {
-  /// The user-supplied callback for sending notifications of state changes.
-  final OnStateChange? onStateChange;
-
-  /// The user-supplied callback for handling the updates coming from the server.
-  final OnUpdateFunction onUpdate;
-
+class GrpcCommClient extends CommClient {
   /// The amount of time (in seconds) to wait for a connection to be established.
   final int _connectingPeriod = 3;
 
@@ -97,7 +60,7 @@ class GrpcCommClient {
   Timer? _timer;
 
   /// The current state of communication.
-  PGCommState _state = PGCommState.inactive;
+  CommState _state = CommState.inactive;
 
   /// True means the server is invalid or unreachable, given the provided server
   /// address and port in the open() method call.
@@ -125,21 +88,17 @@ class GrpcCommClient {
   /// reestablishing streaming with the server during a paused state.
   ///
   /// * Debug messages are printed to the console if [debug] is true.
-  GrpcCommClient(this.onUpdate,
-      {this.onStateChange,
+  GrpcCommClient(
+      {required super.onUpdate,
+      super.onStateChange,
       this.serverCheckinPeriod = 60,
       this.reestablishmentPeriod = 30,
       this.debug = false});
 
-  /// Opens a session for streaming updates back/forth with a server.
-  ///
-  /// The optional [serverAddress] is the address of the server.  Likewise, the optional
-  /// [serverPort] is the server port to connect through.  If either of these are not
-  /// provided then it uses the previous values of the serverAddress and/or
-  /// serverPort properties.
+  @override
   void open({String? serverAddress, int? serverPort}) {
     // Active session already?
-    if (_state != PGCommState.inactive) {
+    if (_state != CommState.inactive) {
       _cleanupResources(false);
     }
 
@@ -177,27 +136,28 @@ class GrpcCommClient {
     // Initialize with an empty update
     _response = PGUpdate();
 
-    _state = PGCommState.connecting;
+    _state = CommState.connecting;
     _startStreamingIncomingUpdates();
   }
 
   /// Closes an open communication session (if any) and enters the inactive state.
+  @override
   void close() {
     _cleanupResources(false);
     _notifyListeners();
   }
 
-  /// Returns the current state of communication.
-  PGCommState get state {
+  @override
+  CommState get state {
     return _state;
   }
 
-  /// True means the server is invalid or unreachable, given the provided server
-  /// address and port in the open() method call.
+  @override
   bool get invalidServer {
     return _invalidServer;
   }
 
+  @override
   double get reestablishmentWaitProgress {
     if (_timer == null) {
       return 0.0;
@@ -213,7 +173,7 @@ class GrpcCommClient {
   /// Set the server address for next communication session.  If there is a session
   /// already open and the server address is different then it will be forcefully closed.
   set serverAddress(String addr) {
-    if (_state != PGCommState.inactive && addr != _serverAddress) {
+    if (_state != CommState.inactive && addr != _serverAddress) {
       _cleanupResources(false);
     }
     _serverAddress = addr;
@@ -227,7 +187,7 @@ class GrpcCommClient {
   /// Set the server port for next communication session.  If there is a session
   /// already open and the server port is different then it will be forcefully closed.
   set serverPort(int port) {
-    if (_state != PGCommState.inactive && port != _serverPort) {
+    if (_state != CommState.inactive && port != _serverPort) {
       _cleanupResources(false);
     }
     _serverPort = port;
@@ -239,19 +199,18 @@ class GrpcCommClient {
     return _timer != null ? _timer!.tick : 0;
   }
 
-  /// Forcefully try to re-establish streaming without waiting for a reconnection
-  /// countdown to expire.
+  @override
   void tryConnectionAgain() {
-    if (_state == PGCommState.connectingWait) {
+    if (_state == CommState.connectingWait) {
       open();
-    } else if (_state == PGCommState.reestablishmentDelay) {
+    } else if (_state == CommState.reestablishmentDelay) {
       _startStreamingIncomingUpdates();
     }
   }
 
-  /// Stream an update back to the server.
+  @override
   void streamUpdateToServer(CborValue cborUpdate) {
-    if (_state != PGCommState.active) return;
+    if (_state != CommState.active) return;
     _response = PGUpdate(cbor: cbor.encode(cborUpdate));
     // NOTE:  this routine doesn't support multiple back-to-back updates without
     // a microtask intermission.
@@ -259,11 +218,16 @@ class GrpcCommClient {
     _completer.complete(true);
   }
 
+  @override
+  String serverEndpointDescription() {
+    return 'Server at $_serverAddress:$_serverPort';
+  }
+
   /// Cleans up outstanding resources for the active session.
   /// [invalidServer] should be true if calling this after a failed attempt to
   /// to establish a client channel due to an invalid server address.
   void _cleanupResources(bool invalidServer) {
-    _state = PGCommState.inactive;
+    _state = CommState.inactive;
 
     // Clean up resources in reverse-order of creation
     _call?.cancel();
@@ -290,22 +254,22 @@ class GrpcCommClient {
     }
 
     switch (_state) {
-      case PGCommState.inactive:
+      case CommState.inactive:
         // This should never happen
         assert(false);
-      case PGCommState.active:
+      case CommState.active:
         // Send over an empty partial update
         var emptyPartialUpdate = CborList([const CborBool(false)]);
         streamUpdateToServer(emptyPartialUpdate);
-      case PGCommState.connecting:
+      case CommState.connecting:
         // Switch to next state
-        _state = PGCommState.connectingWait;
+        _state = CommState.connectingWait;
         _startTimer(1);
 
-      case PGCommState.connectingWait:
+      case CommState.connectingWait:
         _notifyListeners();
 
-      case PGCommState.reestablishmentDelay:
+      case CommState.reestablishmentDelay:
         _notifyListeners();
 
         if (timer.tick >= reestablishmentPeriod) {
@@ -342,10 +306,10 @@ class GrpcCommClient {
         print('Received update of length = ${pgUpdate.cbor.length} bytes');
       }
 
-      if (_state != PGCommState.active) {
+      if (_state != CommState.active) {
         _notifyListeners();
       }
-      _state = PGCommState.active;
+      _state = CommState.active;
 
       // reset the timer for checking in with server
       _startTimer(serverCheckinPeriod);
@@ -363,7 +327,7 @@ class GrpcCommClient {
       print('Streaming of updates is starting.');
     }
 
-    final timerPeriod = (_state == PGCommState.connecting)
+    final timerPeriod = (_state == CommState.connecting)
         ? _connectingPeriod
         : reestablishmentPeriod;
 
@@ -386,9 +350,9 @@ class GrpcCommClient {
       // Clear any pending response heading back to server
       _response = PGUpdate();
 
-      if (_state == PGCommState.active ||
-          _state == PGCommState.reestablishmentDelay) {
-        _state = PGCommState.reestablishmentDelay;
+      if (_state == CommState.active ||
+          _state == CommState.reestablishmentDelay) {
+        _state = CommState.reestablishmentDelay;
         _startTimer(1);
         _notifyListeners();
       }

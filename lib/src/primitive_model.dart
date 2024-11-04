@@ -14,6 +14,10 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
   List<Primitive> _topPrimitives = [];
   final List<PrimitiveModelWatcher> _watchers = [];
 
+  /// The list of objects watching this model.
+  List<PrimitiveModelWatcher> get watchers =>
+      List<PrimitiveModelWatcher>.unmodifiable(_watchers);
+
   /// Returns true if the model is empty.
   bool get isEmpty {
     return _topPrimitives.isEmpty;
@@ -40,6 +44,10 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
       }
     }
     _watchers.add(watcher);
+  }
+
+  void removeWatcher(PrimitiveModelWatcher watcher) {
+    _watchers.remove(watcher);
   }
 
   void onFullModelUpdate() {

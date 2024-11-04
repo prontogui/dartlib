@@ -1,6 +1,8 @@
 // Copyright 2024 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+import 'dart:io';
+
 import 'package:cbor/cbor.dart';
 import 'field.dart';
 import 'pkey.dart';
@@ -8,6 +10,7 @@ import 'fkey.dart';
 import 'field_hooks.dart';
 import 'primitive.dart';
 import 'string_field.dart';
+import 'dart:convert';
 
 class FieldRef {
   FieldRef(this.fkey, this.field);
@@ -16,13 +19,26 @@ class FieldRef {
   Field field;
 }
 
+/// The base class for all primitives.
 abstract class PrimitiveBase implements Primitive {
-  PrimitiveBase({String embodiment = '', String tag = ''})
-      : _embodiment = StringField.from(embodiment),
-        _tag = StringField.from(tag) {}
+  PrimitiveBase({String embodiment = '', String tag = ''}) {
+    this.embodiment = embodiment;
+    this.tag = tag;
+  }
 
+  // The PKey of this primitive.
   PKey _pkey = PKey();
+
+  // Cached field refs.
   List<FieldRef>? __cachedFieldRefs;
+
+  // Common fields for all primitives
+  final _embodiment = StringField();
+  final _tag = StringField();
+
+  /// Cached embodimenet properties.  These are built on demand and cleared when
+  /// embodiment is reassigned.  If embodiment is empty then this value remains null.
+  Map<String, dynamic>? __cachedEmbodimentProperties;
 
   // Derived primitives must implement this method to describe their type and fields.
   void describeFields(List<FieldRef> fieldRefs);
@@ -45,14 +61,57 @@ abstract class PrimitiveBase implements Primitive {
     return __cachedFieldRefs!;
   }
 
-  // Common fields for all primitives
-  final StringField _embodiment;
-  final StringField _tag;
-
-  // The embodiment to use for rendering the Text.
+  /// The embodiment to use for rendering the primitive.
+  ///
+  /// Setting the embodiment is done using a JSON string, a simple assignment of embodiment type,
+  /// or a simplified key-value pair string.  For example:
+  ///
+  /// This will always return a JSON string, the canonical representation of the embodiment,
+  /// regardless of how it was set.
   String get embodiment => _embodiment.value;
   set embodiment(String embodiment) {
-    _embodiment.value = embodiment;
+    // In any case, clear the cached embodiment properties.
+    __cachedEmbodimentProperties = null;
+    _embodiment.value = _canonizeEmbodiment(embodiment);
+  }
+
+  String _canonizeEmbodiment(String embodimentSetting) {
+    var s = embodimentSetting.trim();
+
+    if (s.isEmpty) {
+      return '';
+    }
+
+    if (s.startsWith('{')) {
+      return s;
+    }
+
+    if (s.contains(':')) {
+      return _convertSimplifiedKVPairsToJson(s);
+    }
+
+    return '{"embodiment":"$s"}';
+  }
+
+  String _convertSimplifiedKVPairsToJson(String embodiment) {
+    var innerJson = "";
+
+    var pairs = embodiment.split(',');
+
+    for (var pair in pairs) {
+      var kv = pair.split(':');
+      if (kv.length != 2) {
+        throw Exception('Invalid key:value pair in simplified embodiment');
+      }
+
+      if (innerJson.isNotEmpty) {
+        innerJson += ',';
+      }
+
+      innerJson += '"${kv[0].trim()}":"${kv[1].trim()}"';
+    }
+
+    return '{$innerJson}';
   }
 
   // The tag to keep around with this primitive.
@@ -64,6 +123,7 @@ abstract class PrimitiveBase implements Primitive {
   void initializeFromCborMap(PKey pkey, CborMap cbor) {
     _pkey = pkey;
     ingestFullCborMap(cbor);
+    __cachedEmbodimentProperties = null;
   }
 
   @override
@@ -139,6 +199,7 @@ abstract class PrimitiveBase implements Primitive {
 
   @override
   void ingestFullCborMap(CborMap cbor) {
+    __cachedEmbodimentProperties = null;
     for (var item in cbor.entries) {
       var k = item.key;
 
@@ -179,6 +240,10 @@ abstract class PrimitiveBase implements Primitive {
         throw 'field not found';
       }
 
+      if (fkey == fkeyEmbodiment) {
+        __cachedEmbodimentProperties = null;
+      }
+
       field.ingestPartialCborValue(item.value);
     }
   }
@@ -201,6 +266,24 @@ abstract class PrimitiveBase implements Primitive {
     }
 
     return -1;
+  }
+
+  @override
+  Map<String, dynamic> get embodimentProperties {
+    if (__cachedEmbodimentProperties != null) {
+      return __cachedEmbodimentProperties!;
+    }
+
+    late String embodimentJson = embodiment.trim();
+
+    if (embodimentJson.trim().isEmpty) {
+      return const {};
+    }
+
+    __cachedEmbodimentProperties =
+        jsonDecode(embodimentJson) as Map<String, dynamic>;
+
+    return __cachedEmbodimentProperties!;
   }
 
   /// Returns a pretty-printed string representation of this primitive.

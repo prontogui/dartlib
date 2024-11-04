@@ -20,6 +20,30 @@ void main() {
       expect(frame.showing, isTrue);
     });
 
+    test('should initialize with provided embodiment', () {
+      final frame = Frame(embodiment: '{"embodiment": "full-view"}');
+
+      expect(frame.embodiment, equals('{"embodiment": "full-view"}'));
+      expect(frame.embodimentProperties['embodiment'], equals('full-view'));
+    });
+
+    test('should initialize with provided embodiment using special syntax 1',
+        () {
+      final frame = Frame(embodiment: 'full-view');
+
+      expect(frame.embodiment, equals('{"embodiment":"full-view"}'));
+      expect(frame.embodimentProperties['embodiment'], equals('full-view'));
+    });
+
+    test('should initialize with provided embodiment using special syntax 2',
+        () {
+      final frame = Frame(embodiment: 'embodiment : full-view, yadayada : 123');
+
+      expect(frame.embodiment,
+          equals('{"embodiment":"full-view","yadayada":"123"}'));
+      expect(frame.embodimentProperties['embodiment'], equals('full-view'));
+    });
+
     test('should update frameItems', () {
       final frame = Frame();
       final primitive = Text();
