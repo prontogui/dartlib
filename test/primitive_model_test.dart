@@ -1,7 +1,6 @@
 import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/primitive_model.dart';
-import 'package:dartlib/src/primitive.dart';
 import 'package:dartlib/src/pkey.dart';
 import 'package:dartlib/src/fkey.dart';
 import 'package:dartlib/src/primitive_model_watcher.dart';
@@ -10,12 +9,18 @@ import 'test_cbor_samples.dart';
 
 class MockPrimitiveModelWatcher implements PrimitiveModelWatcher {
   bool fullModelUpdated = false;
+  bool partialModelUpdated = false;
   bool topLevelPrimitiveUpdated = false;
   bool fieldSet = false;
 
   @override
   void onFullModelUpdate() {
     fullModelUpdated = true;
+  }
+
+  @override
+  void onPartialModelUpdate() {
+    partialModelUpdated = true;
   }
 
   @override

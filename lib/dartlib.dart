@@ -4,11 +4,12 @@
 export 'src/comm_client.dart'
     show CommClient, CommState, OnStateChange, OnUpdateFunction;
 export 'src/grpc_comm.dart' show GrpcCommClient;
-export 'src/fkey.dart' show FKey;
+export 'src/fkey.dart'; // export everything, especially the fkeyXXX constants.
 export 'src/pkey.dart' show PKey;
 export 'src/primitive.dart' show Primitive;
 export 'src/primitive_model.dart' show PrimitiveModel;
 export 'src/primitive_model_watcher.dart' show PrimitiveModelWatcher;
+export 'src/primitive_locator.dart' show PrimitiveLocator;
 export 'src/synchro_base.dart' show SynchroBase;
 export 'src/update_synchro.dart' show UpdateSynchro;
 export 'src/check.dart' show Check;

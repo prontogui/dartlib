@@ -33,7 +33,7 @@ class UpdateSynchro extends SynchroBase {
       updateList.add(p!.egestPartialCborMap(update.fields));
     }
 
-    pendingUpdates.clear();
+    clearPendingUpdates();
 
     return CborList(updateList);
   }
@@ -57,7 +57,7 @@ class UpdateSynchro extends SynchroBase {
       updateList.add(next.egestFullCborMap());
     }
 
-    // TODO:  should we clear pendingUpdates here?
+    clearPendingUpdates();
 
     return CborList(updateList);
   }

@@ -38,7 +38,12 @@ class SynchroBase implements PrimitiveModelWatcher {
   final Set<FKey>? fieldFilter;
 
   @override
-  void onFullModelUpdate() {}
+  void onFullModelUpdate() {
+    clearPendingUpdates();
+  }
+
+  @override
+  void onPartialModelUpdate() {}
 
   @override
   void onTopLevelPrimitiveUpdate() {}
@@ -61,6 +66,11 @@ class SynchroBase implements PrimitiveModelWatcher {
     if (structural) {
       _ignoreDescendantUpdates(pkey);
     }
+  }
+
+  /// Clears all pending updates.
+  void clearPendingUpdates() {
+    pendingUpdates.clear();
   }
 
   /// Finds an update in the list of pending updates.
