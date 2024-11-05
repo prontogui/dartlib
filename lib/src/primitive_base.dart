@@ -127,6 +127,9 @@ abstract class PrimitiveBase implements Primitive {
   }
 
   @override
+  PKey get pkey => _pkey;
+
+  @override
   Primitive locateNextDescendant(PKeyLocator locator) {
     throw Exception(
         'locateNextDescendant not implemented for this primitive because it doesn\'t have descendants.');

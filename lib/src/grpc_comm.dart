@@ -165,13 +165,12 @@ class GrpcCommClient extends CommClient {
     return _timer!.tick / reestablishmentPeriod;
   }
 
-  /// Address of server we are streaming updates with.
+  @override
   String get serverAddress {
     return _serverAddress;
   }
 
-  /// Set the server address for next communication session.  If there is a session
-  /// already open and the server address is different then it will be forcefully closed.
+  @override
   set serverAddress(String addr) {
     if (_state != CommState.inactive && addr != _serverAddress) {
       _cleanupResources(false);
@@ -179,13 +178,12 @@ class GrpcCommClient extends CommClient {
     _serverAddress = addr;
   }
 
-  /// Port of server we are streamig update with.
+  @override
   int get serverPort {
     return _serverPort;
   }
 
-  /// Set the server port for next communication session.  If there is a session
-  /// already open and the server port is different then it will be forcefully closed.
+  @override
   set serverPort(int port) {
     if (_state != CommState.inactive && port != _serverPort) {
       _cleanupResources(false);

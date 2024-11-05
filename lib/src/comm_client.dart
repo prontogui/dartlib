@@ -68,6 +68,15 @@ abstract class CommClient {
   /// Closes an open communication session (if any) and enters the inactive state.
   void close();
 
+  /// Address of server we are streaming updates with.
+  String get serverAddress;
+  set serverAddress(String addr);
+
+  /// Server port for the communication session.  If there is a session
+  /// already open and the server port is different then it will be forcefully closed.
+  int get serverPort;
+  set serverPort(int port);
+
   /// Returns a description of the server endpoint we are trying to connect to.
   ///
   /// Note:  this is protocol-specific.

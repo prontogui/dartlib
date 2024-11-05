@@ -136,6 +136,19 @@ class PKey {
   }
 
   @override
+  bool operator ==(Object other) {
+    if (other is PKey) {
+      return isEqualTo(other);
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(_indices);
+  }
+
+  @override
   String toString() {
     return _indices.toString();
   }

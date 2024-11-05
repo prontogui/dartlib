@@ -8,6 +8,9 @@ import 'field_hooks.dart';
 
 // Interface for Primitives.
 abstract class Primitive {
+  /// The path to this primitive.
+  PKey get pkey;
+
   /// Prepare this primitive for updates, where [pkey] is the path to this primitive,
   /// and [fieldHooks] is the interface to call when fields of this primitive are updated.
   void prepareForUpdates(PKey pkey, FieldHooks fieldHooks);

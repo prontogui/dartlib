@@ -198,4 +198,22 @@ void main() {
     expect(locator.nextIndex(), equals(1));
     expect(() => locator.nextIndex(), throwsException);
   });
+
+  test('hashCodes are the same', () {
+    final pkey1 = PKey(1, 2, 3);
+    final pkey2 = PKey(1, 2, 3);
+    final hash1 = pkey1.hashCode;
+    final hash2 = pkey2.hashCode;
+
+    expect(hash1, equals(hash2));
+  });
+
+  test('hashCodes are different', () {
+    final pkey1 = PKey(1, 2);
+    final pkey2 = PKey(1, 2, 3);
+    final hash1 = pkey1.hashCode;
+    final hash2 = pkey2.hashCode;
+
+    expect(hash1, isNot(equals(hash2)));
+  });
 }
