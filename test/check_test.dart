@@ -1,6 +1,9 @@
 import 'package:test/test.dart';
 import 'package:dartlib/src/check.dart';
 
+import 'test_cbor_samples.dart';
+import 'package:dartlib/src/pkey.dart';
+
 void main() {
   group('Check', () {
     test('Default constructor initializes with default values', () {
@@ -46,6 +49,13 @@ void main() {
       expect(check.checked, true);
       check.nextState();
       expect(check.checked, false);
+    });
+
+    test('all fields are added', () {
+      final command = Check();
+      expect(
+          () => command.initializeFromCborMap(PKey(0), cborForCheck('Turn On')),
+          returnsNormally);
     });
   });
 }

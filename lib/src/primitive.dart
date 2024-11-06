@@ -39,7 +39,7 @@ abstract class Primitive {
   /// updates for pre-existing child primmitives.  New children are not created.
   void ingestPartialCborMap(CborMap cbor);
 
-  /// Returns the type of primitive this is.
+  /// Returns the canonical type of this primitive.
   String get describeType;
 
   /// True if the primitive has not been prepared yet for updates.

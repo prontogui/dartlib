@@ -63,9 +63,10 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
   }
 
   void _prepareForUpdates() {
-    var emptyPKey = PKey();
+    var i = 0;
     for (var p in _topPrimitives) {
-      p.prepareForUpdates(emptyPKey, this);
+      p.prepareForUpdates(PKey(i), this);
+      i++;
     }
   }
 
@@ -131,7 +132,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
       newTopPrimitives.add(PrimitiveFactory.createPrimitiveFromCborMap(
           PKey.fromPKey(pkey, i), cbor));
     }
-    _topPrimitives = newTopPrimitives;
+    topPrimitives = newTopPrimitives;
 
     onFullModelUpdate();
   }

@@ -21,6 +21,11 @@ class BlobField extends FieldBase implements Field {
 
   @override
   void ingestFullCborValue(CborValue value) {
+    if (value is CborNull) {
+      _ba.clear();
+      return;
+    }
+
     if (value is! CborBytes) {
       throw Exception('value is not a CborBytes');
     }

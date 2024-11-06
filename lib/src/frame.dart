@@ -32,6 +32,7 @@ class Frame extends PrimitiveBase {
   @override
   void describeFields(List<FieldRef> fieldRefs) {
     fieldRefs.add(FieldRef(fkeyFrameItems, _frameItems));
+    fieldRefs.add(FieldRef(fkeyShowing, _showing));
   }
 
   @override

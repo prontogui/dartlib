@@ -9,6 +9,8 @@ import 'package:dartlib/src/fkey.dart';
 import 'package:dartlib/src/pkey.dart';
 import 'package:dartlib/src/field_hooks.dart';
 
+import 'test_cbor_samples.dart';
+
 class PrepareForUpdatesSetup implements FieldHooks {
   PrepareForUpdatesSetup() {
     _setupTest();
@@ -74,6 +76,22 @@ void main() {
       final primitive = Text(content: 'test');
       field.value = primitive;
       expect(field.value, equals(primitive));
+    });
+
+    test('ingestFullCborValue works', () {
+      var t = PrepareForUpdatesSetup();
+      t.field.ingestFullCborValue(distinctCborForText());
+      expect(t.field.value!.describeType, equals('Text'));
+      expect(t.onsetCalled, equals(0));
+    });
+
+    test('ingestParialCborValue works', () {
+      var t = PrepareForUpdatesSetup();
+      t.field.value = t.text;
+      t.field.ingestPartialCborValue(partialCborForText('ABC'));
+      var text = t.field.value as Text;
+      expect(text.content, equals('ABC'));
+      expect(t.onsetCalled, equals(2));
     });
 
     test('ingestFullCborValue throws exception if value is not CborMap', () {

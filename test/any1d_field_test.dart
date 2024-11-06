@@ -38,7 +38,11 @@ void main() {
       ]);
     }
 
-    populateFromCbor() {
+    populateFromFullCbor() {
+      field.ingestFullCborValue(getCborForTesting());
+    }
+
+    populateFromPartialCbor() {
       field.ingestFullCborValue(getCborForTesting());
     }
 
@@ -110,7 +114,7 @@ void main() {
 
     test('ingestFullCborValue updates the internal list', () {
       populateField();
-      populateFromCbor();
+      populateFromFullCbor();
 
       field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks());
 
@@ -122,6 +126,8 @@ void main() {
       expect(primitive1.notPreparedYet, isTrue);
       expect(primitive2.content, equals('Original Content 2'));
       expect(primitive2.notPreparedYet, isTrue);
+
+      //expect(on)
     });
 
     test('ingestPartialCborValue updates existing primitives', () {

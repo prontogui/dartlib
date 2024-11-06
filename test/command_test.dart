@@ -3,6 +3,8 @@ import 'package:test/test.dart';
 import 'package:dartlib/src/command.dart';
 import 'package:dartlib/src/pkey.dart';
 
+import 'test_cbor_samples.dart';
+
 void main() {
   group('Command', () {
     test('initial values are set correctly', () {
@@ -62,6 +64,14 @@ void main() {
 
       expect(command.status, 2);
       expect(command.visible, false);
+    });
+
+    test('all fields are added', () {
+      final command = Command();
+      expect(
+          () => command.initializeFromCborMap(
+              PKey(0), cborForCommandAsOutlined()),
+          returnsNormally);
     });
   });
 }

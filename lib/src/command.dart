@@ -29,7 +29,7 @@ class Command extends PrimitiveBase {
   void describeFields(List<FieldRef> fieldRefs) {
     fieldRefs.add(FieldRef(fkeyCommandIssued, _commandIssued));
     fieldRefs.add(FieldRef(fkeyLabel, _label));
-    fieldRefs.add(FieldRef(fkeyLabel, _status));
+    fieldRefs.add(FieldRef(fkeyStatus, _status));
   }
 
   @override

@@ -1,5 +1,7 @@
 import 'package:test/test.dart';
 import 'package:dartlib/src/choice.dart';
+import 'package:dartlib/src/pkey.dart';
+import 'test_cbor_samples.dart';
 
 void main() {
   group('Choice', () {
@@ -63,6 +65,12 @@ void main() {
     test('isChoiceValid returns false for empty choice', () {
       final choice = Choice(choice: '', choices: ['Option1', 'Option2']);
       expect(choice.isChoiceValid, isFalse);
+    });
+
+    test('all fields are added', () {
+      final command = Choice();
+      expect(() => command.initializeFromCborMap(PKey(0), cborForChoice()),
+          returnsNormally);
     });
   });
 }

@@ -68,7 +68,8 @@ class Any1DField extends FieldBase implements Field {
   @override
   void ingestFullCborValue(CborValue value) {
     if (value is! CborList) {
-      throw Exception('value is not a CborList');
+      throw Exception(
+          'Any1DField:ingestFullCborValue - value is not a CborList');
     }
 
     var newArray = List<Primitive>.generate(value.length, (index) {
@@ -90,7 +91,8 @@ class Any1DField extends FieldBase implements Field {
   @override
   void ingestPartialCborValue(CborValue value) {
     if (value is! CborList) {
-      throw Exception('value is not a CborList');
+      throw Exception(
+          'Any1DField:ingestPartialCborValue - value is not a CborList');
     }
 
     if (_pa.length != value.length) {

@@ -28,8 +28,14 @@ class Strings1DField extends FieldBase implements Field {
 
   @override
   void ingestFullCborValue(CborValue value) {
+    if (value is CborNull) {
+      _sa.clear();
+      return;
+    }
+
     if (value is! CborList) {
-      throw Exception('value is not a CborList');
+      throw Exception(
+          'Strings1DField:ingestFullCborValue - value is not a CborList');
     }
 
     _sa.replaceRange(

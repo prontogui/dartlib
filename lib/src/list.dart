@@ -27,11 +27,14 @@ class ListP extends PrimitiveBase {
   late IntegerField _selected;
 
   @override
-  String get describeType => 'ListP';
+  // Return the cananical type name for this primitive.  ListP is used specifically
+  // in this library because List is a reserved word in Dart.
+  String get describeType => 'List';
 
   @override
   void describeFields(List<FieldRef> fieldRefs) {
     fieldRefs.add(FieldRef(fkeyListItems, _listItems));
+    fieldRefs.add(FieldRef(fkeySelected, _selected));
   }
 
   @override

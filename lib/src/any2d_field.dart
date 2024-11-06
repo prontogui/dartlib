@@ -168,7 +168,8 @@ class Any2DField extends FieldBase implements Field {
   @override
   void ingestFullCborValue(CborValue value) {
     if (value is! CborList) {
-      throw Exception('value is not a CborList');
+      throw Exception(
+          'Any2DField:ingestFullCborValue - value is not a CborList');
     }
 
     var fieldPKey = PKey.fromPKey(pkey, fieldPKeyIndex);
@@ -222,7 +223,8 @@ class Any2DField extends FieldBase implements Field {
   @override
   void ingestPartialCborValue(CborValue value) {
     if (value is! CborList) {
-      throw Exception('value is not a CborList');
+      throw Exception(
+          'Any2DField:ingestPartialCborValue - value is not a CborList');
     }
 
     if (_pa.length != value.length) {

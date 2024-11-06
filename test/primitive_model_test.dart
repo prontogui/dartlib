@@ -5,6 +5,11 @@ import 'package:dartlib/src/pkey.dart';
 import 'package:dartlib/src/fkey.dart';
 import 'package:dartlib/src/primitive_model_watcher.dart';
 import 'package:dartlib/src/text.dart';
+import 'package:dartlib/src/frame.dart';
+import 'package:dartlib/src/group.dart';
+import 'package:dartlib/src/list.dart';
+import 'package:dartlib/src/table.dart';
+
 import 'test_cbor_samples.dart';
 
 class MockPrimitiveModelWatcher implements PrimitiveModelWatcher {
@@ -87,18 +92,56 @@ void main() {
 */
     });
 
-    test('locatePrimitive returns correct primitive', () {
-      var primitive = Text();
-      model.topPrimitives = [primitive];
-      var pkey = PKey.fromIndices([0]);
-      expect(model.locatePrimitive(pkey), primitive);
-    });
-
     test('onSetField notifies watchers', () {
       var pkey = PKey();
       var fkey = fkeyChecked;
       model.onSetField(pkey, fkey, true);
       expect(watcher.fieldSet, isTrue);
+    });
+  });
+
+  group('PKey assignments and locatePrimitive', () {
+    final l1 = Text(content: 'l1');
+    final l2 = Text(content: 'l2');
+    final l = ListP(listItems: [l1, l2]);
+    final g = Group(groupItems: [l]);
+    final t1 = Text(content: 't1');
+    final t2 = Text(content: 't2');
+    final t = Table(rows: [
+      [t1],
+      [t2]
+    ]);
+    final f = Frame(frameItems: [g, t]);
+    final model = PrimitiveModel();
+
+    test('Correct PKeys are assigned', () {
+      model.topPrimitives = [f];
+
+      expect(f.pkey, PKey.fromIndices([0]));
+      expect(t.pkey, PKey.fromIndices([0, 0, 1]));
+      expect(t1.pkey, PKey.fromIndices([0, 0, 1, 0, 0, 0]));
+      expect(t2.pkey, PKey.fromIndices([0, 0, 1, 0, 1, 0]));
+      expect(g.pkey, PKey.fromIndices([0, 0, 0]));
+      expect(l.pkey, PKey.fromIndices([0, 0, 0, 0, 0]));
+      expect(l1.pkey, PKey.fromIndices([0, 0, 0, 0, 0, 0, 0]));
+      expect(l2.pkey, PKey.fromIndices([0, 0, 0, 0, 0, 0, 1]));
+    });
+    test('locatePrimitive returns correct primitive', () {
+      model.topPrimitives = [f];
+
+      expect(model.locatePrimitive(PKey.fromIndices([0])), equals(f));
+      expect(model.locatePrimitive(PKey.fromIndices([0, 0, 1])), equals(t));
+      expect(model.locatePrimitive(PKey.fromIndices([0, 0, 1, 0, 0, 0])),
+          equals(t1));
+      expect(model.locatePrimitive(PKey.fromIndices([0, 0, 1, 0, 1, 0])),
+          equals(t2));
+      expect(model.locatePrimitive(PKey.fromIndices([0, 0, 0])), equals(g));
+      expect(
+          model.locatePrimitive(PKey.fromIndices([0, 0, 0, 0, 0])), equals(l));
+      expect(model.locatePrimitive(PKey.fromIndices([0, 0, 0, 0, 0, 0, 0])),
+          equals(l1));
+      expect(model.locatePrimitive(PKey.fromIndices([0, 0, 0, 0, 0, 0, 1])),
+          equals(l2));
     });
   });
 }

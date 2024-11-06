@@ -123,7 +123,6 @@ abstract class PrimitiveBase implements Primitive {
   void initializeFromCborMap(PKey pkey, CborMap cbor) {
     _pkey = pkey;
     ingestFullCborMap(cbor);
-    __cachedEmbodimentProperties = null;
   }
 
   @override
@@ -217,7 +216,7 @@ abstract class PrimitiveBase implements Primitive {
 
       var field = findField(fkey);
       if (field == null) {
-        throw 'field not found';
+        throw 'field ${k.toString()} not found for primitive of type $describeType';
       }
 
       field.ingestFullCborValue(item.value);
@@ -240,7 +239,7 @@ abstract class PrimitiveBase implements Primitive {
 
       var field = findField(fkey);
       if (field == null) {
-        throw 'field not found';
+        throw 'field ${k.toString()} not found for primitive of type $describeType';
       }
 
       if (fkey == fkeyEmbodiment) {

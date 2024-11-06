@@ -53,6 +53,11 @@ void main() {
       expect(field.value, equals(['hello', 'world']));
     });
 
+    test('ingestFullCborValue with CborNull (empty list)', () {
+      field.ingestFullCborValue(const CborNull());
+      expect(field.value, equals([]));
+    });
+
     test('ingestFullCborValue with invalid CborList throws exception', () {
       final cborList = CborList([CborString('hello'), CborSmallInt(42)]);
       expect(() => field.ingestFullCborValue(cborList), throwsException);

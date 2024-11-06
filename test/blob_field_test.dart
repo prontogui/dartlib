@@ -31,6 +31,11 @@ void main() {
       expect(blobField.value, equals(testData));
     });
 
+    test('ingestFullCborValue with CborNull (empty)', () {
+      blobField.ingestFullCborValue(const CborNull());
+      expect(blobField.value, equals([]));
+    });
+
     test('ingestFullCborValue with invalid CborValue throws exception', () {
       final cborValue = CborString('invalid');
       expect(() => blobField.ingestFullCborValue(cborValue), throwsException);

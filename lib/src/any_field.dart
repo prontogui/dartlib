@@ -80,6 +80,7 @@ class AnyField extends FieldBase implements Field {
       throw Exception('field has a null primitive');
     }
     _p!.ingestPartialCborMap(value);
+    onSet();
   }
 
   @override

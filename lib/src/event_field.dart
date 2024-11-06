@@ -16,8 +16,9 @@ class EventField extends FieldBase implements Field {
     if (_eventTimestamp == null) {
       return false;
     }
-
-    _checkMissingFunc();
+    if (fieldHooks == null) {
+      return false;
+    }
 
     return fieldHooks!.getEventTimestamp().difference(_eventTimestamp!) ==
         Duration.zero;
@@ -25,21 +26,20 @@ class EventField extends FieldBase implements Field {
 
   /// Issues the event now.
   void issueNow() {
-    _checkMissingFunc();
-    _eventTimestamp = fieldHooks!.getEventTimestamp();
-  }
-
-  void _checkMissingFunc() {
     if (fieldHooks == null) {
-      throw Exception('Field hooks are missing');
+      return;
     }
+
+    _eventTimestamp = fieldHooks!.getEventTimestamp();
   }
 
   // Implement Field interface
 
   @override
   void ingestFullCborValue(CborValue value) {
-    _checkMissingFunc();
+    if (fieldHooks == null) {
+      return;
+    }
     _eventTimestamp = fieldHooks!.getEventTimestamp();
   }
 
