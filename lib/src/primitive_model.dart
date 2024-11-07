@@ -56,6 +56,18 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
     }
   }
 
+  void onBeginPartialModelUpdate() {
+    for (var w in _watchers) {
+      w.onBeginPartialModelUpdate();
+    }
+  }
+
+  void onPartialModelUpdate() {
+    for (var w in _watchers) {
+      w.onPartialModelUpdate();
+    }
+  }
+
   void onTopLevelPrimitiveUpdate() {
     for (var w in _watchers) {
       w.onTopLevelPrimitiveUpdate();
@@ -142,6 +154,8 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
   ///
   /// This method is used internally by the class.
   void _ingestPartialUpdate(List<CborValue> l) {
+    onBeginPartialModelUpdate();
+
     final numPrimitives = l.length;
     bool topLevelUpdated = false;
 
@@ -167,5 +181,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
     if (topLevelUpdated) {
       onTopLevelPrimitiveUpdate();
     }
+
+    onPartialModelUpdate();
   }
 }

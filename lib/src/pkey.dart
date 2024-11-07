@@ -59,7 +59,7 @@ class PKey {
 
   /// Create a PKey from the supplied indices.
   PKey.fromIndices(List<int> indices) {
-    _indices = List<int>.from(indices);
+    _indices = List<int>.from(indices, growable: false);
   }
 
   /// Returns a new PKey built from an existing PKey [fromPKey] with and optional
@@ -69,7 +69,16 @@ class PKey {
     if (index != null) {
       newIndices.add(index);
     }
-    _indices = List<int>.from(newIndices);
+    _indices = List<int>.from(newIndices, growable: false);
+  }
+
+  PKey.parentOf(PKey child) {
+    if (child._indices.isEmpty) {
+      throw Exception('PKey.parentOf() called with empty child');
+    }
+    _indices = List<int>.from(
+        child.indices.getRange(0, child.indices.length - 1),
+        growable: false);
   }
 
   /// Create a PKey from a string of comma separated indices.
@@ -123,6 +132,12 @@ class PKey {
     } else {
       return invalidIndex;
     }
+  }
+
+  /// Convert the PKey to a CborList of indices.
+  CborList toCbor() {
+    return CborList.generate(
+        _indices.length, (index) => CborSmallInt(_indices[index]));
   }
 
   /// The number of levels in the PKey.

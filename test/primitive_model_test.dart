@@ -24,6 +24,9 @@ class MockPrimitiveModelWatcher implements PrimitiveModelWatcher {
   }
 
   @override
+  void onBeginPartialModelUpdate() {}
+
+  @override
   void onPartialModelUpdate() {
     partialModelUpdated = true;
   }

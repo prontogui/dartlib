@@ -7,6 +7,7 @@ import 'fkey.dart';
 // Interface for objects that watch the model.
 abstract class PrimitiveModelWatcher {
   void onFullModelUpdate();
+  void onBeginPartialModelUpdate();
   void onPartialModelUpdate();
   void onTopLevelPrimitiveUpdate();
   void onSetField(PKey pkey, FKey fkey, bool structural);

@@ -216,4 +216,55 @@ void main() {
 
     expect(hash1, isNot(equals(hash2)));
   });
+
+  test('PKey parentOf constructor', () {
+    final child = PKey(1, 2, 3);
+    final parent = PKey.parentOf(child);
+
+    expect(parent.indices.length, equals(2));
+    expect(parent.indices[0], equals(1));
+    expect(parent.indices[1], equals(2));
+  });
+
+  test('PKey parentOf constructor with one index', () {
+    final child = PKey(1);
+    final parent = PKey.parentOf(child);
+
+    expect(parent.indices.length, equals(0));
+  });
+
+  test('PKey parentOf constructor with empty child', () {
+    expect(() => PKey.parentOf(PKey()), throwsException);
+  });
+
+  test('PKey equality operator', () {
+    final pkey1 = PKey(1, 2, 3);
+    final pkey2 = PKey(1, 2, 3);
+    final pkey3 = PKey(1, 2, 4);
+
+    expect(pkey1 == pkey2, isTrue);
+    expect(pkey1 == pkey3, isFalse);
+  });
+
+  test('PKeyLocator with multiple indices', () {
+    final pkey = PKey(1, 2, 3);
+    final locator = PKeyLocator(pkey);
+
+    expect(locator.located(), isFalse);
+    expect(locator.nextIndex(), equals(1));
+    expect(locator.located(), isFalse);
+    expect(locator.nextIndex(), equals(2));
+    expect(locator.located(), isFalse);
+    expect(locator.nextIndex(), equals(3));
+    expect(locator.located(), isTrue);
+  });
+
+  test('PKeyLocator nextIndex throws exception when at last level', () {
+    final pkey = PKey(1, 2);
+    final locator = PKeyLocator(pkey);
+
+    expect(locator.nextIndex(), equals(1));
+    expect(locator.nextIndex(), equals(2));
+    expect(() => locator.nextIndex(), throwsException);
+  });
 }

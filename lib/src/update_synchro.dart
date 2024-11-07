@@ -30,6 +30,7 @@ class UpdateSynchro extends SynchroBase {
       var p = locator.locatePrimitive(update.pkey);
       assert(p != null);
 
+      updateList.add(update.pkey.toCbor());
       updateList.add(p!.egestPartialCborMap(update.fields));
     }
 

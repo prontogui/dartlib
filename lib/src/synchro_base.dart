@@ -43,6 +43,9 @@ class SynchroBase implements PrimitiveModelWatcher {
   }
 
   @override
+  void onBeginPartialModelUpdate() {}
+
+  @override
   void onPartialModelUpdate() {}
 
   @override
