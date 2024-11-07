@@ -1,62 +1,79 @@
 import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/blob_field.dart';
+import 'package:dartlib/src/fkey.dart';
+import 'package:dartlib/src/pkey.dart';
+import 'field_hooks_mock.dart';
 
 void main() {
   group('BlobField', () {
-    late BlobField blobField;
+    late BlobField field;
+    late FieldHooksMock fieldhooks;
 
     setUp(() {
-      blobField = BlobField();
+      field = BlobField();
+      fieldhooks = FieldHooksMock();
     });
 
-    final testData = List<int>.unmodifiable([1, 2, 3, 4]);
+    final testData1 = List<int>.unmodifiable([1, 2, 3, 4]);
+    final testData2 = List<int>.unmodifiable([3, 4]);
 
     populateField() {
-      blobField.value = testData;
+      field.value = testData1;
+    }
+
+    prepareForUpdates() {
+      field.prepareForUpdates(fkeyData, PKey(0), 2, fieldhooks);
     }
 
     test('initial value is an empty list', () {
-      expect(blobField.value, isEmpty);
+      expect(field.value, isEmpty);
     });
 
     test('setting and getting value', () {
+      prepareForUpdates();
       populateField();
-      expect(blobField.value, equals(testData));
+      expect(field.value, equals(testData1));
+      fieldhooks.verifyOnsetCalled(1);
     });
 
     test('ingestFullCborValue with valid CborBytes', () {
-      final cborValue = CborBytes(testData);
-      blobField.ingestFullCborValue(cborValue);
-      expect(blobField.value, equals(testData));
+      prepareForUpdates();
+      final cborValue = CborBytes(testData1);
+      field.ingestFullCborValue(cborValue);
+      expect(field.value, equals(testData1));
+      fieldhooks.verifyOnsetCalled(0);
     });
 
     test('ingestFullCborValue with CborNull (empty)', () {
-      blobField.ingestFullCborValue(const CborNull());
-      expect(blobField.value, equals([]));
+      field.ingestFullCborValue(const CborNull());
+      expect(field.value, equals([]));
     });
 
     test('ingestFullCborValue with invalid CborValue throws exception', () {
       final cborValue = CborString('invalid');
-      expect(() => blobField.ingestFullCborValue(cborValue), throwsException);
+      expect(() => field.ingestFullCborValue(cborValue), throwsException);
     });
 
     test('ingestPartialCborValue calls ingestFullCborValue', () {
-      final cborValue = CborBytes(testData);
-      blobField.ingestPartialCborValue(cborValue);
-      expect(blobField.value, equals(testData));
+      populateField();
+      prepareForUpdates();
+      final cborValue = CborBytes(testData2);
+      field.ingestPartialCborValue(cborValue);
+      expect(field.value, equals(testData2));
+      fieldhooks.verifyOnsetCalled(1);
     });
 
     test('egestCborValue returns correct CborBytes', () {
       populateField();
-      final cborValue = blobField.egestCborValue();
+      final cborValue = field.egestCborValue();
       expect(cborValue, isA<CborBytes>());
-      expect((cborValue as CborBytes).bytes, equals(testData));
+      expect((cborValue as CborBytes).bytes, equals(testData1));
     });
 
     test('toString returns correct format', () {
-      blobField.value = [1, 2, 3, 4];
-      expect(blobField.toString(), equals('Blob [4 bytes]'));
+      field.value = [1, 2, 3, 4];
+      expect(field.toString(), equals('Blob [4 bytes]'));
     });
   });
 }

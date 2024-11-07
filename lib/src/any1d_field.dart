@@ -107,6 +107,7 @@ class Any1DField extends FieldBase implements Field {
       }
       _pa[i].ingestPartialCborMap(cbor);
     }
+    onSet();
   }
 
   @override

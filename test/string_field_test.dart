@@ -4,34 +4,56 @@
 import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/string_field.dart';
+import 'package:dartlib/src/fkey.dart';
+import 'package:dartlib/src/pkey.dart';
+import 'field_hooks_mock.dart';
 
 void main() {
   group('StringField', () {
+    late StringField field;
+    late FieldHooksMock fieldhooks;
+
+    setUp(() {
+      field = StringField();
+      fieldhooks = FieldHooksMock();
+    });
+
+    prepareForUpdates() {
+      field.prepareForUpdates(fkeyLabel, PKey(0), 2, fieldhooks);
+    }
+
     test('initial value is empty string', () {
-      var field = StringField();
       expect(field.value, equals(''));
     });
 
     test('set and get value', () {
-      var field = StringField();
+      prepareForUpdates();
       field.value = 'test';
       expect(field.value, equals('test'));
+      fieldhooks.verifyOnsetCalled(1);
     });
 
     test('isStructural returns false', () {
-      var field = StringField();
       expect(field.isStructural, isFalse);
     });
 
     test('ingestFullCborValue with valid CborString', () {
-      var field = StringField();
+      prepareForUpdates();
       var cborValue = CborString('test');
       field.ingestFullCborValue(cborValue);
       expect(field.value, equals('test'));
+      fieldhooks.verifyOnsetCalled(0);
+    });
+
+    test('ingestFullCborValue with valid CborString', () {
+      prepareForUpdates();
+      var cborValue = CborString('test');
+      field.ingestPartialCborValue(cborValue);
+      expect(field.value, equals('test'));
+      fieldhooks.verifyOnsetCalled(1);
     });
 
     test('ingestFullCborValue with invalid CborValue', () {
-      var field = StringField();
       var cborValue = CborSmallInt(123);
       try {
         field.ingestFullCborValue(cborValue);
@@ -42,7 +64,6 @@ void main() {
     });
 
     test('egestCborValue returns CborString', () {
-      var field = StringField();
       field.value = 'test';
       var cborValue = field.egestCborValue();
       expect(cborValue, isA<CborString>());

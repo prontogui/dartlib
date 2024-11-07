@@ -29,8 +29,8 @@ class EventField extends FieldBase implements Field {
     if (fieldHooks == null) {
       return;
     }
-
     _eventTimestamp = fieldHooks!.getEventTimestamp();
+    onSet();
   }
 
   // Implement Field interface
@@ -40,12 +40,14 @@ class EventField extends FieldBase implements Field {
     if (fieldHooks == null) {
       return;
     }
-    _eventTimestamp = fieldHooks!.getEventTimestamp();
+    _eventTimestamp = null;
   }
 
   @override
   void ingestPartialCborValue(CborValue value) {
     ingestFullCborValue(value);
+    _eventTimestamp = fieldHooks!.getEventTimestamp();
+    onSet();
   }
 
   @override

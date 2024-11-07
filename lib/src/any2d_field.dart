@@ -260,6 +260,7 @@ class Any2DField extends FieldBase implements Field {
         _pa[i][j].ingestPartialCborMap(cbor2);
       }
     }
+    onSet();
   }
 
   @override

@@ -5,15 +5,23 @@ import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/any2d_field.dart';
 import 'package:dartlib/src/text.dart';
+import 'package:dartlib/src/fkey.dart';
+import 'package:dartlib/src/pkey.dart';
+import 'field_hooks_mock.dart';
 
 void main() {
   group('Any2DField', () {
     late Any2DField field;
+    late FieldHooksMock fieldhooks;
     late Text primitive1;
     late Text primitive2;
 
     setUp(() {
+      // (re)assign test variables
       field = Any2DField();
+      fieldhooks = FieldHooksMock();
+      primitive1 = Text();
+      primitive2 = Text();
     });
 
     populateField() {
@@ -25,27 +33,31 @@ void main() {
       ];
     }
 
-    populateFromCbor() {
-      var cborValue = CborList([
+    CborValue getCborContent() {
+      return CborList([
         CborList([
           CborMap({
-            CborString('Content'): CborString('content 1'),
-          }),
-          CborMap({
-            CborString('Content'): CborString('content 2'),
+            CborString('Content'): CborString('new content 1'),
           }),
         ]),
         CborList([
           CborMap({
-            CborString('Content'): CborString('content 3'),
-          }),
-          CborMap({
-            CborString('Content'): CborString('content 4'),
+            CborString('Content'): CborString('new content 2'),
           }),
         ]),
       ]);
+    }
 
-      field.ingestFullCborValue(cborValue);
+    populateFromFullCbor() {
+      field.ingestFullCborValue(getCborContent());
+    }
+
+    populateFromPartialCbor() {
+      field.ingestPartialCborValue(getCborContent());
+    }
+
+    prepareForUpdates() {
+      field.prepareForUpdates(fkeyLabel, PKey(1), 0, fieldhooks);
     }
 
     test('should set and get value correctly', () {
@@ -90,7 +102,7 @@ void main() {
     });
 
     test('ingest value is an unmodifiable list', () {
-      populateFromCbor();
+      populateFromFullCbor();
       expect(() => field.value.clear(), throwsUnsupportedError);
       expect(() => field.value[0].clear(), throwsUnsupportedError);
     });
@@ -103,10 +115,26 @@ void main() {
     });
 
     test('should ingest full Cbor value correctly', () {
-      populateFromCbor();
+      prepareForUpdates();
+      populateFromFullCbor();
       expect(field.value.length, equals(2));
-      expect(field.value[0].length, equals(2));
-      expect(field.value[1].length, equals(2));
+      expect(field.value[0].length, equals(1));
+      expect((field.value[0][0] as Text).content, equals('new content 1'));
+      expect(field.value[1].length, equals(1));
+      expect((field.value[1][0] as Text).content, equals('new content 2'));
+      fieldhooks.verifyOnsetCalled(0);
+    });
+
+    test('should ingest partial Cbor value correctly', () {
+      populateField();
+      prepareForUpdates();
+      populateFromPartialCbor();
+      expect(field.value.length, equals(2));
+      expect(field.value[0].length, equals(1));
+      expect((field.value[0][0] as Text).content, equals('new content 1'));
+      expect(field.value[1].length, equals(1));
+      expect((field.value[1][0] as Text).content, equals('new content 2'));
+      fieldhooks.verifyOnsetCalled(1);
     });
 
     test(

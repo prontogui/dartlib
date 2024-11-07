@@ -4,11 +4,25 @@
 import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/boolean_field.dart';
+import 'package:dartlib/src/fkey.dart';
+import 'package:dartlib/src/pkey.dart';
+import 'field_hooks_mock.dart';
 
 void main() {
   group('BoolField', () {
+    late BooleanField field;
+    late FieldHooksMock fieldhooks;
+
+    setUp(() {
+      field = BooleanField();
+      fieldhooks = FieldHooksMock();
+    });
+
+    prepareForUpdates() {
+      field.prepareForUpdates(fkeyChecked, PKey(0), 2, fieldhooks);
+    }
+
     test('default value is false', () {
-      final field = BooleanField();
       expect(field.value, isFalse);
     });
 
@@ -18,37 +32,37 @@ void main() {
     });
 
     test('value can be set and retrieved', () {
-      final field = BooleanField();
+      prepareForUpdates();
       field.value = true;
       expect(field.value, isTrue);
+      fieldhooks.verifyOnsetCalled(1);
     });
 
     test('ingestFullCborValue sets the value correctly', () {
-      final field = BooleanField();
+      prepareForUpdates();
       field.ingestFullCborValue(CborBool(true));
       expect(field.value, isTrue);
+      fieldhooks.verifyOnsetCalled(0);
     });
 
     test('ingestFullCborValue throws exception for non-CborBool', () {
-      final field = BooleanField();
       expect(() => field.ingestFullCborValue(CborString('asfas')),
           throwsException);
     });
 
     test('ingestPartialCborValue sets the value correctly', () {
-      final field = BooleanField();
+      prepareForUpdates();
       field.ingestPartialCborValue(CborBool(true));
       expect(field.value, isTrue);
+      fieldhooks.verifyOnsetCalled(1);
     });
 
     test('ingestPartialCborValue throws exception for non-CborBool', () {
-      final field = BooleanField();
       expect(() => field.ingestPartialCborValue(CborString('asfas')),
           throwsException);
     });
 
     test('egestCborValue returns the correct CborBool', () {
-      final field = BooleanField();
       field.value = true;
       final cborValue = field.egestCborValue();
       expect(cborValue, isA<CborBool>());
@@ -56,7 +70,6 @@ void main() {
     });
 
     test('toString returns the correct string representation', () {
-      final field = BooleanField();
       field.value = true;
       expect(field.toString(), 'true');
     });

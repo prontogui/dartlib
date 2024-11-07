@@ -36,6 +36,7 @@ class BooleanField extends FieldBase implements Field {
   @override
   void ingestPartialCborValue(CborValue value) {
     ingestFullCborValue(value);
+    onSet();
   }
 
   @override

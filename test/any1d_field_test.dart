@@ -8,23 +8,33 @@ import 'package:dartlib/src/fkey.dart';
 import 'package:dartlib/src/pkey.dart';
 import 'package:dartlib/src/any1d_field.dart';
 import 'package:dartlib/src/text.dart';
+import 'field_hooks_mock.dart';
 
 void main() {
   group('Any1DField', () {
     late Any1DField field;
+    late FieldHooksMock fieldhooks;
     late Text primitive1;
     late Text primitive2;
 
-    List<Text> primitives() => [primitive1, primitive2];
-
     setUp(() {
+      // (re)assign test variables
       field = Any1DField();
+      fieldhooks = FieldHooksMock();
+      primitive1 = Text();
+      primitive2 = Text();
     });
+
+    List<Text> primitives() => [primitive1, primitive2];
 
     populateField() {
       primitive1 = Text(content: 'Original Content 1');
       primitive2 = Text(content: 'Original Content 2');
       field.value = [primitive1, primitive2];
+    }
+
+    void prepareForUpdates() {
+      field.prepareForUpdates(fkeyLabel, PKey(1), 0, fieldhooks);
     }
 
     CborValue getCborForTesting() {
@@ -43,7 +53,7 @@ void main() {
     }
 
     populateFromPartialCbor() {
-      field.ingestFullCborValue(getCborForTesting());
+      field.ingestPartialCborValue(getCborForTesting());
     }
 
     test('initial value is an empty list', () {
@@ -60,8 +70,10 @@ void main() {
     });
 
     test('assigned value is an unmodifiable list', () {
+      prepareForUpdates();
       populateField();
       expect(() => field.value.clear(), throwsUnsupportedError);
+      fieldhooks.verifyOnsetCalled(1);
     });
 
     test('ingested value is an unmodifiable list', () {
@@ -114,27 +126,43 @@ void main() {
 
     test('ingestFullCborValue updates the internal list', () {
       populateField();
+      prepareForUpdates();
       populateFromFullCbor();
-
-      field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks());
 
       var newText = field.value[0] as Text;
       expect(newText.content, equals('new content 1'));
 
       expect(field.value.length, equals(2));
-      expect(primitive1.content, equals('Original Content 1'));
+
+      // Verify the previous primitives have been unprepared
       expect(primitive1.notPreparedYet, isTrue);
-      expect(primitive2.content, equals('Original Content 2'));
       expect(primitive2.notPreparedYet, isTrue);
 
-      //expect(on)
+      // Verify the new primitives have correct field assignment and have been prepared for updates
+      var newp1 = field.value[0] as Text;
+      var newp2 = field.value[1] as Text;
+      expect(newp1.content, equals('new content 1'));
+      expect(newp1.notPreparedYet, isFalse);
+      expect(newp2.content, equals('new content 2'));
+      expect(newp2.notPreparedYet, isFalse);
+
+      // Verify the onset was not called
+      fieldhooks.verifyOnsetCalled(0);
     });
 
     test('ingestPartialCborValue updates existing primitives', () {
       populateField();
-      field.ingestPartialCborValue(getCborForTesting());
-      expect(primitive1.content, equals('new content 1'));
-      expect(primitive2.content, equals('new content 2'));
+      prepareForUpdates();
+      populateFromPartialCbor();
+
+      var newp1 = field.value[0] as Text;
+      var newp2 = field.value[1] as Text;
+      expect(newp1.content, equals('new content 1'));
+      expect(newp2.content, equals('new content 2'));
+
+      // Verify the onset was not called thrice (one time for field itself, one time for
+      // each primitive Content field update)
+      fieldhooks.verifyOnsetCalled(3);
     });
 
     test('egestCborValue returns the correct CborList', () {

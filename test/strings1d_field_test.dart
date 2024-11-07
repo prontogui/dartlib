@@ -4,14 +4,23 @@
 import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/strings1d_field.dart';
+import 'package:dartlib/src/fkey.dart';
+import 'package:dartlib/src/pkey.dart';
+import 'field_hooks_mock.dart';
 
 void main() {
   group('Strings1DField', () {
     late Strings1DField field;
+    late FieldHooksMock fieldhooks;
 
     setUp(() {
       field = Strings1DField();
+      fieldhooks = FieldHooksMock();
     });
+
+    prepareForUpdates() {
+      field.prepareForUpdates(fkeyStatus, PKey(0), 2, fieldhooks);
+    }
 
     List<String> populateField() {
       var testValue = ['hello', 'world'];
@@ -24,8 +33,10 @@ void main() {
     });
 
     test('set and get value', () {
+      prepareForUpdates();
       var testValue = populateField();
       expect(field.value, equals(testValue));
+      fieldhooks.verifyOnsetCalled(1);
     });
 
     test('set makes a copy of value', () {
@@ -48,14 +59,18 @@ void main() {
     });
 
     test('ingestFullCborValue with valid CborList', () {
+      prepareForUpdates();
       final cborList = CborList([CborString('hello'), CborString('world')]);
       field.ingestFullCborValue(cborList);
       expect(field.value, equals(['hello', 'world']));
+      fieldhooks.verifyOnsetCalled(0);
     });
 
     test('ingestFullCborValue with CborNull (empty list)', () {
+      prepareForUpdates();
       field.ingestFullCborValue(const CborNull());
       expect(field.value, equals([]));
+      fieldhooks.verifyOnsetCalled(0);
     });
 
     test('ingestFullCborValue with invalid CborList throws exception', () {
@@ -64,9 +79,11 @@ void main() {
     });
 
     test('ingestPartialCborValue with valid CborList', () {
+      prepareForUpdates();
       final cborList = CborList([CborString('hello'), CborString('world')]);
       field.ingestPartialCborValue(cborList);
       expect(field.value, equals(['hello', 'world']));
+      fieldhooks.verifyOnsetCalled(1);
     });
 
     test('ingestPartialCborValue with invalid CborList throws exception', () {

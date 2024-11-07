@@ -7,91 +7,54 @@ import 'package:dartlib/src/text.dart';
 import 'package:dartlib/src/any_field.dart';
 import 'package:dartlib/src/fkey.dart';
 import 'package:dartlib/src/pkey.dart';
-import 'package:dartlib/src/field_hooks.dart';
+import 'field_hooks_mock.dart';
 
 import 'test_cbor_samples.dart';
 
-class PrepareForUpdatesSetup implements FieldHooks {
-  PrepareForUpdatesSetup() {
-    _setupTest();
-  }
-
-  final field = AnyField();
-  final text = Text(content: 'test text');
-  final otherText = Text(content: 'other test text');
-
-  var onsetCalled = 0;
-  var onsetPkey = PKey();
-  var onsetFKey = invalidFieldName;
-
-  @override
-  DateTime getEventTimestamp() => DateTime.now();
-
-  @override
-  void onSetField(PKey pkey, FKey fkey, bool structural) {
-    onsetCalled++;
-    onsetPkey = pkey;
-    onsetFKey = fkey;
-  }
-
-  void _setupTest() {
-    // Prepare for updates and set a field of text
-    final fkey = fkeyLabel;
-    final pkey = PKey(0, 1, 2);
-    field.prepareForUpdates(fkey, pkey, 6, this);
-  }
-
-  void verifyOnsetCalled1() {
-    // Onset should have been called with the correct PKey and FKey.  Note:
-    // the FKey is the field name of the field that was updated and PKey is
-    // the PKey supplied to prepareForUpdates with the field index appended.
-    expect(onsetCalled, equals(1));
-    expect(onsetPkey.isEqualTo(PKey(0, 1, 2)), isTrue);
-    expect(onsetFKey, equals(fkeyLabel));
-  }
-
-  void verifyOnsetCalled2() {
-    // Onset should have been called with the correct PKey and FKey.  Note:
-    // the FKey is the field name of the field that was updated and PKey is
-    // the PKey supplied to prepareForUpdates with the field index appended.
-    expect(onsetCalled, equals(2));
-    expect(onsetPkey.isEqualTo(PKey(0, 1, 2, 6)), isTrue);
-    expect(onsetFKey, equals(fkeyContent));
-  }
-
-  void verifyOnsetNotCalled() {
-    expect(onsetCalled, equals(0));
-  }
-}
-
 void main() {
   group('AnyField', () {
+    late AnyField field;
+    late FieldHooksMock fieldhooks;
+    late Text text;
+    late Text otherText;
+
+    setUp(() {
+      // (re)assign test variables
+      field = AnyField();
+      fieldhooks = FieldHooksMock();
+      text = Text(content: 'test text');
+      otherText = Text(content: 'other test text');
+
+      // Prepare for updates and set a field of text
+      field.prepareForUpdates(fkeyLabel, PKey(0, 1, 2), 6, fieldhooks);
+    });
+
     test('initial value is null', () {
       final field = AnyField();
       expect(field.value, isNull);
     });
 
     test('set and get value', () {
-      final field = AnyField();
       final primitive = Text(content: 'test');
       field.value = primitive;
       expect(field.value, equals(primitive));
+      fieldhooks.verifyOnsetCalled(1);
     });
 
     test('ingestFullCborValue works', () {
-      var t = PrepareForUpdatesSetup();
-      t.field.ingestFullCborValue(distinctCborForText());
-      expect(t.field.value!.describeType, equals('Text'));
-      expect(t.onsetCalled, equals(0));
+      field.ingestFullCborValue(distinctCborForText());
+      expect(field.value!.describeType, equals('Text'));
+      fieldhooks.verifyOnsetCalled(0);
     });
 
     test('ingestParialCborValue works', () {
-      var t = PrepareForUpdatesSetup();
-      t.field.value = t.text;
-      t.field.ingestPartialCborValue(partialCborForText('ABC'));
-      var text = t.field.value as Text;
-      expect(text.content, equals('ABC'));
-      expect(t.onsetCalled, equals(2));
+      field.value = text;
+      field.ingestPartialCborValue(partialCborForText('ABC'));
+      var newText = field.value as Text;
+      expect(newText.content, equals('ABC'));
+      // Verify the onset was called thrice (one time for previous field assignment,
+      // one for the field itself, one time for primitive Content field update)
+      fieldhooks.verifyOnsetCalled(3);
     });
 
     test('ingestFullCborValue throws exception if value is not CborMap', () {
@@ -132,39 +95,35 @@ void main() {
       field.value = primitive;
       expect(field.toString(), equals(primitive.describeType));
     });
-  });
 
-  test('prepareForUpdates sets up field correctly (1)', () {
-    var t = PrepareForUpdatesSetup();
-    t.field.value = t.text;
-    t.verifyOnsetCalled1();
-  });
+    test('prepareForUpdates sets up field correctly (1)', () {
+      field.value = text;
+      fieldhooks.verifyOnsetCalled(1, pkey: PKey(0, 1, 2), fkey: fkeyLabel);
+    });
 
-  test('prepareForUpdates sets up descendant primitives correctly', () {
-    var t = PrepareForUpdatesSetup();
-    t.field.value = t.text;
-    t.text.content = 'updated';
-    t.verifyOnsetCalled2();
-  });
+    test('prepareForUpdates sets up descendant primitives correctly', () {
+      field.value = text;
+      text.content = 'updated';
+      fieldhooks.verifyOnsetCalled(2,
+          pkey: PKey(0, 1, 2, 6), fkey: fkeyContent);
+    });
 
-  test('when unpreparing for updates, it unprepares its primitive properly',
-      () {
-    var t = PrepareForUpdatesSetup();
-    t.field.unprepareForUpdates();
-    t.field.value = t.text;
-    t.verifyOnsetNotCalled();
-  });
+    test('when unpreparing for updates, it unprepares its primitive properly',
+        () {
+      field.unprepareForUpdates();
+      field.value = text;
+      fieldhooks.verifyOnsetCalled(0);
+    });
 
-  test('assignment unprepares previous primitive', () {
-    var t = PrepareForUpdatesSetup();
-    t.field.value = t.otherText;
-    expect(t.text.notPreparedYet, isTrue);
-  });
+    test('assignment unprepares previous primitive', () {
+      field.value = otherText;
+      expect(text.notPreparedYet, isTrue);
+    });
 
-  test('ingest unprepares previous primitive', () {
-    var t = PrepareForUpdatesSetup();
-    var update = {CborString('Content'): CborString('new stuff')};
-    t.field.ingestFullCborValue(CborMap(update));
-    expect(t.text.notPreparedYet, isTrue);
+    test('ingest unprepares previous primitive', () {
+      var update = {CborString('Content'): CborString('new stuff')};
+      field.ingestFullCborValue(CborMap(update));
+      expect(text.notPreparedYet, isTrue);
+    });
   });
 }
