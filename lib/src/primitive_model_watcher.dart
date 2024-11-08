@@ -11,4 +11,5 @@ abstract class PrimitiveModelWatcher {
   void onPartialModelUpdate();
   void onTopLevelPrimitiveUpdate();
   void onSetField(PKey pkey, FKey fkey, bool structural);
+  void onIngestField(PKey pkey, FKey fkey, bool structural);
 }

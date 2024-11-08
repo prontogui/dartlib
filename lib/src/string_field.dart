@@ -36,7 +36,7 @@ class StringField extends FieldBase implements Field {
   @override
   void ingestPartialCborValue(CborValue value) {
     ingestFullCborValue(value);
-    onSet();
+    onIngest();
   }
 
   @override

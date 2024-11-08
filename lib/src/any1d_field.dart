@@ -90,24 +90,28 @@ class Any1DField extends FieldBase implements Field {
 
   @override
   void ingestPartialCborValue(CborValue value) {
-    if (value is! CborList) {
-      throw Exception(
-          'Any1DField:ingestPartialCborValue - value is not a CborList');
+    var cborList = value;
+    if (cborList is! CborList) {
+      throw Exception("value is not a CborList");
     }
 
-    if (_pa.length != value.length) {
-      throw Exception(
-          'number of primitives in update does not equal existing primitives');
+    var newpa = <Primitive>[];
+    var containerPkey = PKey.fromPKey(pkey, fieldPKeyIndex);
+
+    for (int i = 0; i < cborList.length; i++) {
+      var m = cborList[i] as CborMap;
+
+      var primitive = PrimitiveFactory.createPrimitiveFromCborMap(
+          PKey.fromPKey(containerPkey, i), m);
+
+      newpa.add(primitive);
     }
 
-    for (var i = 0; i < _pa.length; i++) {
-      var cbor = value.elementAt(i);
-      if (cbor is! CborMap) {
-        throw Exception('element is not a CborMap');
-      }
-      _pa[i].ingestPartialCborMap(cbor);
-    }
-    onSet();
+    _unprepareDescendantsForUpdates();
+    _pa = newpa;
+    _prepareDescendantsForUpdates();
+
+    onIngest();
   }
 
   @override

@@ -122,7 +122,7 @@ void main() {
       expect((field.value[0][0] as Text).content, equals('new content 1'));
       expect(field.value[1].length, equals(1));
       expect((field.value[1][0] as Text).content, equals('new content 2'));
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('should ingest partial Cbor value correctly', () {
@@ -131,10 +131,13 @@ void main() {
       populateFromPartialCbor();
       expect(field.value.length, equals(2));
       expect(field.value[0].length, equals(1));
-      expect((field.value[0][0] as Text).content, equals('new content 1'));
+      var newp1 = field.value[0][0] as Text;
+      var newp2 = field.value[1][0] as Text;
+
+      expect(newp1.content, equals('new content 1'));
       expect(field.value[1].length, equals(1));
-      expect((field.value[1][0] as Text).content, equals('new content 2'));
-      fieldhooks.verifyOnsetCalled(1);
+      expect(newp2.content, equals('new content 2'));
+      fieldhooks.verifyOningestCalled(1);
     });
 
     test(

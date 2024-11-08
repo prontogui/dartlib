@@ -34,7 +34,7 @@ void main() {
       prepareForUpdates();
       populateField();
       expect(field.value, equals(testData1));
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('ingestFullCborValue with valid CborBytes', () {
@@ -42,7 +42,7 @@ void main() {
       final cborValue = CborBytes(testData1);
       field.ingestFullCborValue(cborValue);
       expect(field.value, equals(testData1));
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('ingestFullCborValue with CborNull (empty)', () {
@@ -61,7 +61,7 @@ void main() {
       final cborValue = CborBytes(testData2);
       field.ingestPartialCborValue(cborValue);
       expect(field.value, equals(testData2));
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('egestCborValue returns correct CborBytes', () {

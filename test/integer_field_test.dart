@@ -35,7 +35,7 @@ void main() {
       prepareForUpdates();
       field.value = 100;
       expect(field.value, equals(100));
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('ingestFullCborValue sets the value correctly for CborSmallInt', () {
@@ -43,7 +43,7 @@ void main() {
       final cborValue = CborSmallInt(123);
       field.ingestFullCborValue(cborValue);
       expect(field.value, equals(123));
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('ingestFullCborValue sets the value correctly for CborInt', () {
@@ -51,7 +51,7 @@ void main() {
       final cborValue = CborInt(BigInt.from(9203));
       field.ingestFullCborValue(cborValue);
       expect(field.value, equals(9203));
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('ingestFullCborValue sets the value correctly for CborBigInt', () {
@@ -59,7 +59,7 @@ void main() {
       final cborValue = CborBigInt(BigInt.from(9203));
       field.ingestFullCborValue(cborValue);
       expect(field.value, equals(9203));
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('ingestPartialCborValue sets the value correctly for CborSmallInt',
@@ -68,7 +68,7 @@ void main() {
       final cborValue = CborSmallInt(123);
       field.ingestPartialCborValue(cborValue);
       expect(field.value, equals(123));
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('ingestFullCborValue throws exception for non-CborSmallInt', () {

@@ -47,7 +47,7 @@ class EventField extends FieldBase implements Field {
   void ingestPartialCborValue(CborValue value) {
     ingestFullCborValue(value);
     _eventTimestamp = fieldHooks!.getEventTimestamp();
-    onSet();
+    onIngest();
   }
 
   @override

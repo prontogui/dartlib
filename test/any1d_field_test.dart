@@ -73,7 +73,7 @@ void main() {
       prepareForUpdates();
       populateField();
       expect(() => field.value.clear(), throwsUnsupportedError);
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('ingested value is an unmodifiable list', () {
@@ -147,10 +147,10 @@ void main() {
       expect(newp2.notPreparedYet, isFalse);
 
       // Verify the onset was not called
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
-    test('ingestPartialCborValue updates existing primitives', () {
+    test('ingestPartialCborValue updates the internal list', () {
       populateField();
       prepareForUpdates();
       populateFromPartialCbor();
@@ -160,9 +160,12 @@ void main() {
       expect(newp1.content, equals('new content 1'));
       expect(newp2.content, equals('new content 2'));
 
-      // Verify the onset was not called thrice (one time for field itself, one time for
-      // each primitive Content field update)
-      fieldhooks.verifyOnsetCalled(3);
+      expect(newp1.notPreparedYet, isFalse);
+      expect(newp2.notPreparedYet, isFalse);
+
+      expect(primitive1.notPreparedYet, isTrue);
+      expect(primitive2.notPreparedYet, isTrue);
+      fieldhooks.verifyOningestCalled(1);
     });
 
     test('egestCborValue returns the correct CborList', () {

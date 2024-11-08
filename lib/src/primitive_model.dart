@@ -107,6 +107,13 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
     }
   }
 
+  @override
+  void onIngestField(PKey pkey, FKey fkey, bool structural) {
+    for (var w in _watchers) {
+      w.onIngestField(pkey, fkey, structural);
+    }
+  }
+
   void ingestCborUpdate(CborValue v) {
     assert(v is CborList);
 

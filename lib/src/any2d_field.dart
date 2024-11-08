@@ -222,45 +222,52 @@ class Any2DField extends FieldBase implements Field {
 
   @override
   void ingestPartialCborValue(CborValue value) {
-    if (value is! CborList) {
-      throw Exception(
-          'Any2DField:ingestPartialCborValue - value is not a CborList');
+    var cborRows = value;
+    if (cborRows is! CborList) {
+      throw Exception("value is not a CborList");
     }
 
-    if (_pa.length != value.length) {
-      throw Exception(
-          'number of primitives in update does not equal existing primitives');
+    var newpa = <List<Primitive>>[];
+    var containerPkey = PKey.fromPKey(pkey, fieldPKeyIndex);
+    int? columnCount;
+
+    for (int i = 0; i < cborRows.length; i++) {
+      var cborCells = cborRows[i];
+
+      if (cborCells is! CborList) {
+        throw Exception("element is not a CborList");
+      }
+
+      var primitiveRow = <Primitive>[];
+      var rowPkey = PKey.fromPKey(containerPkey, i);
+
+      if (columnCount == null) {
+        // Record the number of columns in the first row.
+        columnCount = cborCells.length;
+      } else if (cborCells.length != columnCount) {
+        // Enforce that the number of columns in each row is the same.
+        throw Exception('number of columns in each row must be the same');
+      }
+
+      for (int j = 0; j < cborCells.length; j++) {
+        var cborCell = cborCells[j] as CborMap;
+
+        var cellPkey = PKey.fromPKey(rowPkey, j);
+
+        var primitive =
+            PrimitiveFactory.createPrimitiveFromCborMap(cellPkey, cborCell);
+
+        primitiveRow.add(primitive);
+      }
+      newpa.add(primitiveRow);
     }
 
-    // Make sure the number of columns in each row is the same and matches
-    // the number of columns in the existing 2D array.
+    _unprepareDescendantsForUpdates();
+    _pa = newpa;
+    _columnCount = columnCount!;
+    _prepareDescendantsForUpdates();
 
-    // For each existing row...
-    for (var i = 0; i < _pa.length; i++) {
-      var cbor = value.elementAt(i);
-
-      if (cbor is! CborList) {
-        throw Exception('element is not a CborList');
-      }
-
-      if (_pa[i].length != cbor.length) {
-        throw Exception(
-            'number of primitives in update does not equal existing primitives');
-      }
-
-      // For each existing cell...
-      for (var j = 0; j < _pa[i].length; j++) {
-        var cbor2 = cbor.elementAt(j);
-
-        if (cbor2 is! CborMap) {
-          throw Exception('element is not a CborMap');
-        }
-
-        // Update the existing cell from cbor map
-        _pa[i][j].ingestPartialCborMap(cbor2);
-      }
-    }
-    onSet();
+    onIngest();
   }
 
   @override

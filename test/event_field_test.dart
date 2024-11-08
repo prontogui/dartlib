@@ -28,7 +28,7 @@ void main() {
       prepareForUpdates();
       field.issueNow();
       expect(field.issued, isTrue);
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test(
@@ -42,19 +42,19 @@ void main() {
     test('full update should return issued false', () {
       field.ingestFullCborValue(CborBool(true));
       expect(field.issued, isFalse);
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('ingestPartialCborValue with true then issued returns true', () {
       field.ingestPartialCborValue(CborBool(true));
       expect(field.issued, isTrue);
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('ingestPartialCborValue with false then issued returns true', () {
       field.ingestPartialCborValue(CborBool(false));
       expect(field.issued, isTrue);
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('egestCborValue should return CborBool(false)', () {

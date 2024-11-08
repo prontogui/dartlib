@@ -65,4 +65,10 @@ abstract class FieldBase implements Field {
       _fieldHooks!.onSetField(_pkey, _fkey, isStructural);
     }
   }
+
+  void onIngest() {
+    if (_fieldHooks != null) {
+      _fieldHooks!.onIngestField(_pkey, _fkey, isStructural);
+    }
+  }
 }

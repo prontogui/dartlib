@@ -35,14 +35,14 @@ void main() {
       prepareForUpdates();
       field.value = true;
       expect(field.value, isTrue);
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('ingestFullCborValue sets the value correctly', () {
       prepareForUpdates();
       field.ingestFullCborValue(CborBool(true));
       expect(field.value, isTrue);
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('ingestFullCborValue throws exception for non-CborBool', () {
@@ -54,7 +54,7 @@ void main() {
       prepareForUpdates();
       field.ingestPartialCborValue(CborBool(true));
       expect(field.value, isTrue);
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('ingestPartialCborValue throws exception for non-CborBool', () {

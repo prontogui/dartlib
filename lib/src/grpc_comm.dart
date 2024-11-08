@@ -24,7 +24,8 @@ class GrpcCommClient extends CommClient {
   /// The amount of time (in seconds) to wait for a connection to be established.
   final int _connectingPeriod = 3;
 
-  /// The amount of time (in seconds) between server check-ins.
+  /// Time period expressed in seconds for how often to check communication with
+  /// the server.  Communication checks are disabled if this is set to 0.
   final int serverCheckinPeriod;
 
   /// The amount of time (in seconds) between attempts to re-establish streaming after
@@ -82,7 +83,8 @@ class GrpcCommClient extends CommClient {
   /// * Callback function [onStateChange] for handling state changes in communication.
   ///
   /// * Time period [serverCheckinPeriod] expressed in seconds
-  /// for how often to check communication with the server.
+  /// for how often to check communication with the server.  Communication checks
+  /// are disable if this is set to 0.
   ///
   /// * Time period [reestablishmentPeriod] expressed in seconds for how often to try
   /// reestablishing streaming with the server during a paused state.
@@ -291,6 +293,9 @@ class GrpcCommClient extends CommClient {
   void _startTimer(int period) {
     if (_timer != null) {
       _timer!.cancel();
+    }
+    if (period <= 0) {
+      return;
     }
     _timer = Timer.periodic(Duration(seconds: period), _timerRoutine);
   }

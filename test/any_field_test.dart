@@ -38,13 +38,13 @@ void main() {
       final primitive = Text(content: 'test');
       field.value = primitive;
       expect(field.value, equals(primitive));
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('ingestFullCborValue works', () {
       field.ingestFullCborValue(distinctCborForText());
       expect(field.value!.describeType, equals('Text'));
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('ingestParialCborValue works', () {
@@ -54,7 +54,7 @@ void main() {
       expect(newText.content, equals('ABC'));
       // Verify the onset was called thrice (one time for previous field assignment,
       // one for the field itself, one time for primitive Content field update)
-      fieldhooks.verifyOnsetCalled(3);
+      fieldhooks.verifyTotalCalls(3);
     });
 
     test('ingestFullCborValue throws exception if value is not CborMap', () {
@@ -112,7 +112,7 @@ void main() {
         () {
       field.unprepareForUpdates();
       field.value = text;
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('assignment unprepares previous primitive', () {

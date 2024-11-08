@@ -9,6 +9,7 @@ import 'fkey.dart';
 /// get timestamps for event fields, etc.
 abstract class FieldHooks {
   void onSetField(PKey pkey, FKey fkey, bool structural);
+  void onIngestField(PKey pkey, FKey fkey, bool structural);
   DateTime getEventTimestamp();
 }
 
@@ -21,6 +22,11 @@ class NullFieldHooks implements FieldHooks {
 
   @override
   void onSetField(PKey pkey, FKey fkey, bool structural) {
+    // Do nothing.
+  }
+
+  @override
+  void onIngestField(PKey pkey, FKey fkey, bool structural) {
     // Do nothing.
   }
 

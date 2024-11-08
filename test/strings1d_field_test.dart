@@ -36,7 +36,7 @@ void main() {
       prepareForUpdates();
       var testValue = populateField();
       expect(field.value, equals(testValue));
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('set makes a copy of value', () {
@@ -63,14 +63,14 @@ void main() {
       final cborList = CborList([CborString('hello'), CborString('world')]);
       field.ingestFullCborValue(cborList);
       expect(field.value, equals(['hello', 'world']));
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('ingestFullCborValue with CborNull (empty list)', () {
       prepareForUpdates();
       field.ingestFullCborValue(const CborNull());
       expect(field.value, equals([]));
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('ingestFullCborValue with invalid CborList throws exception', () {
@@ -83,7 +83,7 @@ void main() {
       final cborList = CborList([CborString('hello'), CborString('world')]);
       field.ingestPartialCborValue(cborList);
       expect(field.value, equals(['hello', 'world']));
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('ingestPartialCborValue with invalid CborList throws exception', () {

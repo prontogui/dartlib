@@ -40,6 +40,11 @@ class MockPrimitiveModelWatcher implements PrimitiveModelWatcher {
   void onSetField(PKey pkey, FKey fkey, bool structural) {
     fieldSet = true;
   }
+
+  @override
+  void onIngestField(PKey pkey, FKey fkey, bool structural) {
+    fieldSet = true;
+  }
 }
 
 void main() {

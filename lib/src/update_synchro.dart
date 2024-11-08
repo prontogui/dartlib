@@ -8,7 +8,8 @@ import 'primitive_locator.dart';
 /// Tracks update to a primitive model and produces full or partial updates
 /// which are ready for sending over a communication link.
 class UpdateSynchro extends SynchroBase {
-  UpdateSynchro(this.locator, super.fieldFilter);
+  UpdateSynchro(
+      this.locator, super.fieldFilter, super.trackOnIngest, super.trackOnSet);
 
   /// The object used to locate a primitive in the model.
   PrimitiveLocator locator;

@@ -28,7 +28,7 @@ class PrimitiveUpdate {
 
 /// Base support for all Synchro objects.
 class SynchroBase implements PrimitiveModelWatcher {
-  SynchroBase(this.fieldFilter);
+  SynchroBase(this.fieldFilter, this.trackOnIngest, this.trackOnSet);
 
   // List of updates to be applied.
   final List<PrimitiveUpdate> pendingUpdates = [];
@@ -36,6 +36,12 @@ class SynchroBase implements PrimitiveModelWatcher {
   /// Set of fields to filter updates by.  If this is null, all fields are tracked
   /// for updates.  If this is non-null, only fields in this list are tracked.
   final Set<FKey>? fieldFilter;
+
+  /// True if this synchro should track updates made by ingestion.
+  final trackOnIngest;
+
+  /// True if this synchro should track updates made by field setters.
+  final trackOnSet;
 
   @override
   void onFullModelUpdate() {
@@ -53,6 +59,19 @@ class SynchroBase implements PrimitiveModelWatcher {
 
   @override
   void onSetField(PKey pkey, FKey fkey, bool structural) {
+    if (trackOnSet) {
+      _handleOnField(pkey, fkey, structural);
+    }
+  }
+
+  @override
+  void onIngestField(PKey pkey, FKey fkey, bool structural) {
+    if (trackOnIngest) {
+      _handleOnField(pkey, fkey, structural);
+    }
+  }
+
+  void _handleOnField(PKey pkey, FKey fkey, bool structural) {
     // Filtering by field?
     if (fieldFilter != null && !fieldFilter!.contains(fkey)) {
       return;

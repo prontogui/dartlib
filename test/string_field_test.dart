@@ -30,7 +30,7 @@ void main() {
       prepareForUpdates();
       field.value = 'test';
       expect(field.value, equals('test'));
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('isStructural returns false', () {
@@ -42,7 +42,7 @@ void main() {
       var cborValue = CborString('test');
       field.ingestFullCborValue(cborValue);
       expect(field.value, equals('test'));
-      fieldhooks.verifyOnsetCalled(0);
+      fieldhooks.verifyTotalCalls(0);
     });
 
     test('ingestFullCborValue with valid CborString', () {
@@ -50,7 +50,7 @@ void main() {
       var cborValue = CborString('test');
       field.ingestPartialCborValue(cborValue);
       expect(field.value, equals('test'));
-      fieldhooks.verifyOnsetCalled(1);
+      fieldhooks.verifyTotalCalls(1);
     });
 
     test('ingestFullCborValue with invalid CborValue', () {
