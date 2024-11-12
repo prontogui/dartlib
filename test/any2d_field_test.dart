@@ -48,6 +48,10 @@ void main() {
       ]);
     }
 
+    CborValue getCborEmptyContent() {
+      return CborList([]);
+    }
+
     populateFromFullCbor() {
       field.ingestFullCborValue(getCborContent());
     }
@@ -60,10 +64,18 @@ void main() {
       field.prepareForUpdates(fkeyLabel, PKey(1), 0, fieldhooks);
     }
 
+    verifyUnmodifiable() {
+      expect(() => field.value.clear(), throwsUnsupportedError);
+      if (field.value.isNotEmpty) {
+        expect(() => field.value[0].clear(), throwsUnsupportedError);
+      }
+    }
+
     test('should set and get value correctly', () {
       populateField();
       expect(field.value[0][0], equals(primitive1));
       expect(field.value[1][0], equals(primitive2));
+      verifyUnmodifiable();
     });
 
     test('should return correct number of rows and columns', () {
@@ -72,20 +84,10 @@ void main() {
       expect(field.columnCount, equals(1));
     });
 
-    test('should handle empty array correctly', () {
+    test('initial value is empty array, no columns, and unmodifiable', () {
       expect(field.rowCount, equals(0));
       expect(field.columnCount, equals(0));
-    });
-
-    test('initial value is an unmodifiable list', () {
-      expect(() => field.value.clear(), throwsUnsupportedError);
-    });
-
-    test('construction value is an unmodifiable list', () {
-      var altField = Any2DField.from([
-        [Text(content: 'Content 1')],
-      ]);
-      expect(() => altField.value.clear(), throwsUnsupportedError);
+      verifyUnmodifiable();
     });
 
     test('columnCount is correct after contruction from array', () {
@@ -97,14 +99,7 @@ void main() {
 
     test('assgined value is an unmodifiable list', () {
       populateField();
-      expect(() => field.value.clear(), throwsUnsupportedError);
-      expect(() => field.value[0].clear(), throwsUnsupportedError);
-    });
-
-    test('ingest value is an unmodifiable list', () {
-      populateFromFullCbor();
-      expect(() => field.value.clear(), throwsUnsupportedError);
-      expect(() => field.value[0].clear(), throwsUnsupportedError);
+      verifyUnmodifiable();
     });
 
     test('should throw exception when ingesting non-CborList value', () {
@@ -112,6 +107,12 @@ void main() {
 
       expect(
           () => field.ingestFullCborValue(nonCborListValue), throwsException);
+    });
+
+    test('should throw exception when ingesting a CborNull value', () {
+      var cborNull = const CborNull();
+
+      expect(() => field.ingestFullCborValue(cborNull), throwsException);
     });
 
     test('should ingest full Cbor value correctly', () {
@@ -123,12 +124,21 @@ void main() {
       expect(field.value[1].length, equals(1));
       expect((field.value[1][0] as Text).content, equals('new content 2'));
       fieldhooks.verifyTotalCalls(0);
+      verifyUnmodifiable();
+    });
+
+    test('should ingest full Cbor, empty array, correctly', () {
+      prepareForUpdates();
+      field.ingestFullCborValue(getCborEmptyContent());
+      expect(field.value.length, equals(0));
+      verifyUnmodifiable();
     });
 
     test('should ingest partial Cbor value correctly', () {
       populateField();
       prepareForUpdates();
       populateFromPartialCbor();
+      verifyUnmodifiable();
       expect(field.value.length, equals(2));
       expect(field.value[0].length, equals(1));
       var newp1 = field.value[0][0] as Text;
@@ -140,14 +150,11 @@ void main() {
       fieldhooks.verifyOningestCalled(1);
     });
 
-    test(
-        'should throw exception when ingesting partial Cbor value with different length',
-        () {
-      var cborValue = CborList([
-        CborList([CborMap({})])
-      ]);
-
-      expect(() => field.ingestPartialCborValue(cborValue), throwsException);
+    test('should ingest partial Cbor, empty array, correctly', () {
+      prepareForUpdates();
+      field.ingestPartialCborValue(getCborEmptyContent());
+      expect(field.value.length, equals(0));
+      verifyUnmodifiable();
     });
 
     test('should egest Cbor value correctly', () {

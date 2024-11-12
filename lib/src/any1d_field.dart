@@ -67,6 +67,16 @@ class Any1DField extends FieldBase implements Field {
 
   @override
   void ingestFullCborValue(CborValue value) {
+    _ingest(value);
+  }
+
+  @override
+  void ingestPartialCborValue(CborValue value) {
+    _ingest(value);
+    onIngest();
+  }
+
+  void _ingest(CborValue value) {
     if (value is! CborList) {
       throw Exception(
           'Any1DField:ingestFullCborValue - value is not a CborList');
@@ -86,32 +96,6 @@ class Any1DField extends FieldBase implements Field {
     _unprepareDescendantsForUpdates();
     _pa = List<Primitive>.unmodifiable(newArray);
     _prepareDescendantsForUpdates();
-  }
-
-  @override
-  void ingestPartialCborValue(CborValue value) {
-    var cborList = value;
-    if (cborList is! CborList) {
-      throw Exception("value is not a CborList");
-    }
-
-    var newpa = <Primitive>[];
-    var containerPkey = PKey.fromPKey(pkey, fieldPKeyIndex);
-
-    for (int i = 0; i < cborList.length; i++) {
-      var m = cborList[i] as CborMap;
-
-      var primitive = PrimitiveFactory.createPrimitiveFromCborMap(
-          PKey.fromPKey(containerPkey, i), m);
-
-      newpa.add(primitive);
-    }
-
-    _unprepareDescendantsForUpdates();
-    _pa = newpa;
-    _prepareDescendantsForUpdates();
-
-    onIngest();
   }
 
   @override

@@ -167,6 +167,16 @@ class Any2DField extends FieldBase implements Field {
 
   @override
   void ingestFullCborValue(CborValue value) {
+    _ingest(value);
+  }
+
+  @override
+  void ingestPartialCborValue(CborValue value) {
+    _ingest(value);
+    onIngest();
+  }
+
+  void _ingest(CborValue value) {
     if (value is! CborList) {
       throw Exception(
           'Any2DField:ingestFullCborValue - value is not a CborList');
@@ -174,10 +184,10 @@ class Any2DField extends FieldBase implements Field {
 
     var fieldPKey = PKey.fromPKey(pkey, fieldPKeyIndex);
 
-    int? numColumns;
+    int? newColumnCount;
 
     // Generate a list of rows from the cbor value...
-    var newRows = List<List<Primitive>>.generate(value.length, (i) {
+    var newpa = List<List<Primitive>>.generate(value.length, (i) {
       var outerCbor = value.elementAt(i);
 
       if (outerCbor is! CborList) {
@@ -186,10 +196,10 @@ class Any2DField extends FieldBase implements Field {
 
       var outerPKey = PKey.fromPKey(fieldPKey, i);
 
-      if (numColumns == null) {
+      if (newColumnCount == null) {
         // Record the number of columns in the first row.
-        numColumns = outerCbor.length;
-      } else if (numColumns != outerCbor.length) {
+        newColumnCount = outerCbor.length;
+      } else if (newColumnCount != outerCbor.length) {
         // Enforce that the number of columns in each row is the same.
         throw Exception('number of columns in each row must be the same');
       }
@@ -211,63 +221,11 @@ class Any2DField extends FieldBase implements Field {
       return List<Primitive>.unmodifiable(row);
     });
 
-    var newRowsUnmodifiable = List<List<Primitive>>.unmodifiable(newRows);
-
     // Save the new list of rows and number of columns
     _unprepareDescendantsForUpdates();
-    _pa = newRowsUnmodifiable;
-    _columnCount = numColumns == null ? 0 : numColumns!;
+    _pa = List<List<Primitive>>.unmodifiable(newpa);
+    _columnCount = newColumnCount ?? 0;
     _prepareDescendantsForUpdates();
-  }
-
-  @override
-  void ingestPartialCborValue(CborValue value) {
-    var cborRows = value;
-    if (cborRows is! CborList) {
-      throw Exception("value is not a CborList");
-    }
-
-    var newpa = <List<Primitive>>[];
-    var containerPkey = PKey.fromPKey(pkey, fieldPKeyIndex);
-    int? columnCount;
-
-    for (int i = 0; i < cborRows.length; i++) {
-      var cborCells = cborRows[i];
-
-      if (cborCells is! CborList) {
-        throw Exception("element is not a CborList");
-      }
-
-      var primitiveRow = <Primitive>[];
-      var rowPkey = PKey.fromPKey(containerPkey, i);
-
-      if (columnCount == null) {
-        // Record the number of columns in the first row.
-        columnCount = cborCells.length;
-      } else if (cborCells.length != columnCount) {
-        // Enforce that the number of columns in each row is the same.
-        throw Exception('number of columns in each row must be the same');
-      }
-
-      for (int j = 0; j < cborCells.length; j++) {
-        var cborCell = cborCells[j] as CborMap;
-
-        var cellPkey = PKey.fromPKey(rowPkey, j);
-
-        var primitive =
-            PrimitiveFactory.createPrimitiveFromCborMap(cellPkey, cborCell);
-
-        primitiveRow.add(primitive);
-      }
-      newpa.add(primitiveRow);
-    }
-
-    _unprepareDescendantsForUpdates();
-    _pa = newpa;
-    _columnCount = columnCount!;
-    _prepareDescendantsForUpdates();
-
-    onIngest();
   }
 
   @override

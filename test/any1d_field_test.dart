@@ -56,23 +56,25 @@ void main() {
       field.ingestPartialCborValue(getCborForTesting());
     }
 
-    test('initial value is an empty list', () {
+    verifyUnmodifiable() {
+      expect(() => field.value.clear(), throwsUnsupportedError);
+    }
+
+    test('initial value is an empty, unmodifiable list', () {
       expect(field.value, isEmpty);
+      verifyUnmodifiable();
     });
 
     test('setting value updates the internal list', () {
       populateField();
       expect(field.value, equals(primitives()));
-    });
-
-    test('initial value is an unmodifiable list', () {
-      expect(() => field.value.clear(), throwsUnsupportedError);
+      verifyUnmodifiable();
     });
 
     test('assigned value is an unmodifiable list', () {
       prepareForUpdates();
       populateField();
-      expect(() => field.value.clear(), throwsUnsupportedError);
+      verifyUnmodifiable();
       fieldhooks.verifyTotalCalls(1);
     });
 
@@ -83,7 +85,7 @@ void main() {
         }),
       ]);
       field.ingestFullCborValue(cborList);
-      expect(() => field.value.clear(), throwsUnsupportedError);
+      verifyUnmodifiable();
     });
 
     test('prepareForUpdates prepares descendant primitives', () {
@@ -128,6 +130,7 @@ void main() {
       populateField();
       prepareForUpdates();
       populateFromFullCbor();
+      verifyUnmodifiable();
 
       var newText = field.value[0] as Text;
       expect(newText.content, equals('new content 1'));
@@ -154,6 +157,7 @@ void main() {
       populateField();
       prepareForUpdates();
       populateFromPartialCbor();
+      verifyUnmodifiable();
 
       var newp1 = field.value[0] as Text;
       var newp2 = field.value[1] as Text;

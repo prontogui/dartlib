@@ -74,7 +74,7 @@ class AnyField extends FieldBase implements Field {
   @override
   void ingestPartialCborValue(CborValue value) {
     if (value is! CborMap) {
-      throw Exception('value is not a CborString');
+      throw Exception('value is not a CborMap');
     }
     if (_p == null) {
       throw Exception('field has a null primitive');
