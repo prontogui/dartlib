@@ -44,6 +44,9 @@ class SynchroBase implements PrimitiveModelWatcher {
   final trackOnSet;
 
   @override
+  void onBeginFullModelUpdate() {}
+
+  @override
   void onFullModelUpdate() {
     clearPendingUpdates();
   }

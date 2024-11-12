@@ -19,6 +19,9 @@ class MockPrimitiveModelWatcher implements PrimitiveModelWatcher {
   bool fieldSet = false;
 
   @override
+  void onBeginFullModelUpdate() {}
+
+  @override
   void onFullModelUpdate() {
     fullModelUpdated = true;
   }
