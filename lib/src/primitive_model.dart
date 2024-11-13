@@ -13,6 +13,7 @@ import 'field_hooks.dart';
 class PrimitiveModel implements PrimitiveLocator, FieldHooks {
   List<Primitive> _topPrimitives = [];
   final List<PrimitiveModelWatcher> _watchers = [];
+  DateTime _eventTimestamp = DateTime.now();
 
   /// The list of objects watching this model.
   List<PrimitiveModelWatcher> get watchers =>
@@ -23,7 +24,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
     return _topPrimitives.isEmpty;
   }
 
-  /// List of top-level primitives comprising the GUI.
+  // List of top-level primitives comprising the GUI.
   List<Primitive> get topPrimitives {
     return _topPrimitives;
   }
@@ -97,7 +98,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
 
   @override
   DateTime getEventTimestamp() {
-    return DateTime.now();
+    return _eventTimestamp;
   }
 
   @override
@@ -114,7 +115,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
     }
   }
 
-  void ingestCborUpdate(CborValue v) {
+  Primitive? ingestCborUpdate(CborValue v) {
     assert(v is CborList);
 
     var l = v as CborList;
@@ -124,13 +125,18 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
 
     if (fullUpdate.value) {
       _ingestFullUpdate(updateList);
+      return null;
     } else {
-      _ingestPartialUpdate(updateList);
+      return _ingestPartialUpdate(updateList);
     }
   }
 
   CborMap egestCborUpdate(bool fullUpdate, List<FKey> fkeys) {
     return CborMap({});
+  }
+
+  void updateEventTimestamp() {
+    _eventTimestamp = DateTime.now();
   }
 
   /// Ingests a full update from a list of CBOR values and notifies listeners.
@@ -160,11 +166,12 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
   /// updated primitive dictates.
   ///
   /// This method is used internally by the class.
-  void _ingestPartialUpdate(List<CborValue> l) {
+  Primitive? _ingestPartialUpdate(List<CborValue> l) {
     onBeginPartialModelUpdate();
 
     final numPrimitives = l.length;
     bool topLevelUpdated = false;
+    Primitive? firstUpdatedPrimitive;
 
     for (var i = 0; i < numPrimitives; i += 2) {
       var pkey = PKey.fromCbor(l.elementAt(i));
@@ -183,6 +190,8 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
       if (!topLevelUpdated) {
         topLevelUpdated = (pkey.indices.length == 1);
       }
+
+      firstUpdatedPrimitive ??= p;
     }
 
     if (topLevelUpdated) {
@@ -190,5 +199,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
     }
 
     onPartialModelUpdate();
+
+    return firstUpdatedPrimitive;
   }
 }
