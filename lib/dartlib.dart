@@ -2,7 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 export 'src/comm_client.dart'
-    show CommClientCtl, CommState, OnStateChange, OnUpdateFunction;
+    show
+        CommClientData,
+        CommClientCtl,
+        CommState,
+        OnStateChange,
+        OnUpdateFunction;
 export 'src/grpc_comm_client.dart' show GrpcCommClient;
 export 'src/fkey.dart'; // export everything, especially the fkeyXXX constants.
 export 'src/pkey.dart' show PKey;
@@ -28,3 +33,4 @@ export 'src/tristate.dart' show Tristate;
 export 'src/prontogui.dart' show ProntoGUI, LocalProntoGUI, RemoteProntoGUI;
 export 'src/grpc_comm_server.dart' show GrpcCommServer;
 export 'src/log.dart' show LoggingLevel, logger, loggingLevel;
+export 'src/local_comm.dart' show LocalComm;
