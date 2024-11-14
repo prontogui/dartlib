@@ -6,7 +6,6 @@ import 'primitive.dart';
 import 'primitive_model.dart';
 import 'grpc_comm_server.dart';
 import 'update_synchro.dart';
-import 'ui_event_synchro.dart';
 
 abstract class ProntoGUI {
   // The model that holds the state of the GUI.
@@ -24,11 +23,7 @@ abstract class ProntoGUI {
 }
 
 class LocalProntoGUI extends ProntoGUI {
-  LocalProntoGUI() {
-    _eventSynchro = UIEventSynchro(locator: model);
-  }
-
-  late UIEventSynchro _eventSynchro;
+  LocalProntoGUI() {}
 
   @override
   Primitive? update() {}
@@ -69,21 +64,18 @@ class RemoteProntoGUI extends ProntoGUI {
   @override
   Primitive? update() {
     var cborOut = _verifyGuiIsSetThenGetNextUpdate();
-    var bytesOut = cbor.encode(cborOut);
-    late CborValue cborIn;
+    late CborValue? cborIn;
     late Primitive? p;
 
     do {
       // Do the exchange of output and input updates.
       try {
-        var bytesIn = _mainServer.exchangeUpdates(bytesOut, false);
+        cborIn = _mainServer.exchangeUpdates(cborOut, false);
 
         // No update from client?
-        if (bytesIn.isEmpty) {
+        if (cborIn == null) {
           return null;
         }
-
-        cborIn = cbor.decode(bytesIn);
       } catch (e) {
         // TODO: log error
         fullUpdateRequired = true;
@@ -106,19 +98,21 @@ class RemoteProntoGUI extends ProntoGUI {
   @override
   Primitive wait() {
     var cborOut = _verifyGuiIsSetThenGetNextUpdate();
-    var bytesOut = cbor.encode(cborOut);
-    late CborValue cborIn;
+    late CborValue? cborIn;
     late Primitive? p;
 
     do {
       // Do the exchange of output and input updates.
       try {
-        var bytesIn = _mainServer.exchangeUpdates(bytesOut, false);
-        cborIn = cbor.decode(bytesIn);
+        cborIn = _mainServer.exchangeUpdates(cborOut, false);
       } catch (e) {
         // TODO: log error
         fullUpdateRequired = true;
         rethrow;
+      }
+
+      if (cborIn == null) {
+        throw Exception('No update from client');
       }
 
       model.updateEventTimestamp();

@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-//import 'dart:async';
 import 'package:cbor/cbor.dart';
 
 /// States of communication
@@ -37,16 +36,16 @@ typedef OnUpdateFunction = void Function(CborValue update);
 /// A callback function for notifying the user of a state change in communication.
 typedef OnStateChange = void Function();
 
+abstract class CommClientData {
+  OnUpdateFunction get onUpdate;
+  set onUpdate(OnUpdateFunction f);
+
+  /// Stream an update back to the server.
+  void streamUpdateToServer(CborValue cborUpdate);
+}
+
 /// Interface for a ProntoGUI communication client to talk with a single server.
-abstract class CommClient {
-  CommClient({required this.onUpdate, this.onStateChange});
-
-  /// The user-supplied callback for handling the updates coming from the server.
-  final OnUpdateFunction onUpdate;
-
-  /// The user-supplied callback for sending notifications of state changes.
-  final OnStateChange? onStateChange;
-
+abstract class CommClientCtl {
   /// Returns the current state of communication.
   CommState get state;
 
@@ -85,7 +84,4 @@ abstract class CommClient {
   /// Forcefully try to re-establish streaming without waiting for a reconnection
   /// countdown to expire.
   void tryConnectionAgain();
-
-  /// Stream an update back to the server.
-  void streamUpdateToServer(CborValue cborUpdate);
 }

@@ -20,9 +20,16 @@ import 'comm_client.dart';
 /// If this check-in fails, then it will keep trying until communication is up again.
 ///
 /// You can call open() any time to specify a different server to connect with.
-class GrpcCommClient extends CommClient {
+class GrpcCommClient implements CommClientData, CommClientCtl {
   /// The amount of time (in seconds) to wait for a connection to be established.
   final int _connectingPeriod = 3;
+
+  /// The user-supplied callback for sending notifications of state changes.
+  final OnStateChange? onStateChange;
+
+  /// The user-supplied callback for handling the updates coming from the server.
+  @override
+  OnUpdateFunction onUpdate;
 
   /// Time period expressed in seconds for how often to check communication with
   /// the server.  Communication checks are disabled if this is set to 0.
@@ -91,8 +98,8 @@ class GrpcCommClient extends CommClient {
   ///
   /// * Debug messages are printed to the console if [debug] is true.
   GrpcCommClient(
-      {required super.onUpdate,
-      super.onStateChange,
+      {required this.onUpdate,
+      this.onStateChange,
       this.serverCheckinPeriod = 60,
       this.reestablishmentPeriod = 30,
       this.debug = false});
