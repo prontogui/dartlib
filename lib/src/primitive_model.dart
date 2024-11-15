@@ -115,6 +115,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
     }
   }
 
+  /// Ingests a full or partial update from a CBOR value and notifies listeners.
   Primitive? ingestCborUpdate(CborValue v) {
     assert(v is CborList);
 
@@ -129,6 +130,17 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
     } else {
       return _ingestPartialUpdate(updateList);
     }
+  }
+
+  /// Ingests a partial update from a CBOR value and notifies listeners.
+  /// If the update ends up being a full update then an exception is thrown.
+  Primitive ingestPartialUpdateOnly(CborValue v) {
+    var p = ingestCborUpdate(v);
+    if (p == null) {
+      throw Exception(
+          'A full update was received.  Only a partial update is allowed.');
+    }
+    return p;
   }
 
   CborMap egestCborUpdate(bool fullUpdate, List<FKey> fkeys) {

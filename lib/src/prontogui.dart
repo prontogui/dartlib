@@ -17,19 +17,19 @@ abstract class ProntoGUI {
     model.topPrimitives = primitives;
   }
 
-  Primitive? update();
+  void update();
 
-  Primitive wait();
+  Future<Primitive> wait();
 }
 
 class LocalProntoGUI extends ProntoGUI {
   LocalProntoGUI() {}
 
   @override
-  Primitive? update() {}
+  void update() {}
 
   @override
-  Primitive wait() {
+  Future<Primitive> wait() {
     throw UnimplementedError();
   }
 }
@@ -62,70 +62,36 @@ class RemoteProntoGUI extends ProntoGUI {
   }
 
   @override
-  Primitive? update() {
+  void update() {
     var cborOut = _verifyGuiIsSetThenGetNextUpdate();
-    late CborValue? cborIn;
-    late Primitive? p;
-
-    do {
-      // Do the exchange of output and input updates.
-      try {
-        cborIn = _mainServer.exchangeUpdates(cborOut, false);
-
-        // No update from client?
-        if (cborIn == null) {
-          return null;
-        }
-      } catch (e) {
-        // TODO: log error
-        fullUpdateRequired = true;
-        rethrow;
-      }
-
-      model.updateEventTimestamp();
-
-      // Ingest the input update.  It could be a empty parital update, where p
-      // is assigned null.  This means the client is just checking in to see if
-      // there is still communication.
-      p = model.ingestCborUpdate(cborIn);
-
-      // Repeat if client was just checking in
-    } while (p == null);
-
-    return p;
+    try {
+      _mainServer.submitUpdateToClient(cborOut);
+    } catch (e) {
+      // TODO: log error
+      fullUpdateRequired = true;
+      rethrow;
+    }
   }
 
   @override
-  Primitive wait() {
+  Future<Primitive> wait() async {
     var cborOut = _verifyGuiIsSetThenGetNextUpdate();
-    late CborValue? cborIn;
-    late Primitive? p;
+    late CborValue cborIn;
 
-    do {
-      // Do the exchange of output and input updates.
-      try {
-        cborIn = _mainServer.exchangeUpdates(cborOut, false);
-      } catch (e) {
-        // TODO: log error
-        fullUpdateRequired = true;
-        rethrow;
-      }
+    // Do the exchange of output and input updates.
+    try {
+      _mainServer.submitUpdateToClient(cborOut);
+      cborIn = await _mainServer.updatesFromClient.first;
+    } catch (e) {
+      // TODO: log error
+      fullUpdateRequired = true;
+      rethrow;
+    }
 
-      if (cborIn == null) {
-        throw Exception('No update from client');
-      }
+    model.updateEventTimestamp();
 
-      model.updateEventTimestamp();
-
-      // Ingest the input update.  It could be a empty parital update, where p
-      // is assigned null.  This means the client is just checking in to see if
-      // there is still communication.
-      p = model.ingestCborUpdate(cborIn);
-
-      // Repeat if client was just checking in
-    } while (p == null);
-
-    return p;
+    // Ingest the input update.  It must only be a partial update.
+    return model.ingestPartialUpdateOnly(cborIn);
   }
 
   CborValue _verifyGuiIsSetThenGetNextUpdate() {

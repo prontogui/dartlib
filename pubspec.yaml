@@ -1,6 +1,7 @@
 name: dartlib
 description: A sample command-line application.
 version: 1.0.0
+publish_to: none    # Added this temporarily to deal with issue in dependency for statemachine, from a local path.
 # repository: https://github.com/my_org/my_repo
 
 environment:
@@ -13,7 +14,9 @@ dependencies:
   protobuf: '>=2.0.0 <4.0.0'
   grpc: '>=3.2.4'
   logger: ^2.4.0
-
+  statemachine: # ^3.3.1
+    path: /Users/andy/dev/pg/statemachine
+  
 dev_dependencies:
   lints: ^3.0.0
   test: ^1.24.0

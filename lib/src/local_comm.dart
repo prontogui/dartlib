@@ -4,25 +4,28 @@ import 'comm_client.dart';
 import 'comm_server.dart';
 
 class LocalComm implements CommClientData, CommServerData {
-  LocalComm({required this.onUpdate});
+  LocalComm();
 
-  final _serverIncoming = Future<CborValue>();
-  final _clientIncoming = Future<CborValue>();
+  final _clientToServer = StreamController<CborValue>();
+  final _serverToClient = StreamController<CborValue>();
 
+  /// Continuous stream of updates from the client.
   @override
-  OnUpdateFunction onUpdate;
-
-  @override
-  void streamUpdateToServer(CborValue cborUpdate) {
-    _serverIncoming.add(cborUpdate);
+  StreamView<CborValue> get updatesFromClient {
+    return StreamView<CborValue>(_clientToServer.stream);
   }
 
+  /// Submit an update to send to the client.
   @override
-  Future<CborValue> exchangeUpdates(CborValue updateOut, bool nowait) async {
-    _clientIncoming.add(updateOut);
-    if (nowait) {
-      return CborNull();
-    }
-    return await _serverIncoming.stream.first;
+  void submitUpdateToClient(CborValue update) {}
+
+  /// Continuous stream of updates from the server.
+  @override
+  StreamView<CborValue> get updatesFromServer {
+    return StreamView<CborValue>(_serverToClient.stream);
   }
+
+  /// Submit an update to send to the server.
+  @override
+  void submitUpdateToServer(CborValue update) {}
 }
