@@ -54,6 +54,6 @@ set loggingLevel(LoggingLevel loggingLevel) {
 
 /// Singleton logger class.
 class _Log extends Logger {
-  _Log._() : super(printer: PrettyPrinter());
+  _Log._() : super(printer: SimplePrinter());
   static final instance = _Log._();
 }

@@ -10,37 +10,7 @@ import 'package:cbor/cbor.dart';
 import 'comm_client.dart';
 import 'package:statemachine/statemachine.dart';
 import 'log.dart';
-
-class PGUpdateToCborTransformer
-    implements StreamTransformer<PGUpdate, CborValue> {
-  @override
-  Stream<CborValue> bind(Stream<PGUpdate> stream) {
-    return stream.map((pgUpdate) {
-      // TODO:  do we need to handle case where pgUpdate.cbor is empty?
-      return cbor.decode(pgUpdate.cbor);
-    });
-  }
-
-  @override
-  StreamTransformer<RS, RT> cast<RS, RT>() {
-    return StreamTransformer.castFrom(this);
-  }
-}
-
-class CborToPGUpdateTransformer
-    implements StreamTransformer<CborValue, PGUpdate> {
-  @override
-  Stream<PGUpdate> bind(Stream<CborValue> stream) {
-    return stream.map((cborValue) {
-      return PGUpdate(cbor: cbor.encode(cborValue));
-    });
-  }
-
-  @override
-  StreamTransformer<RS, RT> cast<RS, RT>() {
-    return StreamTransformer.castFrom(this);
-  }
-}
+import 'progress_transition.dart';
 
 /// ProntoGUI communication client to talk with a single server using gRPC.
 ///
@@ -54,9 +24,6 @@ class CborToPGUpdateTransformer
 ///
 /// You can call open() any time to specify a different server to connect with.
 class GrpcCommClient implements CommClientData, CommClientCtl {
-  /// The amount of time (in seconds) to wait for a connection to be established.
-  final int _connectingPeriod = 3;
-
   /// The user-supplied callback for sending notifications of state changes.
   final OnStateChange? onStateChange;
 
@@ -77,17 +44,14 @@ class GrpcCommClient implements CommClientData, CommClientCtl {
   /// by gRPC/Protobuf tools.
   PGServiceClient? _stub;
 
-  /// The call object for streaming updates from the server.
+  /// The ongoing, active call for streaming updates to/from the server.
   ResponseStream<PGUpdate>? _call;
 
   /// A stream controller for incoming updates from the server.
   final _incomingUpdates = StreamController<CborValue>();
 
   /// A stream controller for outgoing updates to the server.
-  final _outgoingUpdates = StreamController<CborValue>();
-
-  /// A periodic timer used in different communication states.
-  Timer? _timer;
+  var _outgoingUpdates = StreamController<CborValue>();
 
   /// The state machine for communication.
   late final Machine<CommState> _state;
@@ -98,19 +62,11 @@ class GrpcCommClient implements CommClientData, CommClientCtl {
   late final State<CommState> _connectingWaitState;
   late final State<CommState> _activeState;
   late final State<CommState> _restablishmentDelayState;
-  late final TimeoutTransition _restablishmentTimeoutTransition;
-
-  /// The current state of communication.
-  //CommState _state = CommState.inactive;
+  late final ProgressTransition _restablishmentTimeoutTransition;
 
   /// True means the server is invalid or unreachable, given the provided server
   /// address and port in the open() method call.
   bool _invalidServer = false;
-
-  /// True means GrpcCommClient is paused in working with a server, which may be down or
-  /// unavailable at the moment.  If this is False and _active is True, then it can
-  /// be assumed that streaming is working.
-  // bool _paused = false;
 
   /// Construct an object for streaming updates back/forth with a server.
   ///
@@ -129,48 +85,67 @@ class GrpcCommClient implements CommClientData, CommClientCtl {
       {this.onStateChange,
       int serverCheckinPeriod = 60,
       this.reestablishmentPeriod = 30}) {
-    // Create the state machine
+    // Create the state machine for communication.
     _state = Machine<CommState>();
-    _state.onAfterTransition.listen((event) {
-      // Notify listeners of state change
-      if (onStateChange == null) {
-        return;
-      }
-      onStateChange!();
-    });
 
-    // Define the states and transitions of the communication state machine
+    /// Called every time a state is entered.
+    uponStateEntry(String logText) {
+      logger.i(logText);
+      if (onStateChange != null) {
+        onStateChange!();
+      }
+    }
+
+    // Define the states and transitions of the communication state machine.
+
+    // INACTIVE state
     _inactiveState = State<CommState>(_state, CommState.inactive);
     _inactiveState.onEntry(() {
+      uponStateEntry('Entered inactive state');
       _cleanupResources();
     });
 
+    // CONNECTING state
     _connectingState = State<CommState>(_state, CommState.connecting);
     _connectingState.onEntry(() {
+      uponStateEntry('Entered connecting state');
       _connect();
     });
-    _connectingState.onTimeout(Duration(seconds: _connectingPeriod), () {
-      _connectingWaitState.enter();
-    });
 
+    // CONNECTING_WAIT state
     _connectingWaitState = State<CommState>(_state, CommState.connectingWait);
     _connectingWaitState.onEntry(() {
-      _activeState.enter();
+      uponStateEntry('Entered connecting wait state');
+      _startStreaming();
     });
 
+    // ACTIVE state
     _activeState = State<CommState>(_state, CommState.active);
-    _activeState.onTimeout(Duration(seconds: serverCheckinPeriod), () {
-      // TODO:  create a timer to check in with server by injecting a blank update into _outgoingUpdates
-
-      _streamUpdates();
+    _activeState.onEntry(() {
+      uponStateEntry('Entered active state');
     });
 
-    _restablishmentTimeoutTransition =
-        TimeoutTransition(Duration(seconds: reestablishmentPeriod), () {
-      _connectingState.enter();
+    // REESTABLISHMENT_DELAY state
+    _restablishmentTimeoutTransition = ProgressTransition(
+        // Duration until transition is fired
+        Duration(seconds: reestablishmentPeriod),
+
+        // Callback for firing transition
+        () {
+      _connectingWaitState.enter();
+    },
+        // Callback for progress
+        progressCallback: (_) {
+      onStateChange!();
     });
+
     _restablishmentDelayState =
         State<CommState>(_state, CommState.reestablishmentDelay);
+    _restablishmentDelayState.onEntry(
+      () {
+        uponStateEntry('Entered reestablishment delay state');
+      },
+    );
     _restablishmentDelayState.addTransition(_restablishmentTimeoutTransition);
 
     // Initial state is inactive
@@ -191,10 +166,10 @@ class GrpcCommClient implements CommClientData, CommClientCtl {
 
   @override
   void open({String? serverAddress, int? serverPort}) {
-    // Already opened and doing something?
-    if (_state.current != _inactiveState) {
-      _inactiveState.enter();
-    }
+    _invalidServer = false;
+
+    // If already doing something then enter inactive state first.
+    _enterInactiveState();
 
     // Stash a new server address and port if provided
     if (serverAddress != null) {
@@ -208,6 +183,68 @@ class GrpcCommClient implements CommClientData, CommClientCtl {
     _connectingState.enter();
   }
 
+  /// Closes an open communication session (if any) and enters the inactive state.
+  @override
+  void close() {
+    _enterInactiveState();
+  }
+
+  @override
+  CommState get state {
+    assert(_state.current != null);
+    return _state.current!.identifier;
+  }
+
+  @override
+  bool get invalidServer {
+    return _invalidServer;
+  }
+
+  @override
+  double get reestablishmentWaitProgress {
+    return _restablishmentTimeoutTransition.tick / reestablishmentPeriod;
+  }
+
+  @override
+  String get serverAddress {
+    return _serverAddress;
+  }
+
+  @override
+  set serverAddress(String addr) {
+    if (_state.current != _inactiveState && addr != _serverAddress) {
+      _enterInactiveState();
+    }
+    _serverAddress = addr;
+  }
+
+  @override
+  int get serverPort {
+    return _serverPort;
+  }
+
+  @override
+  set serverPort(int port) {
+    if (_state.current != _inactiveState && port != _serverPort) {
+      _enterInactiveState();
+    }
+    _serverPort = port;
+  }
+
+  @override
+  void tryConnectionAgain() {
+    if (_state.current == _connectingWaitState ||
+        _state.current == _restablishmentDelayState) {
+      _connectingState.enter();
+    }
+  }
+
+  @override
+  String serverEndpointDescription() {
+    return 'Server at $_serverAddress:$_serverPort';
+  }
+
+  /// Connects to the server.
   void _connect() {
     try {
       // Open an HTTP/2 channel
@@ -225,105 +262,91 @@ class GrpcCommClient implements CommClientData, CommClientCtl {
       // Create a client object for talking with PGService
       _stub = PGServiceClient(_channel!);
     } catch (err) {
-      _inactiveState.enter();
+      logger.e('Error connecting to server: $err');
+      _enterInactiveState();
       _invalidServer = true;
-      return;
+    } finally {
+      _connectingWaitState.enter();
     }
   }
 
-  void _streamUpdates() async {
-    _call = _stub!.streamUpdates(
-        _outgoingUpdates.stream.transform(CborToPGUpdateTransformer()));
-    _incomingUpdates.addStream(_call!.transform(PGUpdateToCborTransformer()));
-  }
+  /// Starts streaming updates to/from the server.
+  void _startStreaming() {
+    _outgoingUpdates = StreamController<CborValue>();
 
-  /// Closes an open communication session (if any) and enters the inactive state.
-  @override
-  void close() {
-    _inactiveState.enter();
-  }
+    try {
+      // Call the GRPC service to start streaming updates while transforming from CborValue
+      // to PGUpdate
+      _call = _stub!.streamUpdates(
+          _outgoingUpdates.stream.transform(_cborToPGUpdateTransformer));
 
-  @override
-  CommState get state {
-    assert(_state.current != null);
-    return _state.current!.identifier;
-  }
-
-  @override
-  bool get invalidServer {
-    return _invalidServer;
-  }
-
-  @override
-  double get reestablishmentWaitProgress {
-    if (_timer == null) {
-      return 0.0;
-    }
-    return _restablishmentTimeoutTransition.tick / reestablishmentPeriod;
-  }
-
-  @override
-  String get serverAddress {
-    return _serverAddress;
-  }
-
-  @override
-  set serverAddress(String addr) {
-    if (_state.current != _inactiveState && addr != _serverAddress) {
-      _inactiveState.enter();
-    }
-    _serverAddress = addr;
-  }
-
-  @override
-  int get serverPort {
-    return _serverPort;
-  }
-
-  @override
-  set serverPort(int port) {
-    if (_state.current != _inactiveState && port != _serverPort) {
-      _inactiveState.enter();
-    }
-    _serverPort = port;
-  }
-
-  /// The remaining timer ticks (approximately 1 second each) elapsed while waiting for
-  /// a connection or the ticks left until the next attempt to re-establish streaming.
-  int get ticks {
-    return _timer != null ? _timer!.tick : 0;
-  }
-
-  @override
-  void tryConnectionAgain() {
-    if (_state.current == _connectingWaitState ||
-        _state.current == _restablishmentDelayState) {
-      _connectingState.enter();
+      // Route the incoming updates to the _incomingUpdates stream while transforming
+      // them from PGUpdate to CborValue
+      _incomingUpdates.addStream(_call!.transform(_pgUpdateToCborTransformer));
+    } catch (err) {
+      logger.e('Error connecting to server: $err');
+      _enterInactiveState();
+      _invalidServer = true;
     }
   }
 
-  @override
-  String serverEndpointDescription() {
-    return 'Server at $_serverAddress:$_serverPort';
+  /// Transforms PGUpdate to CborValue.  Handles errors by closing the outgoing updates
+  /// and transitioning to the reestablishment delay state.
+  StreamTransformer<PGUpdate, CborValue> get _pgUpdateToCborTransformer {
+    return StreamTransformer<PGUpdate, CborValue>.fromHandlers(
+        // When data is received from the server...
+        handleData: (pgUpdate, sink) {
+      logger.i('Received PGUpdate from server, size=${pgUpdate.cbor.length}');
+
+      // If the state is not active, then transition to active state now.
+      if (_state.current != _activeState) {
+        _activeState.enter();
+      }
+
+      // Decode the update and pass to the receiver of updates.
+      sink.add(cbor.decode(pgUpdate.cbor));
+
+      // When an error happens in ccommunication...
+      // (For example, the server goes down or the connection is lost)
+    }, handleError: (err, stackTrace, sink) {
+      // Pass the error to the receiver of updates.
+      sink.addError(err);
+
+      // Close the outgoing update stream, cleaning up that resource.
+      _outgoingUpdates.close();
+
+      // Transition to the reestablishment delay state.
+      _restablishmentDelayState.enter();
+    });
+  }
+
+  /// Transforms CborValue to PGUpdate.
+  StreamTransformer<CborValue, PGUpdate> get _cborToPGUpdateTransformer {
+    return StreamTransformer<CborValue, PGUpdate>.fromHandlers(
+        handleData: (cborValue, sink) {
+      sink.add(PGUpdate(cbor: cbor.encode(cborValue)));
+    });
+  }
+
+  /// Enters the inactive state, but only when its in a different state.
+  void _enterInactiveState() {
+    if (_state.current != _inactiveState) {
+      _state.current = _inactiveState;
+    }
   }
 
   /// Cleans up outstanding resources for the active session.
-  void _cleanupResources() async {
+  void _cleanupResources() {
     // Clean up resources in reverse-order of creation
     _call?.cancel();
     _call = null;
 
-    _timer?.cancel();
-    _timer = null;
-
-//    _response = PGUpdate();
+    _outgoingUpdates.close();
+    _outgoingUpdates = StreamController<CborValue>();
 
     _stub = null;
 
     _channel?.terminate();
     _channel = null;
-
-    await _outgoingUpdates.stream.drain();
-    await _incomingUpdates.stream.drain();
   }
 }

@@ -14,8 +14,7 @@ dependencies:
   protobuf: '>=2.0.0 <4.0.0'
   grpc: '>=3.2.4'
   logger: ^2.4.0
-  statemachine: # ^3.3.1
-    path: /Users/andy/dev/pg/statemachine
+  statemachine: ^3.3.1
   
 dev_dependencies:
   lints: ^3.0.0
