@@ -87,7 +87,12 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
   Primitive? locatePrimitive(PKey pkey) {
     var locator = PKeyLocator(pkey);
 
-    Primitive? next = topPrimitives[locator.nextIndex()];
+    var nextIndex = locator.nextIndex();
+    if (nextIndex >= topPrimitives.length) {
+      return null;
+    }
+
+    Primitive? next = topPrimitives[nextIndex];
 
     while (!locator.located()) {
       next = next!.locateNextDescendant(locator);

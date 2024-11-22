@@ -52,7 +52,7 @@ class UpdateSynchro extends SynchroBase {
     // Scan list of top-level primitives (where PKey = [i])
     Primitive? next;
     while (true) {
-      next = locator.locatePrimitive(PKey(i));
+      next = locator.locatePrimitive(PKey(i++));
       if (next == null) {
         break;
       }

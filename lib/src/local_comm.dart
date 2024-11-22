@@ -17,7 +17,9 @@ class LocalComm implements CommClientData, CommServerData {
 
   /// Submit an update to send to the client.
   @override
-  void submitUpdateToClient(CborValue update) {}
+  void submitUpdateToClient(CborValue update) {
+    _serverToClient.add(update);
+  }
 
   /// Continuous stream of updates from the server.
   @override
@@ -27,5 +29,7 @@ class LocalComm implements CommClientData, CommServerData {
 
   /// Submit an update to send to the server.
   @override
-  void submitUpdateToServer(CborValue update) {}
+  void submitUpdateToServer(CborValue update) {
+    _clientToServer.add(update);
+  }
 }

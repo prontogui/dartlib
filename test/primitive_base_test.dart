@@ -6,8 +6,7 @@ import 'package:dartlib/src/fkey.dart';
 import 'package:dartlib/src/field_hooks.dart';
 
 class TestPrimitive extends PrimitiveBase {
-  TestPrimitive({String embodiment = '', String tag = ''})
-      : super(embodiment: embodiment, tag: tag);
+  TestPrimitive({super.embodiment, super.tag});
 
   @override
   void describeFields(List<FieldRef> fieldRefs) {

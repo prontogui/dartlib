@@ -38,10 +38,10 @@ class SynchroBase implements PrimitiveModelWatcher {
   final Set<FKey>? fieldFilter;
 
   /// True if this synchro should track updates made by ingestion.
-  final trackOnIngest;
+  final bool trackOnIngest;
 
   /// True if this synchro should track updates made by field setters.
-  final trackOnSet;
+  final bool trackOnSet;
 
   @override
   void onBeginFullModelUpdate() {}

@@ -1,8 +1,6 @@
 // Copyright 2024 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-import 'dart:io';
-
 import 'package:cbor/cbor.dart';
 import 'field.dart';
 import 'pkey.dart';
@@ -173,7 +171,7 @@ abstract class PrimitiveBase implements Primitive {
   CborMap egestFullCborMap() {
     Map<CborValue, CborValue> update = {};
 
-    for (var field in _fieldRefs!) {
+    for (var field in _fieldRefs) {
       update[CborString(fieldnameFor(field.fkey))] =
           field.field.egestCborValue();
     }
