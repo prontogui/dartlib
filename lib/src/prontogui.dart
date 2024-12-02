@@ -16,6 +16,7 @@ class ProntoGUI {
         auxServer = null,
         isRemote = false {
     _updateSynchro = UpdateSynchro(model, null, false, true);
+    model.addWatcher(_updateSynchro);
   }
 
   /// Creates a ProntoGUI server that works remotely using GRPC.
@@ -24,6 +25,7 @@ class ProntoGUI {
         auxServer = GrpcCommServer(),
         isRemote = true {
     _updateSynchro = UpdateSynchro(model, null, false, true);
+    model.addWatcher(_updateSynchro);
   }
 
   // True if this was create as a remote server.
@@ -93,6 +95,8 @@ class ProntoGUI {
     // Do the exchange of output and input updates.
     try {
       mainServer.submitUpdateToClient(cborOut);
+
+      // GETTING THE FIRST DOESN'T WORK!
       cborIn = await mainServer.updatesFromClient.first;
     } catch (e) {
       // TODO: log error

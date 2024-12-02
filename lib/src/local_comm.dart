@@ -6,7 +6,10 @@ import 'comm_server.dart';
 class LocalComm implements CommClientData, CommServerData {
   LocalComm();
 
-  final _clientToServer = StreamController<CborValue>();
+  // Note:  updates going from client (app) to server have to be broadcast, since
+  // a new listener request is performed every update cycle, for example, using
+  // stream.first() method.
+  final _clientToServer = StreamController<CborValue>.broadcast();
   final _serverToClient = StreamController<CborValue>();
 
   /// Continuous stream of updates from the client.

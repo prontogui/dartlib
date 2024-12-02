@@ -31,9 +31,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
 
   set topPrimitives(List<Primitive> primitives) {
     _topPrimitives = primitives;
-
     _prepareForUpdates();
-
     onFullModelUpdate();
   }
 
