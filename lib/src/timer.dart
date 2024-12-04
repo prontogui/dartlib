@@ -13,6 +13,7 @@ import 'event_field.dart';
 class Timer extends PrimitiveBase {
   Timer({super.embodiment, super.tag, int periodMs = 0}) {
     _periodMs = IntegerField.from(periodMs);
+    _timerFired = EventField();
   }
 
   // Field storage
