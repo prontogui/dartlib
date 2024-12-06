@@ -15,6 +15,7 @@ import 'frame.dart';
 import 'group.dart';
 import 'import_file.dart';
 import 'list.dart';
+import 'numericfield.dart';
 import 'table.dart';
 import 'text.dart';
 import 'textfield.dart';
@@ -37,6 +38,7 @@ final Map<String, FactoryFunction> _factoryFunctions = {
   "Imported": () => ImportFile(),
   "Rows": () => Table(),
   "PeriodMs": () => Timer(),
+  "NumericEntry": () => NumericField(),
 };
 
 /// The static object factory responsible for creating primitive-type objects.
