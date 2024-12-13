@@ -13,31 +13,29 @@ const int fkeyChoices = 2;
 const int fkeyCommandIssued = 3;
 const int fkeyContent = 4;
 const int fkeyData = 5;
-const int fkeyDisplayFormat = 6;
-const int fkeyEmbodiment = 7;
-const int fkeyEntryFormat = 8;
-const int fkeyExported = 9;
-const int fkeyFrameItems = 10;
-const int fkeyGroupItems = 11;
-const int fkeyHeadings = 12;
-const int fkeyImage = 13;
-const int fkeyImported = 14;
-const int fkeyIssued = 15;
-const int fkeyLabel = 16;
-const int fkeyListItems = 17;
-const int fkeyName = 18;
-const int fkeyNumericEntry = 19;
-const int fkeyPeriodMs = 20;
-const int fkeyRows = 21;
-const int fkeySelected = 22;
-const int fkeyShowing = 23;
-const int fkeyState = 24;
-const int fkeyStatus = 25;
-const int fkeyTag = 26;
-const int fkeyTextEntry = 27;
-const int fkeyTimerFired = 28;
-const int fkeyValidExtensions = 29;
-const int fkeyMaximumKeys = 30;
+const int fkeyEmbodiment = 6;
+const int fkeyExported = 7;
+const int fkeyFrameItems = 8;
+const int fkeyGroupItems = 9;
+const int fkeyHeadings = 10;
+const int fkeyImage = 11;
+const int fkeyImported = 12;
+const int fkeyIssued = 13;
+const int fkeyLabel = 14;
+const int fkeyListItems = 15;
+const int fkeyName = 16;
+const int fkeyNumericEntry = 17;
+const int fkeyPeriodMs = 18;
+const int fkeyRows = 19;
+const int fkeySelected = 20;
+const int fkeyShowing = 21;
+const int fkeyState = 22;
+const int fkeyStatus = 23;
+const int fkeyTag = 24;
+const int fkeyTextEntry = 25;
+const int fkeyTimerFired = 26;
+const int fkeyValidExtensions = 27;
+const int fkeyMaximumKeys = 29;
 
 final _fkeyToName = _initializeFkeyToName();
 final _nameToFKey = _initializeNameToFKey();
@@ -52,9 +50,7 @@ List<String> _initializeFkeyToName() {
   list[fkeyCommandIssued] = 'CommandIssued';
   list[fkeyContent] = 'Content';
   list[fkeyData] = 'Data';
-  list[fkeyDisplayFormat] = 'DisplayFormat';
   list[fkeyEmbodiment] = 'Embodiment';
-  list[fkeyEntryFormat] = 'EntryFormat';
   list[fkeyExported] = 'Exported';
   list[fkeyFrameItems] = 'FrameItems';
   list[fkeyGroupItems] = 'GroupItems';
@@ -89,9 +85,7 @@ Map<String, int> _initializeNameToFKey() {
     'CommandIssued': fkeyCommandIssued,
     'Content': fkeyContent,
     'Data': fkeyData,
-    'DisplayFormat': fkeyDisplayFormat,
     'Embodiment': fkeyEmbodiment,
-    'EntryFormat': fkeyEntryFormat,
     'Exported': fkeyExported,
     'FrameItems': fkeyFrameItems,
     'GroupItems': fkeyGroupItems,
