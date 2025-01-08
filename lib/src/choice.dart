@@ -7,19 +7,26 @@ import 'string_field.dart';
 import 'strings1d_field.dart';
 
 /// A choice is a user selection from a set of choices.  It is often represented using a pull-down list.
+///
+/// An initial choice is provided by [choice] parameter which maps to a value contained [choices].
+/// Optional labels for each choice are supplied using [choiceLabels], where each label corresponds
+/// to the associated element in [choices].
 class Choice extends PrimitiveBase {
   Choice(
       {super.embodiment,
       super.tag,
       String choice = '',
-      List<String> choices = const []}) {
+      List<String> choices = const [],
+      List<String> choiceLabels = const []}) {
     _choice = StringField.from(choice);
     _choices = Strings1DField.from(choices);
+    _choiceLabels = Strings1DField.from(choiceLabels);
   }
 
   // Field storage
   late StringField _choice;
   late Strings1DField _choices;
+  late Strings1DField _choiceLabels;
 
   @override
   String get describeType => 'Choice';
@@ -35,13 +42,17 @@ class Choice extends PrimitiveBase {
     return _choice.value;
   }
 
-  /// the selected choice or empty if none chosen.
+  /// The selected choice or empty if none chosen.
   String get choice => _choice.value;
   set choice(String choice) => _choice.value = choice;
 
-  /// the set of valid choices to choose from.
+  /// The set of valid choices to choose from.
   List<String> get choices => _choices.value;
   set choices(List<String> choices) => _choices.value = choices;
+
+  /// The optional associated labels for each item in choices.
+  List<String> get choiceLabels => _choiceLabels.value;
+  set choiceLabels(List<String> choices) => _choiceLabels.value = choices;
 
   /// The index (0, 1, ..) of selected choice or -1 if choice is empty.  This is a covenvenience
   /// function as an alternative to Choice().  The canonical storage of choice remains a string.
@@ -59,4 +70,6 @@ class Choice extends PrimitiveBase {
   bool get isChoiceValid {
     return choices.contains(choice);
   }
+
+  /// Returns the label to display for a given choice.
 }
