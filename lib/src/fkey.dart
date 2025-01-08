@@ -10,31 +10,32 @@ const invalidFKey = '';
 const int fkeyChecked = 0;
 const int fkeyChoice = 1;
 const int fkeyChoices = 2;
-const int fkeyCommandIssued = 3;
-const int fkeyContent = 4;
-const int fkeyData = 5;
-const int fkeyEmbodiment = 6;
-const int fkeyExported = 7;
-const int fkeyFrameItems = 8;
-const int fkeyGroupItems = 9;
-const int fkeyHeadings = 10;
-const int fkeyImage = 11;
-const int fkeyImported = 12;
-const int fkeyIssued = 13;
-const int fkeyLabel = 14;
-const int fkeyListItems = 15;
-const int fkeyName = 16;
-const int fkeyNumericEntry = 17;
-const int fkeyPeriodMs = 18;
-const int fkeyRows = 19;
-const int fkeySelected = 20;
-const int fkeyShowing = 21;
-const int fkeyState = 22;
-const int fkeyStatus = 23;
-const int fkeyTag = 24;
-const int fkeyTextEntry = 25;
-const int fkeyTimerFired = 26;
-const int fkeyValidExtensions = 27;
+const int fkeyChoiceLabels = 3;
+const int fkeyCommandIssued = 4;
+const int fkeyContent = 5;
+const int fkeyData = 6;
+const int fkeyEmbodiment = 7;
+const int fkeyExported = 8;
+const int fkeyFrameItems = 9;
+const int fkeyGroupItems = 10;
+const int fkeyHeadings = 11;
+const int fkeyImage = 12;
+const int fkeyImported = 13;
+const int fkeyIssued = 14;
+const int fkeyLabel = 15;
+const int fkeyListItems = 16;
+const int fkeyName = 17;
+const int fkeyNumericEntry = 18;
+const int fkeyPeriodMs = 19;
+const int fkeyRows = 20;
+const int fkeySelected = 21;
+const int fkeyShowing = 22;
+const int fkeyState = 23;
+const int fkeyStatus = 24;
+const int fkeyTag = 25;
+const int fkeyTextEntry = 26;
+const int fkeyTimerFired = 27;
+const int fkeyValidExtensions = 28;
 const int fkeyMaximumKeys = 29;
 
 final _fkeyToName = _initializeFkeyToName();
@@ -47,6 +48,7 @@ List<String> _initializeFkeyToName() {
   list[fkeyChecked] = 'Checked';
   list[fkeyChoice] = 'Choice';
   list[fkeyChoices] = 'Choices';
+  list[fkeyChoiceLabels] = 'ChoiceLabels';
   list[fkeyCommandIssued] = 'CommandIssued';
   list[fkeyContent] = 'Content';
   list[fkeyData] = 'Data';
@@ -82,6 +84,7 @@ Map<String, int> _initializeNameToFKey() {
     'Checked': fkeyChecked,
     'Choice': fkeyChoice,
     'Choices': fkeyChoices,
+    'ChoiceLabels': fkeyChoiceLabels,
     'CommandIssued': fkeyCommandIssued,
     'Content': fkeyContent,
     'Data': fkeyData,

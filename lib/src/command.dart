@@ -68,7 +68,7 @@ class Command extends PrimitiveBase {
     status = enabled ? 0 : 1;
   }
 
-  /// Tthe visibility of the command.  This is derived from the Status field.
+  /// The visibility of the command.  This is derived from the Status field.
   /// Setting this to true will set Status to 0 (visible & enabled)and setting
   /// this to false will set Status to 2 (hidden).
   ///

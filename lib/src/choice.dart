@@ -35,6 +35,7 @@ class Choice extends PrimitiveBase {
   void describeFields(List<FieldRef> fieldRefs) {
     fieldRefs.add(FieldRef(fkeyChoice, _choice));
     fieldRefs.add(FieldRef(fkeyChoices, _choices));
+    fieldRefs.add(FieldRef(fkeyChoiceLabels, _choiceLabels));
   }
 
   @override
