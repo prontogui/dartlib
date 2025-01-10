@@ -49,4 +49,20 @@ abstract class Primitive {
   /// field of this primitive.  If there are no embodiment properties, an empty map
   /// is returned.
   Map<String, dynamic> get embodimentProperties;
+
+  /// The embodiment to use for rendering the primitive.
+  ///
+  /// Setting the embodiment is done using a 1) JSON string, 2) a simple assignment of embodiment type,
+  /// or 3) a simplified key-value pair string.  Examples of 1 and 2 are:
+  /// 'full-view' : equivalent to JSON {"embodiment":"full-view"}
+  /// 'embodiment:outlined-button, width:200, height:50' : equivalent to JSON {"embodiment":"outlined-button", "width":200, "height":50}
+  ///
+  /// This will always return a JSON string, the canonical representation of the embodiment,
+  /// regardless of how it was set.
+  String get embodiment;
+  set embodiment(String embodiment);
+
+  /// An arbitrary tag to keep around with this primitive.
+  String get tag;
+  set tag(String tag);
 }

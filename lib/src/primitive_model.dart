@@ -119,7 +119,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
   }
 
   /// Ingests a full or partial update from a CBOR value and notifies listeners.
-  Primitive? ingestCborUpdate(CborValue v) {
+  List<Primitive>? ingestCborUpdate(CborValue v) {
     assert(v is CborList);
 
     var l = v as CborList;
@@ -137,7 +137,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
 
   /// Ingests a partial update from a CBOR value and notifies listeners.
   /// If the update ends up being a full update then an exception is thrown.
-  Primitive ingestPartialUpdateOnly(CborValue v) {
+  List<Primitive> ingestPartialUpdateOnly(CborValue v) {
     var p = ingestCborUpdate(v);
     if (p == null) {
       throw Exception(
@@ -181,12 +181,12 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
   /// updated primitive dictates.
   ///
   /// This method is used internally by the class.
-  Primitive? _ingestPartialUpdate(List<CborValue> l) {
+  List<Primitive> _ingestPartialUpdate(List<CborValue> l) {
     onBeginPartialModelUpdate();
 
     final numPrimitives = l.length;
     bool topLevelUpdated = false;
-    Primitive? firstUpdatedPrimitive;
+    var updatedPrimitives = <Primitive>[];
 
     for (var i = 0; i < numPrimitives; i += 2) {
       var pkey = PKey.fromCbor(l.elementAt(i));
@@ -206,7 +206,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
         topLevelUpdated = (pkey.indices.length == 1);
       }
 
-      firstUpdatedPrimitive ??= p;
+      updatedPrimitives.add(p);
     }
 
     if (topLevelUpdated) {
@@ -215,6 +215,6 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
 
     onPartialModelUpdate();
 
-    return firstUpdatedPrimitive;
+    return updatedPrimitives;
   }
 }

@@ -88,7 +88,7 @@ class ProntoGUI {
     }
   }
 
-  Future<Primitive> wait() async {
+  Future<List<Primitive>> wait() async {
     var cborOut = _verifyGuiIsSetThenGetNextUpdate();
     late CborValue cborIn;
 
@@ -96,7 +96,6 @@ class ProntoGUI {
     try {
       mainServer.submitUpdateToClient(cborOut);
 
-      // GETTING THE FIRST DOESN'T WORK!
       cborIn = await mainServer.updatesFromClient.first;
     } catch (e) {
       // TODO: log error

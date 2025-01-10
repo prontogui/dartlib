@@ -66,7 +66,9 @@ abstract class PrimitiveBase implements Primitive {
   ///
   /// This will always return a JSON string, the canonical representation of the embodiment,
   /// regardless of how it was set.
+  @override
   String get embodiment => _embodiment.value;
+  @override
   set embodiment(String embodiment) {
     // In any case, clear the cached embodiment properties.
     __cachedEmbodimentProperties = null;
@@ -112,8 +114,10 @@ abstract class PrimitiveBase implements Primitive {
     return '{$innerJson}';
   }
 
-  // The tag to keep around with this primitive.
+  /// The tag to keep around with this primitive.
+  @override
   String get tag => _tag.value;
+  @override
   set tag(String tag) {
     _tag.value = tag;
   }
