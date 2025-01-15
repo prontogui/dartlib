@@ -8,18 +8,21 @@ import 'strings1d_field.dart';
 import 'any2d_field.dart';
 import 'integer_field.dart';
 import 'primitive.dart';
+import 'sub_embodiments.dart';
 
 /// A table displays an array of primitives in a grid of rows and columns.
-class Table extends PrimitiveBase {
+class Table extends PrimitiveBase with SubEmbodiments {
   Table(
       {super.embodiment,
       super.tag,
       List<String> headings = const [],
       List<List<Primitive>> rows = const [],
-      int status = 0}) {
+      int status = 0,
+      List<String> subEmbodiments = const []}) {
     _headings = Strings1DField.from(headings);
     _rows = Any2DField.from(rows);
     _status = IntegerField.from(status);
+    initializeSubEmbodiments(subEmbodiments);
   }
 
   // Field storage
@@ -35,6 +38,7 @@ class Table extends PrimitiveBase {
     fieldRefs.add(FieldRef(fkeyRows, _rows));
     fieldRefs.add(FieldRef(fkeyHeadings, _headings));
     fieldRefs.add(FieldRef(fkeyStatus, _status));
+    describeSubEmbodimentsField(fieldRefs);
   }
 
   @override
@@ -50,6 +54,13 @@ class Table extends PrimitiveBase {
 
     // The next index thereafter specifies which primitive to access...
     return rows[rowIndex][colIndex];
+  }
+
+  @override
+  void clearCachedFieldInformation(FKey? forFkey) {
+    if (forFkey == null || forFkey == fkeySubEmbodiments) {
+      clearCachedSubEmbodiments();
+    }
   }
 
   @override

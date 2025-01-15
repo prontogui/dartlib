@@ -32,11 +32,12 @@ const int fkeySelected = 21;
 const int fkeyShowing = 22;
 const int fkeyState = 23;
 const int fkeyStatus = 24;
-const int fkeyTag = 25;
-const int fkeyTextEntry = 26;
-const int fkeyTimerFired = 27;
-const int fkeyValidExtensions = 28;
-const int fkeyMaximumKeys = 29;
+const int fkeySubEmbodiments = 25;
+const int fkeyTag = 26;
+const int fkeyTextEntry = 27;
+const int fkeyTimerFired = 28;
+const int fkeyValidExtensions = 29;
+const int fkeyMaximumKeys = 30;
 
 final _fkeyToName = _initializeFkeyToName();
 final _nameToFKey = _initializeNameToFKey();
@@ -70,6 +71,7 @@ List<String> _initializeFkeyToName() {
   list[fkeyShowing] = 'Showing';
   list[fkeyState] = 'State';
   list[fkeyStatus] = 'Status';
+  list[fkeySubEmbodiments] = 'SubEmbodiments';
   list[fkeyTag] = 'Tag';
   list[fkeyTextEntry] = 'TextEntry';
   list[fkeyTimerFired] = 'TimerFired';
@@ -106,6 +108,7 @@ Map<String, int> _initializeNameToFKey() {
     'Showing': fkeyShowing,
     'State': fkeyState,
     'Status': fkeyStatus,
+    'SubEmbodiment': fkeySubEmbodiments,
     'Tag': fkeyTag,
     'TextEntry': fkeyTextEntry,
     'TimerFired': fkeyTimerFired,

@@ -34,12 +34,20 @@ abstract class PrimitiveBase implements Primitive {
   final _embodiment = StringField();
   final _tag = StringField();
 
-  /// Cached embodimenet properties.  These are built on demand and cleared when
+  /// Cached embodiment properties.  These are built on demand and cleared when
   /// embodiment is reassigned.  If embodiment is empty then this value remains null.
   Map<String, dynamic>? __cachedEmbodimentProperties;
 
-  // Derived primitives must implement this method to describe their type and fields.
+  // Sub-classed primitives must implement this method to describe their type and fields.
   void describeFields(List<FieldRef> fieldRefs);
+
+  /// Certain sub-classed primitives must implement this method to clear any cached
+  /// information pertaining to fields.
+  /// If [forFkey] is null then ALL cached information for any field should be cleared.
+  /// Otherwise, [forFkey] specifies for which field the information should be cleared.
+  void clearCachedFieldInformation(FKey? forFkey) {
+    // Do nothing here
+  }
 
   List<FieldRef> get _fieldRefs {
     // Build list of field refs on demand and cache it.
@@ -72,10 +80,10 @@ abstract class PrimitiveBase implements Primitive {
   set embodiment(String embodiment) {
     // In any case, clear the cached embodiment properties.
     __cachedEmbodimentProperties = null;
-    _embodiment.value = _canonizeEmbodiment(embodiment);
+    _embodiment.value = canonizeEmbodiment(embodiment);
   }
 
-  String _canonizeEmbodiment(String embodimentSetting) {
+  static String canonizeEmbodiment(String embodimentSetting) {
     var s = embodimentSetting.trim();
 
     if (s.isEmpty) {
@@ -87,13 +95,13 @@ abstract class PrimitiveBase implements Primitive {
     }
 
     if (s.contains(':')) {
-      return _convertSimplifiedKVPairsToJson(s);
+      return convertSimplifiedKVPairsToJson(s);
     }
 
     return '{"embodiment":"$s"}';
   }
 
-  String _convertSimplifiedKVPairsToJson(String embodiment) {
+  static String convertSimplifiedKVPairsToJson(String embodiment) {
     var innerJson = "";
 
     var pairs = embodiment.split(',');
@@ -246,6 +254,9 @@ abstract class PrimitiveBase implements Primitive {
 
       if (fkey == fkeyEmbodiment) {
         __cachedEmbodimentProperties = null;
+      }
+      if (fkey == fkeySubEmbodiments) {
+        clearCachedFieldInformation(fkeySubEmbodiments);
       }
 
       field.ingestPartialCborValue(item.value);
