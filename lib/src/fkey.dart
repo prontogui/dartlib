@@ -108,7 +108,7 @@ Map<String, int> _initializeNameToFKey() {
     'Showing': fkeyShowing,
     'State': fkeyState,
     'Status': fkeyStatus,
-    'SubEmbodiment': fkeySubEmbodiments,
+    'SubEmbodiments': fkeySubEmbodiments,
     'Tag': fkeyTag,
     'TextEntry': fkeyTextEntry,
     'TimerFired': fkeyTimerFired,
