@@ -12,6 +12,11 @@ import 'primitive_factory.dart';
 
 /// A field that holds a single primitive.
 class AnyField extends FieldBase implements Field {
+  AnyField() : _p = null;
+
+  /// Initializes with a primitive.
+  AnyField.from(Primitive? p) : _p = p;
+
   /// Storage of this field's value.
   Primitive? _p;
 

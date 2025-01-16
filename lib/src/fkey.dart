@@ -19,25 +19,28 @@ const int fkeyExported = 8;
 const int fkeyFrameItems = 9;
 const int fkeyGroupItems = 10;
 const int fkeyHeadings = 11;
-const int fkeyImage = 12;
-const int fkeyImported = 13;
-const int fkeyIssued = 14;
-const int fkeyLabel = 15;
-const int fkeyListItems = 16;
-const int fkeyName = 17;
-const int fkeyNumericEntry = 18;
-const int fkeyPeriodMs = 19;
-const int fkeyRows = 20;
-const int fkeySelected = 21;
-const int fkeyShowing = 22;
-const int fkeyState = 23;
-const int fkeyStatus = 24;
-const int fkeySubEmbodiments = 25;
-const int fkeyTag = 26;
-const int fkeyTextEntry = 27;
-const int fkeyTimerFired = 28;
-const int fkeyValidExtensions = 29;
-const int fkeyMaximumKeys = 30;
+const int fkeyIcon = 12;
+const int fkeyIconID = 13;
+const int fkeyImage = 14;
+const int fkeyImported = 15;
+const int fkeyIssued = 16;
+const int fkeyLabel = 17;
+const int fkeyListItems = 18;
+const int fkeyName = 19;
+const int fkeyNumericEntry = 20;
+const int fkeyPeriodMs = 21;
+const int fkeyRows = 22;
+const int fkeySelected = 23;
+const int fkeyShowing = 24;
+const int fkeyState = 25;
+const int fkeyStatus = 26;
+const int fkeySubEmbodiments = 27;
+const int fkeyTag = 28;
+const int fkeyTextEntry = 29;
+const int fkeyTimerFired = 30;
+const int fkeyTitle = 31;
+const int fkeyValidExtensions = 32;
+const int fkeyMaximumKeys = 33;
 
 final _fkeyToName = _initializeFkeyToName();
 final _nameToFKey = _initializeNameToFKey();
@@ -58,6 +61,8 @@ List<String> _initializeFkeyToName() {
   list[fkeyFrameItems] = 'FrameItems';
   list[fkeyGroupItems] = 'GroupItems';
   list[fkeyHeadings] = 'Headings';
+  list[fkeyIcon] = 'Icon';
+  list[fkeyIcon] = 'IconID';
   list[fkeyImage] = 'Image';
   list[fkeyImported] = 'Imported';
   list[fkeyIssued] = 'Issued';
@@ -75,6 +80,7 @@ List<String> _initializeFkeyToName() {
   list[fkeyTag] = 'Tag';
   list[fkeyTextEntry] = 'TextEntry';
   list[fkeyTimerFired] = 'TimerFired';
+  list[fkeyTitle] = 'Title';
   list[fkeyValidExtensions] = 'ValidExtensions';
 
   return list;
@@ -95,6 +101,8 @@ Map<String, int> _initializeNameToFKey() {
     'FrameItems': fkeyFrameItems,
     'GroupItems': fkeyGroupItems,
     'Headings': fkeyHeadings,
+    'Icon': fkeyIcon,
+    'IconID': fkeyIconID,
     'Image': fkeyImage,
     'Imported': fkeyImported,
     'Issued': fkeyIssued,
@@ -112,6 +120,7 @@ Map<String, int> _initializeNameToFKey() {
     'Tag': fkeyTag,
     'TextEntry': fkeyTextEntry,
     'TimerFired': fkeyTimerFired,
+    'Title': fkeyTitle,
     'ValidExtensions': fkeyValidExtensions,
   };
 }

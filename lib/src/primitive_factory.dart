@@ -13,6 +13,7 @@ import 'command.dart';
 import 'export_file.dart';
 import 'frame.dart';
 import 'group.dart';
+import 'icon.dart';
 import 'import_file.dart';
 import 'list.dart';
 import 'numericfield.dart';
@@ -39,6 +40,7 @@ final Map<String, FactoryFunction> _factoryFunctions = {
   "Rows": () => Table(),
   "PeriodMs": () => Timer(),
   "NumericEntry": () => NumericField(),
+  "IconID": () => Icon(),
 };
 
 /// The static object factory responsible for creating primitive-type objects.
