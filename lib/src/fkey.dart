@@ -62,7 +62,7 @@ List<String> _initializeFkeyToName() {
   list[fkeyGroupItems] = 'GroupItems';
   list[fkeyHeadings] = 'Headings';
   list[fkeyIcon] = 'Icon';
-  list[fkeyIcon] = 'IconID';
+  list[fkeyIconID] = 'IconID';
   list[fkeyImage] = 'Image';
   list[fkeyImported] = 'Imported';
   list[fkeyIssued] = 'Issued';

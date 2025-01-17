@@ -69,23 +69,29 @@ class AnyField extends FieldBase implements Field {
 
   @override
   void ingestFullCborValue(CborValue value) {
-    if (value is! CborMap) {
-      throw Exception('value is not a CborMap');
-    }
     _unprepareDescendantsForUpdates();
-    _p = PrimitiveFactory.createPrimitiveFromCborMap(pkey, value);
+
+    if (value is CborNull) {
+      _p = null;
+    } else if (value is! CborMap) {
+      throw Exception('value is not a CborMap');
+    } else {
+      _p = PrimitiveFactory.createPrimitiveFromCborMap(pkey, value);
+    }
   }
 
   @override
   void ingestPartialCborValue(CborValue value) {
-    if (value is! CborMap) {
+    if (value is CborNull) {
+      _p = null;
+    } else if (value is! CborMap) {
       throw Exception('value is not a CborMap');
-    }
-    if (_p == null) {
+    } else if (_p == null) {
       throw Exception('field has a null primitive');
+    } else {
+      _p!.ingestPartialCborMap(value);
+      onIngest();
     }
-    _p!.ingestPartialCborMap(value);
-    onIngest();
   }
 
   @override
