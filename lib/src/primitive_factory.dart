@@ -16,6 +16,7 @@ import 'group.dart';
 import 'icon.dart';
 import 'import_file.dart';
 import 'list.dart';
+import 'node.dart';
 import 'numericfield.dart';
 import 'table.dart';
 import 'text.dart';
@@ -33,6 +34,7 @@ final Map<String, FactoryFunction> _factoryFunctions = {
   "Exported": () => ExportFile(),
   "GroupItems": () => Group(),
   "FrameItems": () => Frame(),
+  "NodeItems": () => Node(),
   "ListItems": () => ListP(),
   "State": () => Tristate(),
   "TextEntry": () => TextField(),

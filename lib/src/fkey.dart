@@ -25,22 +25,24 @@ const int fkeyImage = 14;
 const int fkeyImported = 15;
 const int fkeyIssued = 16;
 const int fkeyLabel = 17;
-const int fkeyListItems = 18;
-const int fkeyName = 19;
-const int fkeyNumericEntry = 20;
-const int fkeyPeriodMs = 21;
-const int fkeyRows = 22;
-const int fkeySelected = 23;
-const int fkeyShowing = 24;
-const int fkeyState = 25;
-const int fkeyStatus = 26;
-const int fkeySubEmbodiments = 27;
-const int fkeyTag = 28;
-const int fkeyTextEntry = 29;
-const int fkeyTimerFired = 30;
-const int fkeyTitle = 31;
-const int fkeyValidExtensions = 32;
-const int fkeyMaximumKeys = 33;
+const int fkeyLevel = 18;
+const int fkeyListItems = 19;
+const int fkeyName = 20;
+const int fkeyNodeItems = 21;
+const int fkeyNumericEntry = 22;
+const int fkeyPeriodMs = 23;
+const int fkeyRows = 24;
+const int fkeySelected = 25;
+const int fkeyShowing = 26;
+const int fkeyState = 27;
+const int fkeyStatus = 28;
+const int fkeySubEmbodiments = 29;
+const int fkeyTag = 30;
+const int fkeyTextEntry = 31;
+const int fkeyTimerFired = 32;
+const int fkeyTitle = 33;
+const int fkeyValidExtensions = 34;
+const int fkeyMaximumKeys = 35;
 
 final _fkeyToName = _initializeFkeyToName();
 final _nameToFKey = _initializeNameToFKey();
@@ -67,8 +69,10 @@ List<String> _initializeFkeyToName() {
   list[fkeyImported] = 'Imported';
   list[fkeyIssued] = 'Issued';
   list[fkeyLabel] = 'Label';
+  list[fkeyLevel] = 'Level';
   list[fkeyListItems] = 'ListItems';
   list[fkeyName] = 'Name';
+  list[fkeyNodeItems] = 'NodeItems';
   list[fkeyNumericEntry] = 'NumericEntry';
   list[fkeyPeriodMs] = 'PeriodMs';
   list[fkeyRows] = 'Rows';
@@ -107,8 +111,10 @@ Map<String, int> _initializeNameToFKey() {
     'Imported': fkeyImported,
     'Issued': fkeyIssued,
     'Label': fkeyLabel,
+    'Level': fkeyLevel,
     'ListItems': fkeyListItems,
     'Name': fkeyName,
+    'NodeItems': fkeyNodeItems,
     'NumericEntry': fkeyNumericEntry,
     'PeriodMs': fkeyPeriodMs,
     'Rows': fkeyRows,
