@@ -25,24 +25,25 @@ const int fkeyImage = 14;
 const int fkeyImported = 15;
 const int fkeyIssued = 16;
 const int fkeyLabel = 17;
-const int fkeyLevel = 18;
-const int fkeyListItems = 19;
-const int fkeyName = 20;
-const int fkeyNodeItems = 21;
-const int fkeyNumericEntry = 22;
-const int fkeyPeriodMs = 23;
+const int fkeyListItems = 18;
+const int fkeyName = 19;
+const int fkeyNodeItem = 20;
+const int fkeyNumericEntry = 21;
+const int fkeyPeriodMs = 22;
+const int fkeyRoot = 23;
 const int fkeyRows = 24;
-const int fkeySelected = 25;
+const int fkeySelection = 25;
 const int fkeyShowing = 26;
 const int fkeyState = 27;
 const int fkeyStatus = 28;
 const int fkeySubEmbodiments = 29;
-const int fkeyTag = 30;
-const int fkeyTextEntry = 31;
-const int fkeyTimerFired = 32;
-const int fkeyTitle = 33;
-const int fkeyValidExtensions = 34;
-const int fkeyMaximumKeys = 35;
+const int fkeySubNodes = 30;
+const int fkeyTag = 31;
+const int fkeyTextEntry = 32;
+const int fkeyTimerFired = 33;
+const int fkeyTitle = 34;
+const int fkeyValidExtensions = 35;
+const int fkeyMaximumKeys = 36;
 
 final _fkeyToName = _initializeFkeyToName();
 final _nameToFKey = _initializeNameToFKey();
@@ -69,18 +70,19 @@ List<String> _initializeFkeyToName() {
   list[fkeyImported] = 'Imported';
   list[fkeyIssued] = 'Issued';
   list[fkeyLabel] = 'Label';
-  list[fkeyLevel] = 'Level';
   list[fkeyListItems] = 'ListItems';
   list[fkeyName] = 'Name';
-  list[fkeyNodeItems] = 'NodeItems';
+  list[fkeyNodeItem] = 'NodeItem';
   list[fkeyNumericEntry] = 'NumericEntry';
   list[fkeyPeriodMs] = 'PeriodMs';
+  list[fkeyRoot] = 'Root';
   list[fkeyRows] = 'Rows';
-  list[fkeySelected] = 'Selected';
+  list[fkeySelection] = 'Selection';
   list[fkeyShowing] = 'Showing';
   list[fkeyState] = 'State';
   list[fkeyStatus] = 'Status';
   list[fkeySubEmbodiments] = 'SubEmbodiments';
+  list[fkeySubNodes] = 'SubNodes';
   list[fkeyTag] = 'Tag';
   list[fkeyTextEntry] = 'TextEntry';
   list[fkeyTimerFired] = 'TimerFired';
@@ -111,18 +113,19 @@ Map<String, int> _initializeNameToFKey() {
     'Imported': fkeyImported,
     'Issued': fkeyIssued,
     'Label': fkeyLabel,
-    'Level': fkeyLevel,
     'ListItems': fkeyListItems,
     'Name': fkeyName,
-    'NodeItems': fkeyNodeItems,
+    'NodeItem': fkeyNodeItem,
     'NumericEntry': fkeyNumericEntry,
     'PeriodMs': fkeyPeriodMs,
+    'Root': fkeyRoot,
     'Rows': fkeyRows,
-    'Selected': fkeySelected,
+    'Selection': fkeySelection,
     'Showing': fkeyShowing,
     'State': fkeyState,
     'Status': fkeyStatus,
     'SubEmbodiments': fkeySubEmbodiments,
+    'SubNodes': fkeySubNodes,
     'Tag': fkeyTag,
     'TextEntry': fkeyTextEntry,
     'TimerFired': fkeyTimerFired,

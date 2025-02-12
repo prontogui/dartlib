@@ -4,46 +4,56 @@
 import 'fkey.dart';
 import 'pkey.dart';
 import 'primitive_base.dart';
+import 'any_field.dart';
 import 'any1d_field.dart';
-import 'integer_field.dart';
 import 'primitive.dart';
+import 'nothing.dart';
 
-/// A node is a related set of primitives representing an item in a ListP primitive,
-/// especially when a multi-level list is desired.  These items represent information
-/// to display in the list item and are static in type and quantity.
+/// A node is used to represent a tree of primitives. If it contains other nodes,
+/// then it is considered a branch.  If it contains other primitives then it is
+/// considered a leaf.  It is an error to have both node and non-node primitives as items.
 class Node extends PrimitiveBase {
   Node(
       {super.embodiment,
       super.tag,
-      List<Primitive> nodeItems = const [],
-      int level = 0}) {
-    _nodeItems = Any1DField.from(nodeItems);
-    _level = IntegerField.from(level);
+      Primitive? nodeItem,
+      List<Primitive> subNodes = const []}) {
+    if (nodeItem == null) {
+      _nodeItem = AnyField.from(Nothing());
+    } else {
+      _nodeItem = AnyField.from(nodeItem);
+    }
+    _subNodes = Any1DField.from(subNodes);
   }
 
   // Field storage
-  late Any1DField _nodeItems;
-  late IntegerField _level;
+
+  // This always holds a valid primitive or the Nothing primitive.
+  late AnyField _nodeItem;
+  late Any1DField _subNodes;
 
   @override
   String get describeType => 'Node';
 
   @override
   void describeFields(List<FieldRef> fieldRefs) {
-    fieldRefs.add(FieldRef(fkeyNodeItems, _nodeItems));
-    fieldRefs.add(FieldRef(fkeyLevel, _level));
+    fieldRefs.add(FieldRef(fkeyNodeItem, _nodeItem));
+    fieldRefs.add(FieldRef(fkeySubNodes, _subNodes));
   }
 
   @override
   Primitive locateNextDescendant(PKeyLocator locator) {
     // The next index specifies which container field to access...
     var nextIndex = locator.nextIndex();
-    if (nextIndex != 0) {
+    if (nextIndex == 0) {
+      assert(_nodeItem.value != null);
+      return _nodeItem.value!;
+    } else if (nextIndex == 1) {
+      // The next index thereafter specifies which primitive to access...
+      return _subNodes.value[locator.nextIndex()];
+    } else {
       throw Exception('PKey locator is out of bounds');
     }
-
-    // The next index thereafter specifies which primitive to access...
-    return nodeItems[locator.nextIndex()];
   }
 
   @override
@@ -51,13 +61,31 @@ class Node extends PrimitiveBase {
     return "";
   }
 
-  /// The collection of primitives that make up the node.
-  List<Primitive> get nodeItems => _nodeItems.value;
-  set nodeItems(List<Primitive> nodeItems) => _nodeItems.value = nodeItems;
+  Primitive? locateNode(List<int> nodePath) {
+    var nodes = _subNodes.value;
 
-  /// The level of the node inside a ListP that is display multi-level items.
-  int get level => _level.value;
-  set level(int level) {
-    _level.value = level;
+    if (nodePath.isEmpty) {
+      return null;
+    }
+
+    var index = nodePath[0];
+    if (index < 0 || index >= nodes.length) {
+      return null;
+    }
+
+    var subNode = nodes[index] as Node;
+    return subNode.locateNode(nodePath.sublist(1));
   }
+
+  /// The sub-nodes (descendents) of this node.
+  List<Primitive> get subNodes => _subNodes.value;
+  set subNodes(List<Primitive> subNodes) => _subNodes.value = subNodes;
+
+  /// The primitive this node contains.
+  Primitive get nodeItem {
+    assert(_nodeItem.value != null);
+    return _nodeItem.value!;
+  }
+
+  set nodeItem(Primitive nodeItem) => _nodeItem.value = nodeItem;
 }

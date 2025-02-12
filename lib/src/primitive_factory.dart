@@ -17,11 +17,13 @@ import 'icon.dart';
 import 'import_file.dart';
 import 'list.dart';
 import 'node.dart';
+import 'nothing.dart';
 import 'numericfield.dart';
 import 'table.dart';
 import 'text.dart';
 import 'textfield.dart';
 import 'timer.dart';
+import 'tree.dart';
 import 'tristate.dart';
 
 typedef FactoryFunction = PrimitiveBase Function();
@@ -43,12 +45,18 @@ final Map<String, FactoryFunction> _factoryFunctions = {
   "PeriodMs": () => Timer(),
   "NumericEntry": () => NumericField(),
   "IconID": () => Icon(),
+  "Root": () => Tree(),
 };
 
 /// The static object factory responsible for creating primitive-type objects.
 abstract class PrimitiveFactory {
   /// Creates the appropriate primitive from the CBOR specification provide in [ctorArgs].
   static Primitive createPrimitiveFromCborMap(PKey pkey, CborMap cbor) {
+    // Is it Nothing (no fields)?
+    if (cbor.keys.isEmpty) {
+      return Nothing();
+    }
+
     // Determine what primitive to create from the unique set of fields it holds.
     for (var key in cbor.keys) {
       if (key is! CborString) {
