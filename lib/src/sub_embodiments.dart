@@ -10,7 +10,7 @@ mixin SubEmbodiments {
 
   /// Cached sub-embodiment properties.  These are built on demand and cleared when
   /// SubEmbodiements is reassigned.  If embodiment is empty then this value remains null.
-  List<Map<String, dynamic>>? __cachedSubEmbodimentProperties = null;
+  Map<int, Map<String, dynamic>>? __cachedSubEmbodimentProperties;
 
   void initializeSubEmbodiments(List<String> subEmbodiments) {
     // Use the field setter to make sure the embodiments are stored in canonical form
@@ -32,9 +32,7 @@ mixin SubEmbodiments {
   ///
   /// This will always return an array of JSON strings, the canonical representation
   /// of the embodiments, regardless of how it was set.
-  @override
   List<String> get subEmbodiments => _subEmbodiments.value;
-  @override
   set subEmbodiments(List<String> subEmbodiments) {
     // In any case, clear the cached sub-embodiments properties.
     clearCachedSubEmbodiments();
@@ -45,25 +43,31 @@ mixin SubEmbodiments {
   }
 
   /// The sub-embodiments as property maps.
-  List<Map<String, dynamic>> get subEmbodimentProperties {
+  Map<String, dynamic> getSubEmbodimentProperties(int index) {
+    if (index < 0 || index >= _subEmbodiments.value.length) {
+      return const {};
+    }
     if (__cachedSubEmbodimentProperties != null) {
-      return __cachedSubEmbodimentProperties!;
+      var existing = __cachedSubEmbodimentProperties![index];
+      if (existing != null) {
+        return existing;
+      }
     }
 
-    __cachedSubEmbodimentProperties = List<Map<String, dynamic>>.generate(
-      _subEmbodiments.value.length,
-      (i) {
-        var embodimentJson = _subEmbodiments.value[i];
+    var sub = _subEmbodiments.value[index];
+    if (sub.trim().isEmpty) {
+      return const {};
+    }
 
-        if (embodimentJson.trim().isEmpty) {
-          return const {};
-        }
+    var subProps = jsonDecode(sub) as Map<String, dynamic>;
 
-        return jsonDecode(embodimentJson) as Map<String, dynamic>;
-      },
-      growable: false,
-    );
+    // Put in the cache
+    if (__cachedSubEmbodimentProperties == null) {
+      __cachedSubEmbodimentProperties ??= {index: subProps};
+    } else {
+      __cachedSubEmbodimentProperties![index] = subProps;
+    }
 
-    return __cachedSubEmbodimentProperties!;
+    return subProps;
   }
 }
