@@ -1,6 +1,6 @@
-import 'fkey.dart';
-import 'primitive_base.dart';
-import 'strings1d_field.dart';
+import '../src/fkey.dart';
+import '../src/primitive_base.dart';
+import '../src/strings1d_field.dart';
 import 'dart:convert';
 
 /// Implements the SubEmbodiments field for various primitives.

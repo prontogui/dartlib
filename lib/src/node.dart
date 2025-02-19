@@ -7,7 +7,6 @@ import 'primitive_base.dart';
 import 'any_field.dart';
 import 'any1d_field.dart';
 import 'primitive.dart';
-import 'nothing.dart';
 
 /// A node is used to represent a tree of primitives. If it contains other nodes,
 /// then it is considered a branch.  If it contains other primitives then it is
@@ -18,11 +17,14 @@ class Node extends PrimitiveBase {
       super.tag,
       Primitive? nodeItem,
       List<Primitive> subNodes = const []}) {
+/*        
     if (nodeItem == null) {
       _nodeItem = AnyField.from(Nothing());
     } else {
       _nodeItem = AnyField.from(nodeItem);
     }
+*/
+    _nodeItem = AnyField.from(nodeItem);
     _subNodes = Any1DField.from(subNodes);
   }
 
@@ -37,6 +39,7 @@ class Node extends PrimitiveBase {
 
   @override
   void describeFields(List<FieldRef> fieldRefs) {
+    // IMPORTANT: list fields in alphabetical order!
     fieldRefs.add(FieldRef(fkeyNodeItem, _nodeItem));
     fieldRefs.add(FieldRef(fkeySubNodes, _subNodes));
   }
@@ -46,7 +49,9 @@ class Node extends PrimitiveBase {
     // The next index specifies which container field to access...
     var nextIndex = locator.nextIndex();
     if (nextIndex == 0) {
-      assert(_nodeItem.value != null);
+      if (_nodeItem.value == null) {
+        throw Exception('PKey locator is out of bounds');
+      }
       return _nodeItem.value!;
     } else if (nextIndex == 1) {
       // The next index thereafter specifies which primitive to access...
@@ -82,10 +87,9 @@ class Node extends PrimitiveBase {
   set subNodes(List<Primitive> subNodes) => _subNodes.value = subNodes;
 
   /// The primitive this node contains.
-  Primitive get nodeItem {
-    assert(_nodeItem.value != null);
-    return _nodeItem.value!;
+  Primitive? get nodeItem {
+    return _nodeItem.value;
   }
 
-  set nodeItem(Primitive nodeItem) => _nodeItem.value = nodeItem;
+  set nodeItem(Primitive? nodeItem) => _nodeItem.value = nodeItem;
 }

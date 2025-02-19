@@ -5,29 +5,31 @@ import 'fkey.dart';
 import "pkey.dart";
 import 'primitive_base.dart';
 import 'strings1d_field.dart';
+import 'any1d_field.dart';
 import 'any2d_field.dart';
 import 'integer_field.dart';
 import 'primitive.dart';
-import 'sub_embodiments.dart';
 
 /// A table displays an array of primitives in a grid of rows and columns.
-class Table extends PrimitiveBase with SubEmbodiments {
-  Table(
-      {super.embodiment,
-      super.tag,
-      List<String> headings = const [],
-      List<List<Primitive>> rows = const [],
-      int status = 0,
-      List<String> subEmbodiments = const []}) {
+class Table extends PrimitiveBase {
+  Table({
+    super.embodiment,
+    super.tag,
+    List<String> headings = const [],
+    List<Primitive> modelRow = const [],
+    List<List<Primitive>> rows = const [],
+    int status = 0,
+  }) {
     _headings = Strings1DField.from(headings);
+    _modelRow = Any1DField.from(modelRow);
     _rows = Any2DField.from(rows);
     _status = IntegerField.from(status);
-    initializeSubEmbodiments(subEmbodiments);
   }
 
   // Field storage
-  late Any2DField _rows;
   late Strings1DField _headings;
+  late Any1DField _modelRow;
+  late Any2DField _rows;
   late IntegerField _status;
 
   @override
@@ -35,31 +37,29 @@ class Table extends PrimitiveBase with SubEmbodiments {
 
   @override
   void describeFields(List<FieldRef> fieldRefs) {
-    fieldRefs.add(FieldRef(fkeyRows, _rows));
+    // IMPORTANT: list fields in alphabetical order!
     fieldRefs.add(FieldRef(fkeyHeadings, _headings));
+    fieldRefs.add(FieldRef(fkeyModelRow, _modelRow));
+    fieldRefs.add(FieldRef(fkeyRows, _rows));
     fieldRefs.add(FieldRef(fkeyStatus, _status));
-    describeSubEmbodimentsField(fieldRefs);
   }
 
   @override
   Primitive locateNextDescendant(PKeyLocator locator) {
     // The next index specifies which container field to access...
     var nextIndex = locator.nextIndex();
-    if (nextIndex != 0) {
-      throw Exception('PKey locator is out of bounds');
-    }
+    switch (nextIndex) {
+      case 0:
+        var colIndex = locator.nextIndex();
+        return modelRow[colIndex];
+      case 1:
+        var rowIndex = locator.nextIndex();
+        var colIndex = locator.nextIndex();
 
-    var rowIndex = locator.nextIndex();
-    var colIndex = locator.nextIndex();
-
-    // The next index thereafter specifies which primitive to access...
-    return rows[rowIndex][colIndex];
-  }
-
-  @override
-  void clearCachedFieldInformation(FKey? forFkey) {
-    if (forFkey == null || forFkey == fkeySubEmbodiments) {
-      clearCachedSubEmbodiments();
+        // The next index thereafter specifies which primitive to access...
+        return rows[rowIndex][colIndex];
+      default:
+        throw Exception('PKey locator is out of bounds');
     }
   }
 
@@ -72,6 +72,10 @@ class Table extends PrimitiveBase with SubEmbodiments {
   List<String> get headings => _headings.value;
   set headings(List<String> headings) => _headings.value = headings;
 
+  /// The model row of primitives to show for each column.
+  List<Primitive> get modelRow => _modelRow.value;
+  set modelRow(List<Primitive> modelRow) => _modelRow.value = modelRow;
+
   /// The dynamically populated 2D (rows, cols) collection of primitives that appear in the table.
   List<List<Primitive>> get rows => _rows.value;
   set rows(List<List<Primitive>> rows) => _rows.value = rows;
@@ -79,6 +83,10 @@ class Table extends PrimitiveBase with SubEmbodiments {
   /// The status of the table:  0 = Table Normal, 1 = Table Disabled, 2 = Table Hidden.
   int get status => _status.value;
   set status(int status) => _status.value = status;
+
+  /// The dynamically populated 2D (rows, cols) collection of primitives that appear in the table.
+  List<List<Primitive>> get rowPrototype => _rows.value;
+  set rowPrototype(List<List<Primitive>> rows) => _rows.value = rows;
 
   /// Inserts a new row in this table before the index specified.  If index is -1 or extends beyond the number
   /// of rows in the table then row is appended at the end of the table.

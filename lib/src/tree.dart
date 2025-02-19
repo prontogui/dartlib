@@ -8,23 +8,26 @@ import 'any_field.dart';
 import 'integer1d_field.dart';
 import 'primitive.dart';
 import 'node.dart';
-import 'sub_embodiments.dart';
 
 /// A node is used to represent a tree of primitives. If it contains other nodes,
 /// then it is considered a branch.  If it contains other primitives then it is
 /// considered a leaf.  It is an error to have both node and non-node primitives as items.
-class Tree extends PrimitiveBase with SubEmbodiments {
-  Tree({super.embodiment, super.tag, Node? root}) {
+class Tree extends PrimitiveBase {
+  Tree({super.embodiment, super.tag, Primitive? modelItem, Node? root}) {
     root ??= Node();
+    _modelItem = AnyField.from(modelItem);
     _root = AnyField.from(root);
     _selection = Integer1DField();
-    initializeSubEmbodiments(subEmbodiments);
   }
 
   // Field storage
 
+  // This field stores a model item which can be any type of primitive.
+  late AnyField _modelItem;
+
   // This always contains a Node primitive and is never null.
   late AnyField _root;
+
   late Integer1DField _selection;
 
   @override
@@ -32,26 +35,44 @@ class Tree extends PrimitiveBase with SubEmbodiments {
 
   @override
   void describeFields(List<FieldRef> fieldRefs) {
+    fieldRefs.add(FieldRef(fkeyModelItem, _modelItem));
     fieldRefs.add(FieldRef(fkeyRoot, _root));
     fieldRefs.add(FieldRef(fkeySelection, _selection));
-    describeSubEmbodimentsField(fieldRefs);
   }
 
   @override
   Primitive locateNextDescendant(PKeyLocator locator) {
     // The next index specifies which container field to access...
     var nextIndex = locator.nextIndex();
-    if (nextIndex != 0) {
-      throw Exception('PKey locator is out of bounds');
+    switch (nextIndex) {
+      case 0:
+        if (_modelItem.value == null) {
+          throw Exception('PKey locator is out of bounds');
+        }
+        return _modelItem.value!;
+      case 1:
+        if (_root.value == null) {
+          throw Exception('PKey locator is out of bounds');
+        }
+        return _root.value!;
+      default:
+        throw Exception('PKey locator is out of bounds');
     }
-
-    // The next index thereafter specifies which primitive to access...
-    return _root.value!;
   }
 
   @override
   String toString() {
     return "";
+  }
+
+  /// The model primitive which all list items will be like.  It is mainly used to
+  /// specify embodiment settings to use for all list items.
+  Primitive? get modelItem {
+    return _modelItem.value;
+  }
+
+  set modelItem(Primitive? p) {
+    _modelItem.value = p;
   }
 
   /// The collection of primitives that make up the node.

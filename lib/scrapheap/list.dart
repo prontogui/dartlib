@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// EXAMPLE USAGE OF SubEmbodiments
+/*
 import 'dart:io';
-
-import 'package:dartlib/src/any_field.dart';
 
 import 'fkey.dart';
 import 'pkey.dart';
@@ -12,28 +12,26 @@ import 'primitive_base.dart';
 import 'any1d_field.dart';
 import 'integer1d_field.dart';
 import 'primitive.dart';
+import '../scrapheap/sub_embodiments.dart';
 
 /// A list is a collection of primitives that have a sequential-like relationship
 /// and might be dynamic in quantity or kind.
 ///
 /// Note: it is named ListP to avoid conflict with the Dart List class.
-class ListP extends PrimitiveBase {
+class ListP extends PrimitiveBase with SubEmbodiments {
   ListP(
       {super.embodiment,
       super.tag,
       List<Primitive> listItems = const [],
       int selection = 0,
-      Primitive? modelItem}) {
+      List<String> subEmbodiments = const []}) {
     _listItems = Any1DField.from(listItems);
     _selection = Integer1DField.from([selection]);
-    _modelItem = AnyField.from(modelItem);
+    initializeSubEmbodiments(subEmbodiments);
   }
 
   // Field storage
   late Any1DField _listItems;
-
-  // The model item to use when embodifying list items.
-  late AnyField _modelItem;
 
   // This has either 1 item or is empty for no selection.
   late Integer1DField _selection;
@@ -46,24 +44,26 @@ class ListP extends PrimitiveBase {
   @override
   void describeFields(List<FieldRef> fieldRefs) {
     fieldRefs.add(FieldRef(fkeyListItems, _listItems));
-    fieldRefs.add(FieldRef(fkeyModelItem, _modelItem));
     fieldRefs.add(FieldRef(fkeySelection, _selection));
+    describeSubEmbodimentsField(fieldRefs);
   }
 
   @override
   Primitive locateNextDescendant(PKeyLocator locator) {
     // The next index specifies which container field to access...
     var nextIndex = locator.nextIndex();
-    switch (nextIndex) {
-      case 0:
-        return listItems[locator.nextIndex()];
-      case 1:
-        if (_modelItem.value == null) {
-          throw Exception('PKey locator is out of bounds');
-        }
-        return _modelItem.value!;
-      default:
-        throw Exception('PKey locator is out of bounds');
+    if (nextIndex != 0) {
+      throw Exception('PKey locator is out of bounds');
+    }
+
+    // The next index thereafter specifies which primitive to access...
+    return listItems[locator.nextIndex()];
+  }
+
+  @override
+  void clearCachedFieldInformation(FKey? forFkey) {
+    if (forFkey == null || forFkey == fkeySubEmbodiments) {
+      clearCachedSubEmbodiments();
     }
   }
 
@@ -100,14 +100,5 @@ class ListP extends PrimitiveBase {
     }
     return listItems[selected];
   }
-
-  /// The model primitive which all list items will be like.  It is mainly used to
-  /// specify embodiment settings to use for all list items.
-  Primitive? get modelItem {
-    return _modelItem.value;
-  }
-
-  set modelItem(Primitive? p) {
-    _modelItem.value = p;
-  }
 }
+*/

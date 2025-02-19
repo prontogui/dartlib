@@ -41,14 +41,6 @@ abstract class PrimitiveBase implements Primitive {
   // Sub-classed primitives must implement this method to describe their type and fields.
   void describeFields(List<FieldRef> fieldRefs);
 
-  /// Certain sub-classed primitives must implement this method to clear any cached
-  /// information pertaining to fields.
-  /// If [forFkey] is null then ALL cached information for any field should be cleared.
-  /// Otherwise, [forFkey] specifies for which field the information should be cleared.
-  void clearCachedFieldInformation(FKey? forFkey) {
-    // Do nothing here
-  }
-
   List<FieldRef> get _fieldRefs {
     // Build list of field refs on demand and cache it.
     if (__cachedFieldRefs == null) {
@@ -254,9 +246,6 @@ abstract class PrimitiveBase implements Primitive {
 
       if (fkey == fkeyEmbodiment) {
         __cachedEmbodimentProperties = null;
-      }
-      if (fkey == fkeySubEmbodiments) {
-        clearCachedFieldInformation(fkeySubEmbodiments);
       }
 
       field.ingestPartialCborValue(item.value);
