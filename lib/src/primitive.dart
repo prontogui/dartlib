@@ -45,11 +45,6 @@ abstract class Primitive {
   /// True if the primitive has not been prepared yet for updates.
   bool get notPreparedYet;
 
-  /// The embodiment properties of this primitive, derived from the embodiment
-  /// field of this primitive.  If there are no embodiment properties, an empty map
-  /// is returned.
-  Map<String, dynamic> get embodimentProperties;
-
   /// The embodiment to use for rendering the primitive.
   ///
   /// Setting the embodiment is done using a 1) JSON string, 2) a simple assignment of embodiment type,
@@ -61,6 +56,17 @@ abstract class Primitive {
   /// regardless of how it was set.
   String get embodiment;
   set embodiment(String embodiment);
+
+  /// The embodiment property map of this primitive, derived from the embodiment
+  /// field of this primitive.  If there are no embodiment properties, an empty map
+  /// is returned.
+  Map<String, dynamic> get embodimentMap;
+
+  /// A cached object representing the embodiment info, which is derived
+  /// from embodimentMap and store here by the App. This is set to null
+  /// by the primitive object whenever the embodiment changes.
+  dynamic get embodimentInfo;
+  set embodimentInfo(dynamic info);
 
   /// An arbitrary tag to keep around with this primitive.
   String get tag;

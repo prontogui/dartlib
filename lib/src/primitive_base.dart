@@ -34,9 +34,16 @@ abstract class PrimitiveBase implements Primitive {
   final _embodiment = StringField();
   final _tag = StringField();
 
-  /// Cached embodiment properties.  These are built on demand and cleared when
-  /// embodiment is reassigned.  If embodiment is empty then this value remains null.
-  Map<String, dynamic>? __cachedEmbodimentProperties;
+  // Cached embodiment property map.  These are built on demand and cleared when
+  // embodiment is reassigned.  If embodiment is empty then this value remains null.
+  Map<String, dynamic>? __cachedEmbodimentMap;
+
+  dynamic __cachedEmbodimentInfo;
+
+  void _clearCachedEmbodimentObjects() {
+    __cachedEmbodimentMap = null;
+    __cachedEmbodimentInfo = null;
+  }
 
   // Sub-classed primitives must implement this method to describe their type and fields.
   void describeFields(List<FieldRef> fieldRefs);
@@ -71,7 +78,7 @@ abstract class PrimitiveBase implements Primitive {
   @override
   set embodiment(String embodiment) {
     // In any case, clear the cached embodiment properties.
-    __cachedEmbodimentProperties = null;
+    _clearCachedEmbodimentObjects();
     _embodiment.value = canonizeEmbodiment(embodiment);
   }
 
@@ -203,7 +210,7 @@ abstract class PrimitiveBase implements Primitive {
 
   @override
   void ingestFullCborMap(CborMap cbor) {
-    __cachedEmbodimentProperties = null;
+    _clearCachedEmbodimentObjects();
     for (var item in cbor.entries) {
       var k = item.key;
 
@@ -245,7 +252,7 @@ abstract class PrimitiveBase implements Primitive {
       }
 
       if (fkey == fkeyEmbodiment) {
-        __cachedEmbodimentProperties = null;
+        _clearCachedEmbodimentObjects();
       }
 
       field.ingestPartialCborValue(item.value);
@@ -273,9 +280,9 @@ abstract class PrimitiveBase implements Primitive {
   }
 
   @override
-  Map<String, dynamic> get embodimentProperties {
-    if (__cachedEmbodimentProperties != null) {
-      return __cachedEmbodimentProperties!;
+  Map<String, dynamic> get embodimentMap {
+    if (__cachedEmbodimentMap != null) {
+      return __cachedEmbodimentMap!;
     }
 
     late String embodimentJson = embodiment.trim();
@@ -284,10 +291,17 @@ abstract class PrimitiveBase implements Primitive {
       return const {};
     }
 
-    __cachedEmbodimentProperties =
-        jsonDecode(embodimentJson) as Map<String, dynamic>;
+    __cachedEmbodimentMap = jsonDecode(embodimentJson) as Map<String, dynamic>;
 
-    return __cachedEmbodimentProperties!;
+    return __cachedEmbodimentMap!;
+  }
+
+  @override
+  dynamic get embodimentInfo => __cachedEmbodimentInfo;
+
+  @override
+  set embodimentInfo(dynamic props) {
+    __cachedEmbodimentInfo = props;
   }
 
   /// Returns a pretty-printed string representation of this primitive.
