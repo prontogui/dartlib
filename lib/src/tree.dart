@@ -9,9 +9,7 @@ import 'integer1d_field.dart';
 import 'primitive.dart';
 import 'node.dart';
 
-/// A node is used to represent a tree of primitives. If it contains other nodes,
-/// then it is considered a branch.  If it contains other primitives then it is
-/// considered a leaf.  It is an error to have both node and non-node primitives as items.
+/// A tree is used to represent a tree of primitives.
 class Tree extends PrimitiveBase {
   Tree({super.embodiment, super.tag, Primitive? modelItem, Node? root}) {
     root ??= Node();
