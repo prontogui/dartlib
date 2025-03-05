@@ -92,4 +92,8 @@ class Node extends PrimitiveBase {
   }
 
   set nodeItem(Primitive? nodeItem) => _nodeItem.value = nodeItem;
+
+  /// Arbitrary data assigned and used by the App. Note: this is only used on the
+  /// App side and is not implemented by server-side libraries like golib.
+  dynamic appData;
 }
