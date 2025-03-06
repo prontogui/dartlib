@@ -39,3 +39,4 @@ export 'src/prontogui.dart' show ProntoGUI;
 export 'src/grpc_comm_server.dart' show GrpcCommServer;
 export 'src/log.dart' show LoggingLevel, logger, loggingLevel;
 export 'src/local_comm.dart' show LocalComm;
+export 'src/card.dart' show Card;
