@@ -7,6 +7,7 @@ import 'pkey.dart';
 import 'primitive.dart';
 import 'primitive_base.dart';
 
+import 'card.dart';
 import 'check.dart';
 import 'choice.dart';
 import 'command.dart';
@@ -29,23 +30,24 @@ import 'tristate.dart';
 typedef FactoryFunction = PrimitiveBase Function();
 
 final Map<String, FactoryFunction> _factoryFunctions = {
-  "Checked": () => Check(),
-  "Content": () => Text(),
-  "Choice": () => Choice(),
-  "CommandIssued": () => Command(),
-  "Exported": () => ExportFile(),
-  "GroupItems": () => Group(),
-  "FrameItems": () => Frame(),
-  "NodeItems": () => Node(),
-  "ListItems": () => ListP(),
-  "State": () => Tristate(),
-  "TextEntry": () => TextField(),
-  "Imported": () => ImportFile(),
-  "Rows": () => Table(),
-  "PeriodMs": () => Timer(),
-  "NumericEntry": () => NumericField(),
-  "IconID": () => Icon(),
-  "Root": () => Tree(),
+  'MainItem': () => Card(),
+  'Checked': () => Check(),
+  'Content': () => Text(),
+  'Choice': () => Choice(),
+  'CommandIssued': () => Command(),
+  'Exported': () => ExportFile(),
+  'GroupItems': () => Group(),
+  'FrameItems': () => Frame(),
+  'NodeItem': () => Node(),
+  'ListItems': () => ListP(),
+  'State': () => Tristate(),
+  'TextEntry': () => TextField(),
+  'Imported': () => ImportFile(),
+  'Rows': () => Table(),
+  'PeriodMs': () => Timer(),
+  'NumericEntry': () => NumericField(),
+  'IconID': () => Icon(),
+  'Root': () => Tree(),
 };
 
 /// The static object factory responsible for creating primitive-type objects.
@@ -71,6 +73,6 @@ abstract class PrimitiveFactory {
       }
     }
 
-    throw Exception('primitive not recognized.');
+    throw Exception('primitive not recognized [${cbor.keys}].');
   }
 }
