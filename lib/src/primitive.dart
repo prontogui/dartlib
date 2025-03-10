@@ -58,9 +58,9 @@ abstract class Primitive {
   set embodiment(String embodiment);
 
   /// The embodiment property map of this primitive, derived from the embodiment
-  /// field of this primitive.  If there are no embodiment properties, an empty map
+  /// field of this primitive.  If there are no embodiment properties the null
   /// is returned.
-  Map<String, dynamic> get embodimentMap;
+  Map<String, dynamic>? get embodimentMap;
 
   /// A cached object representing the embodiment info, which is derived
   /// from embodimentMap and store here by the App. This is set to null

@@ -280,15 +280,15 @@ abstract class PrimitiveBase implements Primitive {
   }
 
   @override
-  Map<String, dynamic> get embodimentMap {
+  Map<String, dynamic>? get embodimentMap {
     if (__cachedEmbodimentMap != null) {
       return __cachedEmbodimentMap!;
     }
 
-    late String embodimentJson = embodiment.trim();
+    String embodimentJson = embodiment.trim();
 
-    if (embodimentJson.trim().isEmpty) {
-      return const {};
+    if (embodimentJson.isEmpty) {
+      return null;
     }
 
     __cachedEmbodimentMap = jsonDecode(embodimentJson) as Map<String, dynamic>;
