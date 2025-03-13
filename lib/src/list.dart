@@ -2,15 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:io';
-
 import 'package:dartlib/src/any_field.dart';
-
 import 'fkey.dart';
 import 'pkey.dart';
 import 'primitive_base.dart';
 import 'any1d_field.dart';
-import 'integer1d_field.dart';
+import 'integer_field.dart';
 import 'primitive.dart';
 
 /// A list is a collection of primitives that have a sequential-like relationship
@@ -18,15 +15,16 @@ import 'primitive.dart';
 ///
 /// Note: it is named ListP to avoid conflict with the Dart List class.
 class ListP extends PrimitiveBase {
-  ListP(
-      {super.embodiment,
-      super.tag,
-      List<Primitive> listItems = const [],
-      int selection = 0,
-      Primitive? modelItem}) {
+  ListP({
+    super.embodiment,
+    super.tag,
+    List<Primitive> listItems = const [],
+    Primitive? modelItem,
+    int selectedIndex = 0,
+  }) {
     _listItems = Any1DField.from(listItems);
-    _selection = Integer1DField.from([selection]);
     _modelItem = AnyField.from(modelItem);
+    _selectedIndex = IntegerField.from(selectedIndex);
   }
 
   // Field storage
@@ -36,7 +34,7 @@ class ListP extends PrimitiveBase {
   late AnyField _modelItem;
 
   // This has either 1 item or is empty for no selection.
-  late Integer1DField _selection;
+  late IntegerField _selectedIndex;
 
   @override
   // Return the canonical type name for this primitive.  ListP is used specifically
@@ -47,7 +45,7 @@ class ListP extends PrimitiveBase {
   void describeFields(List<FieldRef> fieldRefs) {
     fieldRefs.add(FieldRef(fkeyListItems, _listItems));
     fieldRefs.add(FieldRef(fkeyModelItem, _modelItem));
-    fieldRefs.add(FieldRef(fkeySelection, _selection));
+    fieldRefs.add(FieldRef(fkeySelectedIndex, _selectedIndex));
   }
 
   @override
@@ -77,28 +75,23 @@ class ListP extends PrimitiveBase {
   set listItems(List<Primitive> listItems) => _listItems.value = listItems;
 
   /// The currently selected item or -1 for none selected.
-  int get selection {
-    var sel = _selection.value;
-    return sel.isEmpty ? -1 : sel[0];
+  int get selectedIndex {
+    return _selectedIndex.value;
   }
 
-  set selection(int selection) {
-    if (selection >= 0) {
-      _selection.value = [selection];
-    } else {
-      _selection.value = const [];
-    }
+  set selectedIndex(int selectedIndex) {
+    _selectedIndex.value = selectedIndex;
   }
 
   /// SelectedItem returns the currently selected item from the list.
   /// If the selected index is within the valid range of list items, it returns the item at the selected index.
   /// If the selected index is out of range, it returns null.
   Primitive? get selectedItem {
-    var selected = selection;
-    if (selected < 0 || selected >= listItems.length) {
+    var selectedIndex = _selectedIndex.value;
+    if (selectedIndex < 0 || selectedIndex >= listItems.length) {
       return null;
     }
-    return listItems[selected];
+    return listItems[selectedIndex];
   }
 
   /// The model primitive which all list items will be like.  It is mainly used to

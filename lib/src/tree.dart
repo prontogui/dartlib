@@ -11,11 +11,16 @@ import 'node.dart';
 
 /// A tree is used to represent a tree of primitives.
 class Tree extends PrimitiveBase {
-  Tree({super.embodiment, super.tag, Primitive? modelItem, Node? root}) {
+  Tree(
+      {super.embodiment,
+      super.tag,
+      Primitive? modelItem,
+      Node? root,
+      List<int> selectedPath = const []}) {
     root ??= Node();
     _modelItem = AnyField.from(modelItem);
     _root = AnyField.from(root);
-    _selection = Integer1DField();
+    _selectedPath = Integer1DField.from(selectedPath);
   }
 
   // Field storage
@@ -26,7 +31,7 @@ class Tree extends PrimitiveBase {
   // This always contains a Node primitive and is never null.
   late AnyField _root;
 
-  late Integer1DField _selection;
+  late Integer1DField _selectedPath;
 
   @override
   String get describeType => 'Tree';
@@ -35,7 +40,7 @@ class Tree extends PrimitiveBase {
   void describeFields(List<FieldRef> fieldRefs) {
     fieldRefs.add(FieldRef(fkeyModelItem, _modelItem));
     fieldRefs.add(FieldRef(fkeyRoot, _root));
-    fieldRefs.add(FieldRef(fkeySelection, _selection));
+    fieldRefs.add(FieldRef(fkeySelectedPath, _selectedPath));
   }
 
   @override
@@ -81,13 +86,14 @@ class Tree extends PrimitiveBase {
   /// represented as a list of integers in the order of depth toward the selected
   /// node.  Each integer represents a child node index (zero relative) in that node
   /// level. Note:  it is possible to specify a selection that refers to a non-existant node.
-  List<int> get selection => _selection.value;
-  set selection(List<int> selection) => _selection.value = selection;
+  List<int> get selectedPath => _selectedPath.value;
+  set selectedPath(List<int> selectedPath_) =>
+      _selectedPath.value = selectedPath_;
 
   /// SelectedItem returns the currently selected item from the list.
   /// If the selected index is within the valid range of list items, it returns the item at the selected index.
   /// If the selected index is out of range, it returns null.
   Primitive? get selectedItem {
-    return root.locateNode(selection);
+    return root.locateNode(_selectedPath.value);
   }
 }

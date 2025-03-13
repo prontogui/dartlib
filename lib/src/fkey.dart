@@ -36,19 +36,20 @@ const int fkeyNumericEntry = 25;
 const int fkeyPeriodMs = 26;
 const int fkeyRoot = 27;
 const int fkeyRows = 28;
-const int fkeySelection = 29;
-const int fkeyShowing = 30;
-const int fkeyState = 31;
-const int fkeyStatus = 32;
-const int fkeySubItem = 33;
-const int fkeySubNodes = 34;
-const int fkeyTag = 35;
-const int fkeyTextEntry = 36;
-const int fkeyTimerFired = 37;
-const int fkeyTitle = 38;
-const int fkeyTrailingItem = 39;
-const int fkeyValidExtensions = 40;
-const int fkeyMaximumKeys = 41;
+const int fkeySelectedIndex = 29;
+const int fkeySelectedPath = 30;
+const int fkeyShowing = 31;
+const int fkeyState = 32;
+const int fkeyStatus = 33;
+const int fkeySubItem = 34;
+const int fkeySubNodes = 35;
+const int fkeyTag = 36;
+const int fkeyTextEntry = 37;
+const int fkeyTimerFired = 38;
+const int fkeyTitle = 39;
+const int fkeyTrailingItem = 40;
+const int fkeyValidExtensions = 41;
+const int fkeyMaximumKeys = 42;
 
 final _fkeyToName = _initializeFkeyToName();
 final _nameToFKey = _initializeNameToFKey();
@@ -86,7 +87,8 @@ List<String> _initializeFkeyToName() {
   list[fkeyPeriodMs] = 'PeriodMs';
   list[fkeyRoot] = 'Root';
   list[fkeyRows] = 'Rows';
-  list[fkeySelection] = 'Selection';
+  list[fkeySelectedIndex] = 'SelectedIndex';
+  list[fkeySelectedPath] = 'SelectedPath';
   list[fkeyShowing] = 'Showing';
   list[fkeyState] = 'State';
   list[fkeyStatus] = 'Status';
@@ -134,7 +136,8 @@ Map<String, int> _initializeNameToFKey() {
     'PeriodMs': fkeyPeriodMs,
     'Root': fkeyRoot,
     'Rows': fkeyRows,
-    'Selection': fkeySelection,
+    'SelectedIndex': fkeySelectedIndex,
+    'SelectedPath': fkeySelectedPath,
     'Showing': fkeyShowing,
     'State': fkeyState,
     'Status': fkeyStatus,
