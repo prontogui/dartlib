@@ -291,6 +291,11 @@ abstract class PrimitiveBase implements Primitive {
       return null;
     }
 
+    // Needs to be canonized?
+    if (!embodimentJson.startsWith('}')) {
+      embodimentJson = canonizeEmbodiment(embodimentJson);
+    }
+
     __cachedEmbodimentMap = jsonDecode(embodimentJson) as Map<String, dynamic>;
 
     return __cachedEmbodimentMap!;

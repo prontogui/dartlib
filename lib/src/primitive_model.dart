@@ -120,6 +120,11 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
 
   /// Ingests a full or partial update from a CBOR value and notifies listeners.
   List<Primitive>? ingestCborUpdate(CborValue v) {
+    // Ignore if its an empty (nil) update
+    if (v is CborNull) {
+      return null;
+    }
+
     assert(v is CborList);
 
     var l = v as CborList;
