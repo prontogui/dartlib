@@ -125,11 +125,12 @@ class Any2DField extends FieldBase implements Field {
 
   // Override the default implementation to prepare the descendant primitives.
   @override
-  void prepareForUpdates(
+  bool prepareForUpdates(
       FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks) {
     super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks);
 
     _prepareDescendantsForUpdates();
+    return true;
   }
 
   /// Prepare descendant primitives for updates.

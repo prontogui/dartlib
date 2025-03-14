@@ -44,12 +44,15 @@ abstract class FieldBase implements Field {
   bool get isStructural => false;
 
   @override
-  void prepareForUpdates(
+  bool prepareForUpdates(
       FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks) {
     _fkey = fkey;
     _pkey = pkey;
     _fieldPKeyIndex = fieldPKeyIndex;
     _fieldHooks = fieldHooks;
+
+    // Non-structural by default.  Structural fields must override prepareForUpdates.
+    return false;
   }
 
   @override

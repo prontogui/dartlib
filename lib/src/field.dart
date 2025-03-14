@@ -13,7 +13,7 @@ abstract interface class Field {
   /// and [fieldHooks] is the interface to call when fields of this primitive are updated.
   /// This method returns true if the field is structural, that is, it contains other
   /// primitives.
-  void prepareForUpdates(
+  bool prepareForUpdates(
       FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks);
 
   /// Unprepare this field for updates.  Subsequent updates to the field will not
@@ -37,8 +37,4 @@ abstract interface class Field {
   ///
   /// Note:  for atomic field types, this method is equivalent to ingestPartialCborValue.
   void ingestFullCborValue(CborValue value);
-
-  /// The structural status of this filed.  Fields that are structural can contains
-  /// other primitives.  Non-structural fields are atomic such as String, Integer, etc.
-  bool get isStructural => false;
 }

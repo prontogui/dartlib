@@ -33,11 +33,12 @@ class AnyField extends FieldBase implements Field {
 
   // Override the default implementation to prepare the descendant primitive.
   @override
-  void prepareForUpdates(
+  bool prepareForUpdates(
       FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks) {
     super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks);
 
     _prepareDescendantsForUpdates();
+    return true;
   }
 
   @override

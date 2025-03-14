@@ -159,10 +159,8 @@ abstract class PrimitiveBase implements Primitive {
     // Prepare each field for updates
     var fieldPKeyIndex = 0;
     for (var fieldRef in _fieldRefs) {
-      fieldRef.field
-          .prepareForUpdates(fieldRef.fkey, pkey, fieldPKeyIndex, fieldHooks);
-
-      if (fieldRef.field.isStructural) {
+      if (fieldRef.field
+          .prepareForUpdates(fieldRef.fkey, pkey, fieldPKeyIndex, fieldHooks)) {
         fieldPKeyIndex++;
       }
     }
