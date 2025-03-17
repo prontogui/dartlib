@@ -8,7 +8,7 @@ void main() {
     test('should initialize with default values', () {
       var listP = ListP();
       expect(listP.listItems, isEmpty);
-      expect(listP.selection, 0);
+      expect(listP.selectedIndex, 0);
       expect(listP.selectedItem, isNull);
     });
 
@@ -21,27 +21,27 @@ void main() {
     });
 
     test('should set and get selected', () {
-      var listP = ListP(selection: 1);
-      expect(listP.selection, 1);
+      var listP = ListP(selectedIndex: 1);
+      expect(listP.selectedIndex, 1);
 
-      listP.selection = 2;
-      expect(listP.selection, 2);
+      listP.selectedIndex = 2;
+      expect(listP.selectedIndex, 2);
     });
 
     test('should return selectedItem correctly', () {
       var primitive1 = Text();
       var primitive2 = Text();
-      var listP = ListP(listItems: [primitive1, primitive2], selection: 1);
+      var listP = ListP(listItems: [primitive1, primitive2], selectedIndex: 1);
 
       expect(listP.selectedItem, primitive2);
 
-      listP.selection = 0;
+      listP.selectedIndex = 0;
       expect(listP.selectedItem, primitive1);
 
-      listP.selection = -1;
+      listP.selectedIndex = -1;
       expect(listP.selectedItem, isNull);
 
-      listP.selection = 2;
+      listP.selectedIndex = 2;
       expect(listP.selectedItem, isNull);
     });
 
