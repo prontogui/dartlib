@@ -30,6 +30,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
   }
 
   set topPrimitives(List<Primitive> primitives) {
+    _unprepareForUpdates();
     _topPrimitives = primitives;
     _prepareForUpdates();
     onFullModelUpdate();
@@ -78,6 +79,12 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
     for (var p in _topPrimitives) {
       p.prepareForUpdates(PKey(i), this);
       i++;
+    }
+  }
+
+  void _unprepareForUpdates() {
+    for (var p in _topPrimitives) {
+      p.unprepareForUpdates();
     }
   }
 
