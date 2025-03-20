@@ -1,4 +1,7 @@
 import 'package:logger/logger.dart';
+// Copyright 2025 ProntoGUI, LLC.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 /// [LoggingLevel]s to control logging output. Logging can be enabled to include all
 /// levels above certain [Level].

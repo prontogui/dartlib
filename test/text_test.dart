@@ -1,3 +1,6 @@
+// Copyright 2025 ProntoGUI, LLC.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 import 'package:test/test.dart';
 import 'package:dartlib/src/text.dart';
 import 'package:dartlib/src/pkey.dart';

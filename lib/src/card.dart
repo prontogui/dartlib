@@ -1,11 +1,10 @@
-// Copyright 2024 ProntoGUI, LLC.
+// Copyright 2025 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 import 'fkey.dart';
 import 'pkey.dart';
 import 'primitive_base.dart';
 import 'any_field.dart';
-import 'integer_field.dart';
 import 'primitive.dart';
 
 /// A group is a related set of primitives, such as a group of commands, that is
