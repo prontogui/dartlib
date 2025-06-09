@@ -15,6 +15,7 @@ import 'export_file.dart';
 import 'frame.dart';
 import 'group.dart';
 import 'icon.dart';
+import 'image.dart';
 import 'import_file.dart';
 import 'list.dart';
 import 'node.dart';
@@ -48,6 +49,7 @@ final Map<String, FactoryFunction> _factoryFunctions = {
   'NumericEntry': () => NumericField(),
   'IconID': () => Icon(),
   'Root': () => Tree(),
+  'Image': () => Image(),
 };
 
 /// The static object factory responsible for creating primitive-type objects.

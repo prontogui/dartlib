@@ -12,10 +12,10 @@ import 'primitive_factory.dart';
 
 /// A field that holds a single primitive.
 class AnyField extends FieldBase implements Field {
-  AnyField() : _p = null;
+  AnyField() : _p = null, super.structural();
 
   /// Initializes with a primitive.
-  AnyField.from(Primitive? p) : _p = p;
+  AnyField.from(Primitive? p) : _p = p, super.structural();
 
   /// Storage of this field's value.
   Primitive? _p;
@@ -38,7 +38,7 @@ class AnyField extends FieldBase implements Field {
     super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks);
 
     _prepareDescendantsForUpdates();
-    return true;
+    return isStructural;
   }
 
   @override

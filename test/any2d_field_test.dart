@@ -61,7 +61,8 @@ void main() {
     }
 
     prepareForUpdates() {
-      field.prepareForUpdates(fkeyLabel, PKey(1), 0, fieldhooks);
+      var isStructural = field.prepareForUpdates(fkeyLabel, PKey(1), 0, fieldhooks);
+      expect(isStructural, isTrue);
     }
 
     verifyUnmodifiable() {

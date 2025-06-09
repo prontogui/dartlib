@@ -1,6 +1,7 @@
 // Copyright 2025 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:dartlib/src/import_file.dart';
 
@@ -17,7 +18,7 @@ void main() {
 
     test('importData sets data, name, and imported flag', () {
       final importFile = ImportFile();
-      final data = [1, 2, 3];
+      final data = Uint8List.fromList([1, 2, 3]);
       final name = 'test.txt';
 
       importFile.importData(data, name);
@@ -29,7 +30,7 @@ void main() {
 
     test('reset clears data and imported flag', () {
       final importFile = ImportFile();
-      final data = [1, 2, 3];
+      final data = Uint8List.fromList([1, 2, 3]);
       final name = 'test.txt';
 
       importFile.importData(data, name);
@@ -41,7 +42,7 @@ void main() {
 
     test('setters and getters work correctly', () {
       final importFile = ImportFile();
-      final data = [4, 5, 6];
+      final data = Uint8List.fromList([4, 5, 6]);
       final name = 'example.txt';
       final validExtensions = ['txt', 'md'];
 

@@ -1,6 +1,9 @@
 // Copyright 2025 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'field.dart';
 import 'package:cbor/cbor.dart';
 import 'field_base.dart';
@@ -8,28 +11,37 @@ import 'field_base.dart';
 /// A field that holds Binary Large OBject (BLOB) value.
 class BlobField extends FieldBase implements Field {
   /// Storage of this field's value.
-  List<int> _ba = [];
+  Uint8List _ba = Uint8List(0);
 
   /// The value of this field.  WHen setting the value, a copy of the input
   /// list is made.  When getting the value, a copy of the internal list is
   /// returned.
-  List<int> get value => _ba;
-  set value(List<int> ba) {
+  Uint8List get value => _ba;
+  set value(Uint8List ba) {
     _ba = ba;
+    onSet();
+  }
+
+  void loadFromFile(String filePath) {
+    final file = File(filePath);
+    if (!file.existsSync()) {
+      throw Exception('File not found: $filePath');
+    }
+    _ba = file.readAsBytesSync();
     onSet();
   }
 
   @override
   void ingestFullCborValue(CborValue value) {
     if (value is CborNull) {
-      _ba.clear();
+      _ba = Uint8List(0);
       return;
     }
 
     if (value is! CborBytes) {
       throw Exception('value is not a CborBytes');
     }
-    _ba = value.bytes;
+    _ba = Uint8List.fromList(value.bytes);
   }
 
   @override

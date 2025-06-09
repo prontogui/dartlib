@@ -26,7 +26,8 @@ void main() {
       otherText = Text(content: 'other test text');
 
       // Prepare for updates and set a field of text
-      field.prepareForUpdates(fkeyLabel, PKey(0, 1, 2), 6, fieldhooks);
+      var isContainer = field.prepareForUpdates(fkeyLabel, PKey(0, 1, 2), 6, fieldhooks);
+      expect(isContainer, isTrue);
     });
 
     test('initial value is null', () {

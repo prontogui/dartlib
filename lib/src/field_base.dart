@@ -8,7 +8,12 @@ import 'field_hooks.dart';
 import 'field.dart';
 
 abstract class FieldBase implements Field {
-  FieldBase() {
+  FieldBase() : _isStructural = false {
+    // Initialize the late fields, which is the same thing as unpreparing for updates.
+    unprepareForUpdates();
+  }
+
+  FieldBase.structural() : _isStructural = true {
     // Initialize the late fields, which is the same thing as unpreparing for updates.
     unprepareForUpdates();
   }
@@ -38,10 +43,14 @@ abstract class FieldBase implements Field {
   /// True if the field has not been prepared yet for updates.
   bool get notPreparedYet => (_fieldHooks == null);
 
+  /// Non-structural by default.  Structural fields must override prepareForUpdates.
   /// Derived field classes can override this when they are considered structural, that is,
   /// they contain other primitives.
-  @override
-  bool get isStructural => false;
+  final bool _isStructural;
+
+  bool get isStructural {
+    return _isStructural;
+  }
 
   @override
   bool prepareForUpdates(
@@ -51,8 +60,7 @@ abstract class FieldBase implements Field {
     _fieldPKeyIndex = fieldPKeyIndex;
     _fieldHooks = fieldHooks;
 
-    // Non-structural by default.  Structural fields must override prepareForUpdates.
-    return false;
+    return isStructural;
   }
 
   @override

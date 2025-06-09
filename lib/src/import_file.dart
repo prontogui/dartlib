@@ -1,13 +1,13 @@
 // Copyright 2025 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-import 'package:dartlib/src/strings1d_field.dart';
-
+import 'dart:typed_data';
 import 'fkey.dart';
 import 'blob_field.dart';
 import 'primitive_base.dart';
 import 'boolean_field.dart';
 import 'string_field.dart';
+import 'strings1d_field.dart';
 
 /// A file that represents a blob of data that can be imported from the app side
 /// and consumed on the server side.
@@ -47,13 +47,13 @@ class ImportFile extends PrimitiveBase {
 
   /// Clears the exported data and the imported flag.
   void reset() {
-    _data.value = [];
+    _data.value = Uint8List(0);
     _imported.value = false;
   }
 
   /// Sets the blob of data for the file, sets the name of the file, and sets
   /// imported flag to true.
-  void importData(List<int> data, String name) {
+  void importData(Uint8List data, String name) {
     _data.value = data;
     _name.value = name;
     _imported.value = true;
@@ -66,8 +66,8 @@ class ImportFile extends PrimitiveBase {
 
   /// The blob of data representing the binary contents of the file.  Note:  this
   /// data could be empty and yet represent a valid, albeit empty, file for export.
-  List<int> get data => _data.value;
-  set data(List<int> value) => _data.value = value;
+  Uint8List get data => _data.value;
+  set data(Uint8List value) => _data.value = value;
 
   /// the suggested file name (including its extension separated by a period) to save the file as.
   String get name => _name.value;

@@ -12,7 +12,7 @@ import 'primitive_factory.dart';
 
 /// A field that holds a one-dimensional array of primitives.
 class Any1DField extends FieldBase implements Field {
-  Any1DField() : _pa = List<Primitive>.unmodifiable([]);
+  Any1DField() : _pa = List<Primitive>.unmodifiable([]), super.structural();
 
   Any1DField.from(List<Primitive> pa) : _pa = List<Primitive>.unmodifiable(pa);
 
@@ -30,6 +30,9 @@ class Any1DField extends FieldBase implements Field {
     onSet();
   }
 
+  @override
+  bool get isStructural => true;
+
   // Implement Field interface
 
   // Override the default implementation to prepare the descendant primitives.
@@ -39,7 +42,7 @@ class Any1DField extends FieldBase implements Field {
     super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks);
 
     _prepareDescendantsForUpdates();
-    return true;
+    return isStructural;
   }
 
   /// Prepare descendant primitives for updates.

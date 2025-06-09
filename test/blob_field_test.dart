@@ -1,6 +1,7 @@
 // Copyright 2025 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/blob_field.dart';
@@ -22,7 +23,7 @@ void main() {
     final testData2 = List<int>.unmodifiable([3, 4]);
 
     populateField() {
-      field.value = testData1;
+      field.value = Uint8List.fromList(testData1);
     }
 
     prepareForUpdates() {
@@ -75,7 +76,7 @@ void main() {
     });
 
     test('toString returns correct format', () {
-      field.value = [1, 2, 3, 4];
+      field.value = Uint8List.fromList([1, 2, 3, 4]);
       expect(field.toString(), equals('Blob [4 bytes]'));
     });
   });

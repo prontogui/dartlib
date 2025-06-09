@@ -1,6 +1,7 @@
 // Copyright 2025 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+import 'dart:typed_data';
 import 'fkey.dart';
 import 'blob_field.dart';
 import 'primitive_base.dart';
@@ -40,7 +41,7 @@ class ExportFile extends PrimitiveBase {
 
   /// Clears the exported data and the exported flag.
   void reset() {
-    _data.value = [];
+    _data.value = Uint8List(0);
     _exported.value = false;
   }
 
@@ -51,8 +52,8 @@ class ExportFile extends PrimitiveBase {
 
   /// The blob of data representing the binary contents of the file.  Note:  this
   /// data could be empty and yet represent a valid, albeit empty, file for export.
-  List<int> get data => _data.value;
-  set data(List<int> value) => _data.value = value;
+  Uint8List get data => _data.value;
+  set data(Uint8List value) => _data.value = value;
 
   /// the suggested file name (including its extension separated by a period) to save the file as.
   String get name => _name.value;

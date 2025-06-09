@@ -34,7 +34,8 @@ void main() {
     }
 
     void prepareForUpdates() {
-      field.prepareForUpdates(fkeyLabel, PKey(1), 0, fieldhooks);
+      var isStructural = field.prepareForUpdates(fkeyLabel, PKey(1), 0, fieldhooks);
+      expect(isStructural, isTrue);
     }
 
     CborValue getCborForTesting() {

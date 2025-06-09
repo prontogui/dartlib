@@ -1,6 +1,7 @@
 // Copyright 2025 ProntoGUI, LLC.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:dartlib/src/export_file.dart';
 
@@ -16,7 +17,7 @@ void main() {
 
     test('reset method clears data and exported flag', () {
       final exportFile = ExportFile(name: 'test.txt');
-      exportFile.data = [1, 2, 3];
+      exportFile.data = Uint8List.fromList([1, 2, 3]);
       exportFile.exported = true;
 
       exportFile.reset();
@@ -38,7 +39,7 @@ void main() {
 
     test('data getter and setter work correctly', () {
       final exportFile = ExportFile(name: 'test.txt');
-      final data = [1, 2, 3];
+      final data = Uint8List.fromList([1, 2, 3]);
 
       exportFile.data = data;
 

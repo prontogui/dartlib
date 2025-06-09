@@ -15,11 +15,11 @@ class Any2DField extends FieldBase implements Field {
   /// Create with an empty array.
   Any2DField()
       : _pa = List<List<Primitive>>.unmodifiable([]),
-        _columnCount = 0;
+        _columnCount = 0, super.structural();
 
   /// Create a new field from a list of rows.  The number of columns in each row
   /// must be the same.  If not, an exception is thrown.
-  Any2DField.from(List<List<Primitive>> pa) {
+  Any2DField.from(List<List<Primitive>> pa) : super.structural() {
     var colCount = _verifyUniformNumColumns(pa);
     if (colCount == null) {
       throw Exception('number of columns in each row must be the same');
@@ -121,6 +121,9 @@ class Any2DField extends FieldBase implements Field {
     onSet();
   }
 
+  @override
+  bool get isStructural => true;
+
   // Implement Field interface
 
   // Override the default implementation to prepare the descendant primitives.
@@ -130,7 +133,7 @@ class Any2DField extends FieldBase implements Field {
     super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks);
 
     _prepareDescendantsForUpdates();
-    return true;
+    return isStructural;
   }
 
   /// Prepare descendant primitives for updates.

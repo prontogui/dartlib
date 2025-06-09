@@ -24,6 +24,7 @@ export 'src/export_file.dart' show ExportFile;
 export 'src/frame.dart' show Frame;
 export 'src/group.dart' show Group;
 export 'src/icon.dart' show Icon;
+export 'src/image.dart' show Image;
 export 'src/import_file.dart' show ImportFile;
 export 'src/list.dart' show ListP;
 export 'src/node.dart' show Node;
