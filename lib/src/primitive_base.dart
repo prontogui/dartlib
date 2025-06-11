@@ -7,6 +7,7 @@ import 'pkey.dart';
 import 'fkey.dart';
 import 'field_hooks.dart';
 import 'primitive.dart';
+import 'primitive_locator.dart';
 import 'string_field.dart';
 import 'dart:convert';
 
@@ -153,14 +154,14 @@ abstract class PrimitiveBase implements Primitive {
   }
 
   @override
-  void prepareForUpdates(PKey pkey, FieldHooks fieldHooks) {
+  void prepareForUpdates(PKey pkey, FieldHooks fieldHooks, PrimitiveLocator locator) {
     _pkey = pkey;
 
     // Prepare each field for updates
     var fieldPKeyIndex = 0;
     for (var fieldRef in _fieldRefs) {
       if (fieldRef.field
-          .prepareForUpdates(fieldRef.fkey, pkey, fieldPKeyIndex, fieldHooks)) {
+          .prepareForUpdates(fieldRef.fkey, pkey, fieldPKeyIndex, fieldHooks, locator)) {
         fieldPKeyIndex++;
       }
     }

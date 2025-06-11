@@ -6,6 +6,7 @@ import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/event_field.dart';
 import 'package:dartlib/src/pkey.dart';
 import 'package:dartlib/src/fkey.dart';
+import 'package:dartlib/src/primitive_locator.dart';
 import 'field_hooks_mock.dart';
 
 void main() {
@@ -14,7 +15,7 @@ void main() {
     late FieldHooksMock fieldhooks;
 
     prepareForUpdates() {
-      field.prepareForUpdates(fkeyCommandIssued, PKey(0), 0, fieldhooks);
+      field.prepareForUpdates(fkeyCommandIssued, PKey(0), 0, fieldhooks, NullPrimitiveLocator());
     }
 
     setUp(() {

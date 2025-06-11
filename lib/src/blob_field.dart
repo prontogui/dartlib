@@ -10,6 +10,15 @@ import 'field_base.dart';
 
 /// A field that holds Binary Large OBject (BLOB) value.
 class BlobField extends FieldBase implements Field {
+
+  /// Constructs a BlobField holding an value with zero data bytes;
+  BlobField();
+
+  /// Constructs a BlobField from the contents of a file.
+  BlobField.fromFile(String filePath) {
+    loadFromFile(filePath);
+  }
+
   /// Storage of this field's value.
   Uint8List _ba = Uint8List(0);
 

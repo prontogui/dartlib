@@ -6,6 +6,7 @@ import 'pkey.dart';
 import 'fkey.dart';
 import 'field_hooks.dart';
 import 'field.dart';
+import 'primitive_locator.dart';
 
 abstract class FieldBase implements Field {
   FieldBase() : _isStructural = false {
@@ -54,7 +55,7 @@ abstract class FieldBase implements Field {
 
   @override
   bool prepareForUpdates(
-      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks) {
+      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks, PrimitiveLocator locator) {
     _fkey = fkey;
     _pkey = pkey;
     _fieldPKeyIndex = fieldPKeyIndex;

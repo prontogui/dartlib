@@ -77,7 +77,7 @@ class PrimitiveModel implements PrimitiveLocator, FieldHooks {
   void _prepareForUpdates() {
     var i = 0;
     for (var p in _topPrimitives) {
-      p.prepareForUpdates(PKey(i), this);
+      p.prepareForUpdates(PKey(i), this, this);
       i++;
     }
   }

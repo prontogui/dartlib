@@ -5,6 +5,7 @@ import 'package:cbor/cbor.dart';
 import 'pkey.dart';
 import 'fkey.dart';
 import 'field_hooks.dart';
+import 'primitive_locator.dart';
 
 // Interface for Primitives.
 abstract class Primitive {
@@ -12,8 +13,9 @@ abstract class Primitive {
   PKey get pkey;
 
   /// Prepare this primitive for updates, where [pkey] is the path to this primitive,
-  /// and [fieldHooks] is the interface to call when fields of this primitive are updated.
-  void prepareForUpdates(PKey pkey, FieldHooks fieldHooks);
+  /// [fieldHooks] is the interface to call when fields of this primitive are updated,
+  /// and [locator] is the interface for locating other primitives.
+  void prepareForUpdates(PKey pkey, FieldHooks fieldHooks, PrimitiveLocator locator);
 
   /// Unprepare this primitive for updates.  Subsequent updates to fields will not
   /// call the previous onset function, not will this primitive have a valid PKey.

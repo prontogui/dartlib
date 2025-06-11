@@ -9,6 +9,7 @@ import 'fkey.dart';
 import 'pkey.dart';
 import 'field_hooks.dart';
 import 'primitive_factory.dart';
+import 'primitive_locator.dart';
 
 /// A field that holds a uniform two-dimensional array of primitives.
 class Any2DField extends FieldBase implements Field {
@@ -38,6 +39,10 @@ class Any2DField extends FieldBase implements Field {
 
   /// Storage of number fo columns.
   late int _columnCount;
+
+
+  /// The primitive locator
+  PrimitiveLocator? _locator;
 
   /// The number of rows in the 2D array.
   int get rowCount {
@@ -129,9 +134,9 @@ class Any2DField extends FieldBase implements Field {
   // Override the default implementation to prepare the descendant primitives.
   @override
   bool prepareForUpdates(
-      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks) {
-    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks);
-
+      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks, PrimitiveLocator locator) {
+    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks, locator);
+    _locator = locator;
     _prepareDescendantsForUpdates();
     return isStructural;
   }
@@ -156,7 +161,7 @@ class Any2DField extends FieldBase implements Field {
         var innerPKey = PKey.fromPKey(outerPKey, j);
 
         // Add another level representing the array index of primitive
-        innerList[j].prepareForUpdates(innerPKey, fieldHooks!);
+        innerList[j].prepareForUpdates(innerPKey, fieldHooks!, _locator!);
       }
     }
   }

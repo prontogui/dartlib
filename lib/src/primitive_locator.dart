@@ -7,3 +7,12 @@ import 'primitive.dart';
 abstract class PrimitiveLocator {
   Primitive? locatePrimitive(PKey pkey);
 }
+
+/// A null implementation of [PrimitiveLocator] that does nothing.  Primarily used
+/// for testing purposes.
+class NullPrimitiveLocator implements PrimitiveLocator {
+  @override
+  Primitive? locatePrimitive(PKey pkey) {
+    return null;
+  }
+}

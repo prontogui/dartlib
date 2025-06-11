@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 import 'package:dartlib/src/field_hooks.dart';
+import 'package:dartlib/src/primitive_locator.dart';
 import 'package:test/test.dart';
 import 'package:dartlib/src/command.dart';
 import 'package:dartlib/src/pkey.dart';
@@ -21,7 +22,7 @@ void main() {
 
     test('issueNow sets issued to true', () {
       final command = Command();
-      command.prepareForUpdates(PKey(0), NullFieldHooks());
+      command.prepareForUpdates(PKey(0), NullFieldHooks(), NullPrimitiveLocator());
       command.issueNow();
 
       expect(command.issued, true);

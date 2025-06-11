@@ -7,6 +7,7 @@ import 'package:dartlib/src/text.dart';
 import 'package:dartlib/src/any_field.dart';
 import 'package:dartlib/src/fkey.dart';
 import 'package:dartlib/src/pkey.dart';
+import 'package:dartlib/src/primitive_locator.dart';
 import 'field_hooks_mock.dart';
 
 import 'test_cbor_samples.dart';
@@ -26,7 +27,7 @@ void main() {
       otherText = Text(content: 'other test text');
 
       // Prepare for updates and set a field of text
-      var isContainer = field.prepareForUpdates(fkeyLabel, PKey(0, 1, 2), 6, fieldhooks);
+      var isContainer = field.prepareForUpdates(fkeyLabel, PKey(0, 1, 2), 6, fieldhooks, NullPrimitiveLocator());
       expect(isContainer, isTrue);
     });
 
@@ -64,11 +65,11 @@ void main() {
           () => field.ingestFullCborValue(CborString('test')), throwsException);
     });
 
-    test('ingestFullCborValue throws exception if primitive is null', () {
+    test('ingestFullCborValue does not throw exception if primitive is null', () {
       final field = AnyField();
-      expect(() => field.ingestFullCborValue(CborMap({})), throwsException);
+      expect(() => field.ingestFullCborValue(CborMap({})), returnsNormally);
     });
-
+   
     test('ingestPartialCborValue throws exception if value is not CborMap', () {
       final field = AnyField();
       expect(() => field.ingestPartialCborValue(CborString('test')),

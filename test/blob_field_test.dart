@@ -7,6 +7,7 @@ import 'package:cbor/cbor.dart';
 import 'package:dartlib/src/blob_field.dart';
 import 'package:dartlib/src/fkey.dart';
 import 'package:dartlib/src/pkey.dart';
+import 'package:dartlib/src/primitive_locator.dart';
 import 'field_hooks_mock.dart';
 
 void main() {
@@ -27,7 +28,7 @@ void main() {
     }
 
     prepareForUpdates() {
-      field.prepareForUpdates(fkeyData, PKey(0), 2, fieldhooks);
+      field.prepareForUpdates(fkeyData, PKey(0), 2, fieldhooks, NullPrimitiveLocator());
     }
 
     test('initial value is an empty list', () {

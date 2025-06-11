@@ -5,6 +5,7 @@ import 'package:test/test.dart';
 import 'package:dartlib/src/text.dart';
 import 'package:dartlib/src/pkey.dart';
 import 'package:dartlib/src/field_hooks.dart';
+import 'package:dartlib/src/primitive_locator.dart';
 
 void main() {
   group('Text', () {
@@ -16,9 +17,9 @@ void main() {
     });
 
     test('Constructor initializes with provided values', () {
-      final text = Text(content: 'Hello', embodiment: 'Bold', tag: 'Greeting');
+      final text = Text(content: 'Hello', embodiment: 'FancyText', tag: 'Greeting');
       expect(text.content, 'Hello');
-      expect(text.embodiment, 'Bold');
+      expect(text.embodiment, '{"embodiment":"FancyText"}');
       expect(text.tag, 'Greeting');
     });
 
@@ -30,8 +31,8 @@ void main() {
 
     test('Embodiment getter and setter work correctly', () {
       final text = Text();
-      text.embodiment = 'Italic';
-      expect(text.embodiment, 'Italic');
+      text.embodiment = 'FancyText';
+      expect(text.embodiment, '{"embodiment":"FancyText"}');
     });
 
     test('Tag getter and setter work correctly', () {
@@ -47,7 +48,7 @@ void main() {
 
     test('prepareForUpdates does not throw', () {
       final text = Text();
-      expect(() => text.prepareForUpdates(PKey(), NullFieldHooks()),
+      expect(() => text.prepareForUpdates(PKey(), NullFieldHooks(), NullPrimitiveLocator()),
           returnsNormally);
     });
   });

@@ -8,6 +8,7 @@ import 'package:dartlib/src/fkey.dart';
 import 'package:dartlib/src/pkey.dart';
 import 'package:dartlib/src/any1d_field.dart';
 import 'package:dartlib/src/text.dart';
+import 'package:dartlib/src/primitive_locator.dart';
 import 'field_hooks_mock.dart';
 
 void main() {
@@ -34,7 +35,7 @@ void main() {
     }
 
     void prepareForUpdates() {
-      var isStructural = field.prepareForUpdates(fkeyLabel, PKey(1), 0, fieldhooks);
+      var isStructural = field.prepareForUpdates(fkeyLabel, PKey(1), 0, fieldhooks, NullPrimitiveLocator());
       expect(isStructural, isTrue);
     }
 
@@ -95,14 +96,14 @@ void main() {
         Text(content: 'Original Content 2')
       ];
       field.value = primitives;
-      field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks());
+      field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks(), NullPrimitiveLocator());
       for (var primitive in primitives) {
         expect(primitive.notPreparedYet, isFalse);
       }
     });
 
     test('assignment prepares descendant primitives', () {
-      field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks());
+      field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks(), NullPrimitiveLocator());
       populateField();
       for (var primitive in primitives()) {
         expect(primitive.notPreparedYet, isFalse);
@@ -114,7 +115,7 @@ void main() {
         Text(content: 'Original Content 1'),
         Text(content: 'Original Content 2')
       ];
-      field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks());
+      field.prepareForUpdates(fkeyLabel, PKey(1), 0, NullFieldHooks(), NullPrimitiveLocator());
       field.value = primitives;
 
       var newPrimitives = [

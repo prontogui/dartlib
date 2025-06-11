@@ -21,35 +21,37 @@ const int fkeyGroupItems = 10;
 const int fkeyHeadings = 11;
 const int fkeyIcon = 12;
 const int fkeyIconID = 13;
-const int fkeyImage = 14;
-const int fkeyImported = 15;
-const int fkeyIssued = 16;
-const int fkeyLabel = 17;
-const int fkeyLeadingItem = 18;
-const int fkeyListItems = 19;
-const int fkeyMainItem = 20;
-const int fkeyModelItem = 21;
-const int fkeyModelRow = 22;
-const int fkeyName = 23;
-const int fkeyNodeItem = 24;
-const int fkeyNumericEntry = 25;
-const int fkeyPeriodMs = 26;
-const int fkeyRoot = 27;
-const int fkeyRows = 28;
-const int fkeySelectedIndex = 29;
-const int fkeySelectedPath = 30;
-const int fkeyShowing = 31;
-const int fkeyState = 32;
-const int fkeyStatus = 33;
-const int fkeySubItem = 34;
-const int fkeySubNodes = 35;
-const int fkeyTag = 36;
-const int fkeyTextEntry = 37;
-const int fkeyTimerFired = 38;
-const int fkeyTitle = 39;
-const int fkeyTrailingItem = 40;
-const int fkeyValidExtensions = 41;
-const int fkeyMaximumKeys = 42;
+const int fkeyID = 14;
+const int fkeyImage = 15;
+const int fkeyImported = 16;
+const int fkeyIssued = 17;
+const int fkeyLabel = 18;
+const int fkeyLeadingItem = 19;
+const int fkeyListItems = 20;
+const int fkeyMainItem = 21;
+const int fkeyModelItem = 22;
+const int fkeyModelRow = 23;
+const int fkeyName = 24;
+const int fkeyNodeItem = 25;
+const int fkeyNumericEntry = 26;
+const int fkeyPeriodMs = 27;
+const int fkeyRef = 28;
+const int fkeyRoot = 29;
+const int fkeyRows = 30;
+const int fkeySelectedIndex = 31;
+const int fkeySelectedPath = 32;
+const int fkeyShowing = 33;
+const int fkeyState = 34;
+const int fkeyStatus = 35;
+const int fkeySubItem = 36;
+const int fkeySubNodes = 37;
+const int fkeyTag = 38;
+const int fkeyTextEntry = 39;
+const int fkeyTimerFired = 40;
+const int fkeyTitle = 41;
+const int fkeyTrailingItem = 42;
+const int fkeyValidExtensions = 43;
+const int fkeyMaximumKeys = 44;
 
 final _fkeyToName = _initializeFkeyToName();
 final _nameToFKey = _initializeNameToFKey();
@@ -72,6 +74,7 @@ List<String> _initializeFkeyToName() {
   list[fkeyHeadings] = 'Headings';
   list[fkeyIcon] = 'Icon';
   list[fkeyIconID] = 'IconID';
+  list[fkeyID] = 'ID';
   list[fkeyImage] = 'Image';
   list[fkeyImported] = 'Imported';
   list[fkeyIssued] = 'Issued';
@@ -85,6 +88,7 @@ List<String> _initializeFkeyToName() {
   list[fkeyNodeItem] = 'NodeItem';
   list[fkeyNumericEntry] = 'NumericEntry';
   list[fkeyPeriodMs] = 'PeriodMs';
+  list[fkeyRef] = 'Ref';
   list[fkeyRoot] = 'Root';
   list[fkeyRows] = 'Rows';
   list[fkeySelectedIndex] = 'SelectedIndex';
@@ -121,6 +125,7 @@ Map<String, int> _initializeNameToFKey() {
     'Headings': fkeyHeadings,
     'Icon': fkeyIcon,
     'IconID': fkeyIconID,
+    'ID': fkeyID,
     'Image': fkeyImage,
     'Imported': fkeyImported,
     'Issued': fkeyIssued,
@@ -134,6 +139,7 @@ Map<String, int> _initializeNameToFKey() {
     'NodeItem': fkeyNodeItem,
     'NumericEntry': fkeyNumericEntry,
     'PeriodMs': fkeyPeriodMs,
+    'Ref': fkeyRef,
     'Root': fkeyRoot,
     'Rows': fkeyRows,
     'SelectedIndex': fkeySelectedIndex,

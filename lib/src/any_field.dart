@@ -9,6 +9,7 @@ import 'fkey.dart';
 import 'pkey.dart';
 import 'field_hooks.dart';
 import 'primitive_factory.dart';
+import 'primitive_locator.dart';
 
 /// A field that holds a single primitive.
 class AnyField extends FieldBase implements Field {
@@ -29,14 +30,17 @@ class AnyField extends FieldBase implements Field {
     onSet();
   }
 
+  /// The primitive locator
+  PrimitiveLocator? _locator;
+
   // Implement Field interface
 
   // Override the default implementation to prepare the descendant primitive.
   @override
   bool prepareForUpdates(
-      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks) {
-    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks);
-
+      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks, PrimitiveLocator locator) {
+    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks, locator);
+    _locator = locator;
     _prepareDescendantsForUpdates();
     return isStructural;
   }
@@ -58,7 +62,7 @@ class AnyField extends FieldBase implements Field {
     // Prepare descendant primitive for updates
     if (_p != null) {
       var fieldPKey = PKey.fromPKey(pkey, fieldPKeyIndex);
-      _p!.prepareForUpdates(fieldPKey, fieldHooks!);
+      _p!.prepareForUpdates(fieldPKey, fieldHooks!, _locator!);
     }
   }
 

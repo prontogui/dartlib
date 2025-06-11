@@ -9,6 +9,7 @@ import 'fkey.dart';
 import 'pkey.dart';
 import 'field_hooks.dart';
 import 'primitive_factory.dart';
+import 'primitive_locator.dart';
 
 /// A field that holds a one-dimensional array of primitives.
 class Any1DField extends FieldBase implements Field {
@@ -33,14 +34,17 @@ class Any1DField extends FieldBase implements Field {
   @override
   bool get isStructural => true;
 
+  /// The primitive locator
+  PrimitiveLocator? _locator;
+
   // Implement Field interface
 
   // Override the default implementation to prepare the descendant primitives.
   @override
   bool prepareForUpdates(
-      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks) {
-    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks);
-
+      FKey fkey, PKey pkey, int fieldPKeyIndex, FieldHooks fieldHooks, PrimitiveLocator locator) {
+    super.prepareForUpdates(fkey, pkey, fieldPKeyIndex, fieldHooks, locator);
+    _locator = locator;
     _prepareDescendantsForUpdates();
     return isStructural;
   }
@@ -59,7 +63,7 @@ class Any1DField extends FieldBase implements Field {
 
     for (var i = 0; i < _pa.length; i++) {
       // Add another level representing the array index of primitive
-      _pa[i].prepareForUpdates(PKey.fromPKey(fieldPKey, i), fieldHooks!);
+      _pa[i].prepareForUpdates(PKey.fromPKey(fieldPKey, i), fieldHooks!, _locator!);
     }
   }
 

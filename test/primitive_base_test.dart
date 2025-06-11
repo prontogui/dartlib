@@ -7,6 +7,7 @@ import 'package:dartlib/src/primitive_base.dart';
 import 'package:dartlib/src/pkey.dart';
 import 'package:dartlib/src/fkey.dart';
 import 'package:dartlib/src/field_hooks.dart';
+import 'package:dartlib/src/primitive_locator.dart';
 
 class TestPrimitive extends PrimitiveBase {
   TestPrimitive({super.embodiment, super.tag});
@@ -25,12 +26,16 @@ void main() {
     test('Test embodiment and tag getters and setters', () {
       var primitive =
           TestPrimitive(embodiment: 'initialEmbodiment', tag: 'initialTag');
-      expect(primitive.embodiment, 'initialEmbodiment');
+
+      // expecting canonized embodiment
+      expect(primitive.embodiment, '{"embodiment":"initialEmbodiment"}');
       expect(primitive.tag, 'initialTag');
 
       primitive.embodiment = 'newEmbodiment';
       primitive.tag = 'newTag';
-      expect(primitive.embodiment, 'newEmbodiment');
+
+      // expecting canonized embodiment
+      expect(primitive.embodiment, '{"embodiment":"newEmbodiment"}');
       expect(primitive.tag, 'newTag');
     });
 
@@ -52,7 +57,8 @@ void main() {
           TestPrimitive(embodiment: 'testEmbodiment', tag: 'testTag');
       var cborMap = primitive.egestFullCborMap();
 
-      expect(cborMap[CborString('Embodiment')], CborString('testEmbodiment'));
+      // expecting canonized embodiment
+      expect(cborMap[CborString('Embodiment')], CborString('{"embodiment":"testEmbodiment"}'));
       expect(cborMap[CborString('Tag')], CborString('testTag'));
     });
 
@@ -60,13 +66,13 @@ void main() {
       var primitive =
           TestPrimitive(embodiment: 'testEmbodiment', tag: 'testTag');
 
-      primitive.prepareForUpdates(PKey(0), NullFieldHooks());
-      primitive.embodiment = 'testEmbodiment update';
+      primitive.prepareForUpdates(PKey(0), NullFieldHooks(), NullPrimitiveLocator());
+      primitive.embodiment = 'testEmbodimentUpdate';
       var cborMap = primitive.egestPartialCborMap([fkeyEmbodiment]);
 
       expect(cborMap.length, 1);
       expect(cborMap[CborString('Embodiment')],
-          CborString('testEmbodiment update'));
+          CborString('{"embodiment":"testEmbodimentUpdate"}'));
     });
 
     test('Test ingestFullCborMap', () {
@@ -96,7 +102,7 @@ void main() {
     test('Test prettyPrint', () {
       var primitive =
           TestPrimitive(embodiment: 'testEmbodiment', tag: 'testTag');
-      primitive.prepareForUpdates(PKey(0, 2), NullFieldHooks());
+      primitive.prepareForUpdates(PKey(0, 2), NullFieldHooks(), NullPrimitiveLocator());
       var prettyString = primitive.prettyPrint();
 
       expect(prettyString.contains('testEmbodiment'), true);

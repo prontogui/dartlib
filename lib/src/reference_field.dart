@@ -4,13 +4,14 @@
 import 'field.dart';
 import 'package:cbor/cbor.dart';
 import 'field_base.dart';
+import 'references.dart';
 
-/// A field that holds an integer value.
-class IntegerField extends FieldBase implements Field {
-  /// Construct an IntegerField with a default value.
-  IntegerField() : _i = 0;
+/// A field that references a primitive.
+class ReferenceField extends FieldBase implements Field {
+  /// Construct a ReferenceField with a default value.
+  ReferenceField() : _i = 0;
 
-  IntegerField.from(int i) : _i = i;
+  ReferenceField.from(int i) : _i = i;
 
   /// Storage of this field's value.
   int _i;
@@ -18,6 +19,8 @@ class IntegerField extends FieldBase implements Field {
   /// The value of this field.
   int get value => _i;
   set value(int i) {
+    var refs = References();
+
     _i = i;
     onSet();
   }
