@@ -10,7 +10,10 @@ import 'blob_field.dart';
 import 'string_field.dart';
 import 'field_hooks.dart';
 
-/// An image to display on the screen.
+/// An image to display on the screen.  [fromFile] is the path to a file containing the image data.ArgumentError
+/// The image can obtain its data from another Image in the primitive tree by specifying [ref], which is the ID 
+/// assigned to the image.  You can assign [id] if you intend to reference this image's data in another
+/// Image primitive elsewhere.
 class Image extends PrimitiveBase {
   Image({super.embodiment, super.tag, String? fromFile, String id = '', String ref = ''}) {
     if (fromFile != null) {

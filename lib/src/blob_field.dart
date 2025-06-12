@@ -31,6 +31,8 @@ class BlobField extends FieldBase implements Field {
     onSet();
   }
 
+  /// Loads a blob from a file located at [filePath].  Thows an exception
+  /// if file doesn't exist or if there's a problem reading the file.
   void loadFromFile(String filePath) {
     final file = File(filePath);
     if (!file.existsSync()) {
