@@ -31,8 +31,7 @@ class Image extends PrimitiveBase {
   late StringField _ref;
 
   // Internal variables
-  late int _refNo;
-  late PKey? _refImagePkey;
+  PrimitiveRef? _targetRef;
   PrimitiveLocator? _locator;
 
   @override
@@ -49,16 +48,11 @@ class Image extends PrimitiveBase {
   void prepareForUpdates(PKey pkey, FieldHooks fieldHooks, PrimitiveLocator locator) {
     super.prepareForUpdates(pkey, fieldHooks, locator);
 
+    _locator = locator;
+
     // Any referencing going on?
     if (id.isNotEmpty) {
-      References().defineTarget(id, pkey);
-    }
-    if (ref.isNotEmpty) {
-      _refNo = References().reference(ref, (pkey) {
-        _refImagePkey = pkey;
-      });
-
-      _locator = locator;
+      _targetRef = References().defineTarget(id, pkey);
     }
   }
 
@@ -66,16 +60,11 @@ class Image extends PrimitiveBase {
   void unprepareForUpdates() {
     super.unprepareForUpdates();
 
-    // Any referencing going on?
-    if (id.isNotEmpty) {
-      References().undefineTarget(id);
+    var targetRef = _targetRef;
+    if (targetRef != null) {
+      References().undefineTarget(targetRef);
     }
-    if (ref.isNotEmpty) {
-      References().dereference(ref, _refNo);
-    }
-
-    _refNo = References.invalidRefNo;
-    _refImagePkey = null;
+    _targetRef = null;
     _locator = null;
   }
 
@@ -86,15 +75,21 @@ class Image extends PrimitiveBase {
 
   static final _emptyImage = Uint8List.fromList([]);
 
-  /// The image data
+  /// The image data.  If there is no image data available then an empty list is returned.
   Uint8List get image {
+    
     if (_image.value.isNotEmpty) {
       return _image.value;
     }
 
-    if (_refImagePkey != null) {
-      var p = _locator!.locatePrimitive(_refImagePkey!);
-      if (p != null && p is Image) {
+    var imageRef = ref;
+
+    if (imageRef.isNotEmpty) {
+      var p = References().dereference(imageRef, _locator!);
+
+      // Reference primitive must be an Image and must not reference another Image
+      // (this avoids cyclic references)
+      if (p != null && p is Image && p.ref.isEmpty) {
         return p.image;
       }
     }
