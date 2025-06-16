@@ -108,6 +108,11 @@ class References {
     return null;
   }
 
+  @visibleForTesting
+  void resetState() {
+      _refs.clear();
+      _lastRefNo = References._initialRefNo;
+  }
 }
 
 /*

@@ -4,111 +4,120 @@
 import 'package:test/test.dart';
 import 'package:dartlib/src/pkey.dart';
 import 'package:dartlib/src/references.dart';
+import 'package:dartlib/src/primitive_locator.dart';
+import 'package:dartlib/src/nothing.dart';
+import 'package:dartlib/src/primitive.dart';
+
+class MockPrimitiveLocator implements PrimitiveLocator {
+ MockPrimitiveLocator() : primitive = Nothing();
+
+  Primitive primitive;
+  late PKey pkey;
+
+  @override
+  Primitive? locatePrimitive(PKey pkey) {
+    this.pkey = pkey;
+    return primitive;
+  }
+}
 
 void main() {
 
 
-/*
-  
-  group('References', () {
-    late References refs;
+group('References', () {
+  late References refs;
 
-    setUp(() {
+  setUp(() {
       refs = References();
       // Clean up state for singleton between tests
       // Remove all defined targets and late refs
       refs.resetState();
-    });
-
-    test('Singleton returns the same instance', () {
-      final refs2 = References();
-      expect(refs, same(refs2));
-    });
-
-    test('defineTarget maps refID to PKey and calls late refs', () {
-      final pkey = PKey();
-      bool callbackCalled = false;
-      final refNo = refs.reference('id1', (pk) {
-        callbackCalled = true;
-        expect(pk, same(pkey));
-      });
-      expect(refNo, isNonNegative);
-
-      refs.defineTarget('id1', pkey);
-
-      expect(callbackCalled, isTrue);
-      expect(refs.refs['id1'], same(pkey));
-      expect(refs.lateRefs.containsKey('id1'), isFalse);
-    });
-
-    test('defineTarget with no late refs just maps refID', () {
-      final pkey = PKey();
-      refs.defineTarget('id2', pkey);
-      expect(refs.refs['id2'], same(pkey));
-    });
-
-    test('undefineTarget removes mapping', () {
-      final pkey = PKey();
-      refs.defineTarget('id3', pkey);
-      expect(refs.refs.containsKey('id3'), isTrue);
-      refs.undefineTarget('id3');
-      expect(refs.refs.containsKey('id3'), isFalse);
-    });
-
-    test('undefineTarget asserts if late refs exist', () {
-      refs.reference('id4', (_) {});
-      expect(() => refs.undefineTarget('id4'), throwsA(isA<AssertionError>()));
-    });
-
-    test('reference returns invalidRefNo if already defined', () {
-      final pkey = PKey();
-      refs.defineTarget('id5', pkey);
-      bool called = false;
-      final refNo = refs.reference('id5', (pk) {
-        called = true;
-        expect(pk, same(pkey));
-      });
-      expect(refNo, References.invalidRefNo);
-      expect(called, isTrue);
-    });
-
-    test('reference adds late reference and returns refNo', () {
-      bool called = false;
-      final refNo = refs.reference('id6', (_) {
-        called = true;
-      });
-      expect(refNo, isNonNegative);
-      expect(refs.lateRefs['id6']!.containsKey(refNo), isTrue);
-      expect(called, isFalse);
-    });
-
-    test('dereference removes late reference', () {
-      bool called = false;
-      final refNo = refs.reference('id7', (_) {
-        called = true;
-      });
-      expect(refs.lateRefs['id7']!.containsKey(refNo), isTrue);
-      refs.dereference('id7', refNo);
-      expect(refs.lateRefs['id7']!.containsKey(refNo), isFalse);
-      expect(called, isFalse);
-    });
-
-    test('dereference with invalidRefNo does nothing', () {
-      expect(() => refs.dereference('id8', References.invalidRefNo), returnsNormally);
-    });
-
-    test('reference rolls over and throws when max reached', () {
-      refs.lastRefNo = refs.maxRefNo;
-      expect(() => refs.reference('id9', (_) {}), throwsA(isA<StateError>()));
-    });
-
-    test('_checkToResetLastRef resets _lastRefNo when no late refs', () {
-      refs.lastRefNo = 42;
-      refs.lateRefs.clear();
-      refs.checkToResetLastRef();
-      expect(refs.lastRefNo, References.invalidRefNo);
-    });
   });
-*/
 
+  test('Singleton returns the same instance', () {
+    final refs2 = References();
+    expect(refs, same(refs2));
+  });
+
+  test('defineTarget maps refID to PKey', () {
+    final pkey = PKey(1, 2, 3);
+    refs.defineTarget('id1', pkey);
+    var locator = MockPrimitiveLocator();
+    var p = refs.dereference('id1', locator);
+    expect(p, same(locator.primitive));
+    expect(locator.pkey, equals(PKey(1, 2, 3)));
+  });
+
+  test('defineTarget followed by undefine maps refID to null', () {
+    final pkey = PKey(1, 2, 3);
+    var refNo = refs.defineTarget('id1', pkey);
+    refs.undefineTarget(refNo);
+    var locator = MockPrimitiveLocator();
+    var p = refs.dereference('id1', locator);
+    expect(p, isNull);
+  });
+
+  test('define several and undefine some', () {
+    var refNo1 = refs.defineTarget('id1', PKey(1, 2, 3));
+    refs.defineTarget('id2', PKey(2, 3, 4));
+    refs.defineTarget('id3', PKey(2, 3, 5));
+    refs.defineTarget('id4', PKey(1, 3, 1));
+    refs.defineTarget('id5', PKey(1, 3, 2));
+    var refNo6 = refs.defineTarget('id6', PKey(1, 5, 2));
+    refs.undefineTarget(refNo1);
+    refs.undefineTarget(refNo6);
+
+    var locator = MockPrimitiveLocator();
+
+    var p1 = refs.dereference('id1', locator);
+    expect(p1, isNull);
+
+    var p2 = refs.dereference('id2', locator);
+    expect(p2, same(locator.primitive));
+    expect(locator.pkey, equals(PKey(2, 3, 4)));
+
+    var p3 = refs.dereference('id3', locator);
+    expect(p3, same(locator.primitive));
+    expect(locator.pkey, equals(PKey(2, 3, 5)));
+
+    var p4 = refs.dereference('id4', locator);
+    expect(p4, same(locator.primitive));
+    expect(locator.pkey, equals(PKey(1, 3, 1)));
+
+    var p5 = refs.dereference('id5', locator);
+    expect(p5, same(locator.primitive));
+    expect(locator.pkey, equals(PKey(1, 3, 2)));
+
+    var p6 = refs.dereference('id6', locator);
+    expect(p6, isNull);
+  });
+
+  test('define multiple targets same refID', () {
+    refs.defineTarget('id1', PKey(1, 2, 3));
+    refs.defineTarget('id1', PKey(2, 3, 4));
+    refs.defineTarget('id1', PKey(2, 3, 5));
+  
+    var locator = MockPrimitiveLocator();
+
+    var p = refs.dereference('id1', locator);
+    expect(p, same(locator.primitive));
+    expect(locator.pkey, equals(PKey(2, 3, 5)));
+  });
+
+  test('define multiple targets with same refID then reduce to just one', () {
+    refs.defineTarget('id1', PKey(1, 2, 3));
+    var refNo2 = refs.defineTarget('id1', PKey(2, 3, 4));
+    var refNo3 = refs.defineTarget('id1', PKey(2, 3, 5));
+  
+    refs.undefineTarget(refNo2);
+    refs.undefineTarget(refNo3);
+
+    var locator = MockPrimitiveLocator();
+
+    var p = refs.dereference('id1', locator);
+    expect(p, same(locator.primitive));
+    expect(locator.pkey, equals(PKey(1, 2, 3)));
+  });
+
+});
 }
