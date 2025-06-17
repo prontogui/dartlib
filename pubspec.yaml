@@ -1,6 +1,6 @@
 name: dartlib
 description: A Dart library for 1) implementing the server-side communication and ProntoGUI model and for 2) connecting Dart programs to the ProntoGUI App.
-version: 0.0.60
+version: 1.0.0
 publish_to: none    # Added this temporarily to deal with issue in dependency for statemachine, from a local path.
 # repository: https://github.com/my_org/my_repo
 
